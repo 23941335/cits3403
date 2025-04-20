@@ -12,9 +12,10 @@ https://github.com/23941335/cits3403/blob/main/planning.md
     - [Jinja](https://github.com/pallets/jinja) (bundled with Flask)
 - [Flask-Migrate](https://github.com/miguelgrinberg/flask-migrate)
 - [Flask-SQLAlchemy](https://github.com/pallets-eco/flask-sqlalchemy/)
-
+- [Flask-WTF](https://github.com/pallets-eco/flask-wtf/) <!-- cf. lecture 9, slide 31 -->
 Any other requirements listed in the requirements.txt are dependencies of these packages.
-<!-- ```pip install flask flask-sqlalchemy flask-migrate``` -->
+<!-- ```pip install flask flask-sqlalchemy flask-migrate flask-wtf``` -->
+
 #### Create Virtual Environment and Install Dependencies
 
 1. `python -m venv .venv`
