@@ -1,5 +1,9 @@
 # CITS3403 Group Project
 
+## Description
+
+The aim of this project is to create a website which is used to manage tournaments for the game _Marvel Rivals_. Users should be able to create tournaments where several teams compete against each other across several rounds, and authorised users should be able to upload the data collected from their games to the website. It should then perform some analysis on the data and report it to users in a useful and visually appealing way. Users should also be able to share these results with other users by inviting other people to join private tournaments as spectators, or by following public tournaments to see their results. 
+
 ## Planning and Meeting Notes
 https://github.com/23941335/cits3403/blob/main/planning.md
 
