@@ -88,3 +88,33 @@ _The database structure will be quite normalised (so there will be more tables t
   - Participant (a person who is playing in the tournament)
   - Guest (someone invited to view a private tournament, but not playing in it)
 - Account creation time
+
+
+# Site Structure
+(Notes based on issue #2)
+
+The following pages fulfill the introductory view requirement, "describing the context and purpose of the application, and allowing the user to create an account or log in.".
+
+- a homepage
+- login page
+- sign up page
+
+Then for data upload:
+- a page to set up tournaments and then the ability to add data to them. Probably this is one page.
+
+For visualisation:
+- player profile data page (e.g. something like /view/player?id=1234)
+- tournament data page (e.g. /view/tournamnet?id=54)
+- team data page (e.g. /view/team/teamnamehere or /view/team?id=11)
+whether we can have all of these depends on if we get time to implement all of the different data views, but I think so. There might also be more ways to view the data.
+
+For sharing:
+
+Probably wouldnt be a totally separate page, more of a menu inside the tournamnet set up to invite other users. Would allow searching for users and adding them.
+Another option would maybe allow for users to search for tournaments and follow them or request to join (as a guest/viewer) if private.
+
+Other:
+
+- user account settings page
+- tournament feed (maybe?)
+- possibly some admin only pages (if time permits)
