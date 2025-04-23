@@ -1,0 +1,42 @@
+<!-- Use this file for structure shared across the whole site -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <!-- Meta Tags -->
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- Bootstrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+      crossorigin="anonymous"></script>
+   <!-- Stylesheets -->
+   <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+   {% block style %}<style></style>{% endblock %}
+   <!-- Other -->
+   <title>{% block title %}Default Title{% endblock %}</title>
+   <link rel="shortcut icon" href="{{url_for('static', filename='icons/placeholder.ico')}}" type="image/x-icon">
+</head>
+
+<body class="d-flex flex-column">
+   <!-- Feel free to change this structure if you have something better.  -->
+   <header class="bg-primary text-white p-3">
+      <h1>{% block header_text %}Header{% endblock %}</h1>
+  </header>
+
+   {% block nav %} 
+      {% include 'partials/_nav.html'%}
+   {% endblock %}
+
+   <main class="flex-fill mb-4 mt-4 p-3">
+      {% block main %} Main {% endblock %}
+   </main>
+
+   <footer class="bg-dark text-white p-3">
+      {% block footer %} Footer {% endblock %}
+   </footer>
+</body>
+
+</html>
