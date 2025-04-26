@@ -37,6 +37,11 @@ def tournament_page():
     return render_template("pages/tournament.html")
 
 
+@app.route("/tournament/team")
+def team_results_page():
+    return render_template("pages/stats_team.html")
+
+
 # 404 not found page
 @app.errorhandler(404)
 def not_found(err):
