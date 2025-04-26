@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template
+from flask import render_template, redirect
 
 # More pages will be added as necessary, but this will get us started.
 
@@ -10,14 +10,26 @@ def home_page():
     return render_template("pages/home.html")
 
 
-@app.route("/account/login")
+@app.route("/account/login", methods=["GET"])
 def login_page():
     return render_template("pages/login.html")
 
 
-@app.route("/account/signup")
+@app.route("/account/signup", methods=["GET"])
 def signup_page():
     return render_template("pages/signup.html")
+
+
+@app.route("/account/login", methods=["POST"])
+def api_login():
+    # temporary placeholder - go to index page
+    return redirect("/")
+
+
+@app.route("/account/signup", methods=["POST"])
+def api_create_account():
+    # temporary placeholder - go to index page
+    return redirect("/")
 
 
 @app.route("/tournament")
