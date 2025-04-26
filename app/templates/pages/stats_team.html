@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %} Team Performance {% endblock %}
+{% block header_text %} Team Performance During Tournament {% endblock %}
+
+{% block main %}
+<div class="container my-4">
+    <div class="text-center">
+        <h3>Team Name Performance</h3>
+        <p>During <a href="/tournament?id=0">Tournament Name</a></p>
+    </div>
+    <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
+    <div class="mb-4">
+        <div class="bg-light border rounded">
+            <img src="{{ url_for('static', filename='images/placeholder-graph.png') }}" class="img-fluid">
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% set stats = [
+            {'name': 'Wins',                 'value': 4},
+            {'name': 'Losses',               'value': 2},
+            {'name': 'Draws',                'value': 0},
+            {'name': 'Total Kills',          'value': 245},
+            {'name': 'Total Deaths',         'value': 198},
+            {'name': 'Average K/D Ratio',    'value': 1.24},
+            {'name': 'Total Assists',        'value': 112},
+            {'name': 'Total Medals',         'value': 34},
+            {'name': 'Total Final Hits',     'value': 67},
+            {'name': 'Total Damage Dealt',   'value': '58,935'},
+            {'name': 'Total Damage Blocked', 'value': '46,278'},
+            {'name': 'Total Healing',        'value': '27,763'},
+            {'name': 'Average Accuracy',     'value': '62.4%'},
+            {'name': 'Average Kills',        'value': '42'},
+            {'name': 'Average Damage',       'value': '9,822'},
+            {'name': 'Average Healing',      'value': '4,627'}
+        ] %}
+        {% for stat in stats %}
+        <div class="col">
+            <div class="card h-100 text-center">
+            <div class="card-body">
+                <h5 class="card-title" >{{ stat.name }}</h5>
+                <p class="card-text" style="font-size: 2rem;">{{ stat.value }}</p>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
