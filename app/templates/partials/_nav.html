@@ -1,13 +1,38 @@
-<!-- This is here more just to provide an example of the concept of a 'partial' -->
-<!-- Using some simple Bootstrap layouts. Feel free to replace later. -->
 <nav>
   <ul class="nav justify-content-center">
-    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-    <li class="nav-item"><a class="nav-link" href="/account/login">Login</a></li>
-    <li class="nav-item"><a class="nav-link" href="/account/signup">Sign Up</a></li>
-    <li class="nav-item"><a class="nav-link" href="/tournament">Tournament</a></li>
-    <li class="nav-item"><a class="nav-link" href="/tournament/game">Game Results</a></li>
-    <li class="nav-item"><a class="nav-link" href="/tournament/team">Team Results</a></li>
-    <li class="nav-item"><a class="nav-link" href="/thisdoesnotexist">404</a></li>
+    <li class="nav-item">
+      <a class="nav-link" href="/">Home</a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="/tournament">Tournament</a>
+    </li>
+
+    <!-- Dropdown Result -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Result
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="/tournament/game">Game Results</a></li>
+        <li><a class="dropdown-item" href="/tournament/team">Team Results</a></li>
+      </ul>
+    </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/account">Account</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/account/logout">Logout</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/account/signup">Sign Up</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/account/login">Log In</a>
+      </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/thisdoesnotexist">404</a>
+    </li>
   </ul>
 </nav>
