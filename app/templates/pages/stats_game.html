@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %} Game Results {% endblock %}
+{% block header_text %} Game Results {% endblock %}
+
+{% block main %}
+
+<style>
+    .blue-header td { background-color: #478fdc; font-weight: bold; }
+    .orange-header td { background-color: #e39348; font-weight: bold; }
+    .blue-row td{ background-color: #64adfb; }
+    .orange-row td { background-color: #f8b16e; }
+</style>
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <h3 class="pb-2">Team Name A vs. Team Name B </h3>
+    <div class="pb-4"><em><a href="/tournament?id=0">Tournament Name</em></a>, Round 7</div>
+    <div class="summary-panel border border-dark p-3 mb-4 text-white rounded col-8" style="background-color: #333;">
+        <div class="d-flex justify-content-around text-center">
+            <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
+                <p class="mb-1" style="font-size: 0.9rem;">Winning Team</p>
+                <p id="winning-team" style="font-size: 1.5rem; font-weight: bold;">Team Name B</p>
+            </div>
+            <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
+                <p class="mb-1" style="font-size: 0.9rem;">MVP</p>
+                <p id="mvp" style="font-size: 1.5rem; font-weight: bold;">Player 12</p>
+            </div>
+            <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
+                <p class="mb-1" style="font-size: 0.9rem;">SVP</p>
+                <p id="svp" style="font-size: 1.5rem; font-weight: bold;">Player 10</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive col-8">
+        <table class="table table-bordered text-center border-dark">
+            <thead class="table-dark">
+            <tr>
+                <th>Role</th>
+                <th>Hero</th>
+                <th>Player Name</th>
+                <th>Kills</th>
+                <th>Deaths</th>
+                <th>Assists</th>
+                <th>Medals</th>
+                <th>Final Hits</th>
+                <th>Damage</th>
+                <th>Damage Blocked</th>
+                <th>Healing</th>
+                <th>Accuracy</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="blue-header">
+                <td colspan="12"><a href="/tournament/team?id=0" class="text-dark">Team Name A</a></td>
+            </tr>
+            {% for i in range(1, 7) %}
+            <tr class="blue-row">
+                <!-- dummy data -->
+                <td>{{ ['Vanguard', 'Duelist', 'Strategist'] | random }}</td>
+                <td>Hero {{ i }}</td>
+                <td><a href="/tournament/player?id={{i}}" class="text-dark">Player {{ i }}</a></td>
+                <td>{{ i * 2 }}</td>
+                <td>{{ i }}</td>
+                <td>{{ i + 1 }}</td>
+                <td class="medals"></td> <!-- Empty cell for medals -->
+                <td>{{ i * 3 }}</td>
+                <td>{{ i * 100 }}</td>
+                <td>{{ i * 50 }}</td>
+                <td>{{ i * 20 }}</td>
+                <td>{{ i * 5 }}%</td>
+            </tr>
+            {% endfor %}
+            <tr class="orange-header">
+                <td colspan="12"><a href="/tournament/team?id=0" class="text-dark">Team Name B</a></td>
+            </tr>
+            {% for i in range(7, 13) %}
+            <tr class="orange-row">
+                <!-- dummy data -->
+                <td>{{ ['Vanguard', 'Duelist', 'Strategist'] | random }}</td>
+                <td>Hero {{ i }}</td>
+                <td><a href="/tournament/player?id={{i}}" class="text-dark">Player {{ i }}</a></td>
+                <td>{{ i * 2 }}</td>
+                <td>{{ i }}</td>
+                <td>{{ i + 1 }}</td>
+                <td class="medals"></td> <!-- Empty cell for medals -->
+                <td>{{ i * 3 }}</td>
+                <td>{{ i * 100 }}</td>
+                <td>{{ i * 50 }}</td>
+                <td>{{ i * 20 }}</td>
+                <td>{{ i * 5 }}%</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function assignMedal(player_num, row) {
+        let medals = [];
+        switch (player_num) {
+            case 1:
+                medals = ['🥈'];
+                break;
+            case 7:
+                medals = ['🛡️'];
+                break;
+            case 9:
+                medals = ['4️⃣'];
+                break;
+            case 10:
+                medals = ['⚔️','🔥','3️⃣'];
+                break;
+            case 12:
+                medals = ['🥇','➕','✊'];
+                break;
+            default:
+                break;
+        }
+        row.querySelector('.medals').textContent = medals.join(' ');
+    };
+
+    const rows = document.querySelectorAll('tbody tr');
+    let player_num = 0
+    rows.forEach((row, index) => {
+        if (row.classList.contains('blue-header') || row.classList.contains('orange-header')) {
+            return;
+        }
+        player_num += 1
+        // Adjust player_num to account for non-player rows
+        assignMedal(player_num, row);
+    });
+</script>
+
+{% endblock %}

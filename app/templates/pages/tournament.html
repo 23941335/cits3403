@@ -28,6 +28,13 @@
       max-width: 60rem;
       margin: auto;
     }
+    .intro-header {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+    }
     .analysis {
       max-width: 60rem;
       margin: auto;
@@ -97,20 +104,23 @@
 <body>
   <!-- Header -->
   <header>
-    <div class="logo"><strong>Tournament Hub</strong></div>
+    <div class="logo"><strong>Marvel Rivals Tournament Manager</strong></div>
     <nav>
-      <a href="#">Home</a>
+      <a href="/">Home</a>
       <a href="#">Upload Match</a>
       <a href="#">View Tournaments</a>
       <a href="#">Stats</a>
       <a href="#">About</a>
-      <a href="#">Sign Up/ Log In</a>
+      <a href="/account/login">Log In/Sign Up</a>
     </nav>
   </header>
 
   <!-- Tournament Intro -->
   <div class="intro">
-    <h1>[Name of the tournament]</h1>
+    <div class="intro-header">
+      <h1>[Name of the tournament]</h1>
+      <button type="button">Share</button>
+    </div>
     <p>[Description] Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
         Aliquam elementum massa tellus, a hendrerit mauris imperdiet a. Curabitur 
         aliquet nibh non massa convallis, quis mattis lorem vehicula. Phasellus 
@@ -149,8 +159,8 @@
   <!-- Tournament Bracket -->
   <div class="bracket">
     <h2>Bracket</h2>
-    <div class="bracket-graphic">
-      <p>[Bracket Graphic]</p>
+    <div class="bracket-graphic" style="display: flex; justify-content: center; align-items: center;">
+      <img src="/static/images/bracket-placeholder.svg" alt="Bracket Placeholder" style="width: 80%; height: auto;" />
     </div>
   </div>
 
