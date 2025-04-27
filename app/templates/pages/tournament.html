@@ -28,6 +28,13 @@
       max-width: 60rem;
       margin: auto;
     }
+    .intro-header {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+    }
     .analysis {
       max-width: 60rem;
       margin: auto;
@@ -110,7 +117,10 @@
 
   <!-- Tournament Intro -->
   <div class="intro">
-    <h1>[Name of the tournament]</h1>
+    <div class="intro-header">
+      <h1>[Name of the tournament]</h1>
+      <button type="button">Share</button>
+    </div>
     <p>[Description] Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
         Aliquam elementum massa tellus, a hendrerit mauris imperdiet a. Curabitur 
         aliquet nibh non massa convallis, quis mattis lorem vehicula. Phasellus 
