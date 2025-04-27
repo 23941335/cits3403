@@ -31,15 +31,33 @@
       font-size: 0.9rem;
       margin-top: 2rem;
     }
-    .form {
+    .form, .input {
       display: flex;
       flex-flow: column nowrap;
       justify-content: flex-start;
-      align-items: stretch;
       max-width: 60rem;
+    }
+    .form {
+      align-items: stretch;
       margin: auto;
     }
     .input {
+      align-items: flex-start;
+      flex: 1 0;
+      background-color: #1e1e1e;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 0.5rem
+    }
+    .form-label {
+      margin-bottom: 0.5rem;
+    }
+    .submit {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      max-width: 60rem;
+      justify-content: flex-start;
       flex: 1 0;
       background-color: #1e1e1e;
       padding: 1rem;
@@ -67,12 +85,12 @@
   <form method="POST" action="#" class="form">
     <div class="input">
       <label for="name" class="form-label">Tournament Name</label>
-      <input type="text" class="form-control" id="name" name="name" required maxlength="50">
+      <input type="text" class="form-control" id="name" name="name" required maxlength="50" style="min-width: 20rem;">
     </div>
 
     <div class="input">
       <label for="description" class="form-label">Description</label>
-      <textarea class="form-control" id="description" name="description" required maxlength="1000"></textarea>
+      <textarea class="form-control" id="description" name="description" required maxlength="1000" style="min-width: 40rem;"></textarea>
     </div>
 
     <div class="input">
@@ -100,12 +118,12 @@
     </div>
 
     <div class="input">
-      <label for="myfile">Results File (Optional)</label>
+      <label for="myfile" class="form-label">Results File (Optional)</label>
       <input type="file" id="reults_file" name="results_file">
     </div>
 
-    <div class="input">
-      <button type="submit" class="btn btn-primary">
+    <div class="submit">
+      <button type="submit" class="btn btn-primary" style="margin-right: 0.5rem;">
         Confirm
       </button>
       <button type="submit" class="btn btn-primary">
