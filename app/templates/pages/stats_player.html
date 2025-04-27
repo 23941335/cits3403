@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %} Player Performance {% endblock %}
+{% block header_text %} Player Performance During Tournament {% endblock %}
+
+{% block main %}
+<div class="container my-4">
+  <div class="row">
+    <!-- player profile -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="mx-auto pt-4 pb-3">
+          <img src="{{url_for('static', filename='icons/placeholder.ico')}}" class="rounded-circle"
+            alt="player profile photo">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Player Name</h5>
+          <p class="card-text">@playergamertag</p>
+          <p class="card-text">Tournament Rank: <strong>7th</strong></p>
+          <p class="card-text">Tournament K/D: <strong>2.4</strong></p>
+          <p class="card-text">Playstyle: <strong>Strategist</strong></p>
+          <p class="card-text">Additional information about the player.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- list of games/rounds played in this tournament -->
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Games Played In <a href="/tournament">This Tournament</a></h5>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Game</th>
+                <th scope="col">Team Rank</th>
+                <th scope="col">Kills</th>
+                <th scope="col">Deaths</th>
+                <th scope="col">Assists</th>
+                <th scope="col">Medals</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="/tournament/game?id=1">Game 1</a></td>
+                <td>4th</td>
+                <td>20</td>
+                <td>5</td>
+                <td>10</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td><a href="/tournament/game?id=2">Game 2</a></td>
+                <td>2nd</td>
+                <td>25</td>
+                <td>8</td>
+                <td>12</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td><a href="/tournament/game?id=3">Game 3</a></td>
+                <td>1st (MVP)</td>
+                <td>30</td>
+                <td>6</td>
+                <td>15</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td>-</td>
+                <td><strong>75</strong></td>
+                <td><strong>19</strong></td>
+                <td><strong>37</strong></td>
+                <td><strong>4</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- stats from this tournament -->
+  <div class="row mt-4">
+    <div class="col-md-8">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Average Damage Per Game</h5>
+              <p class="card-text">1500</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Average Healing</h5>
+              <p class="card-text">500</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Average Damage Blocked</h5>
+              <p class="card-text">300</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Top Hero</h5>
+              <p class="card-text">Iron Man</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Win Rate</h5>
+              <p class="card-text">65%</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Participation</h5>
+              <p class="card-text">3/4 games</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Average Accuracy</h5>
+              <p class="card-text">48%</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Most Kills in a Game</h5>
+              <p class="card-text">30</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 d-flex align-items-center">
+      <div class="card w-100 h-100">
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <img src="{{url_for('static', filename='images/spider-placeholder.png')}}" alt="Spider Chart Placeholder"
+            class="img-fluid" style="max-width: 100%; height: auto; aspect-ratio: 1 / 1;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
