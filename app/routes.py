@@ -37,6 +37,11 @@ def tournament_page():
     return render_template("pages/tournament.html")
 
 
+@app.route("/create-tournament")
+def new_tournament_page():
+    return render_template("pages/create-tournament.html")
+
+
 @app.route("/tournament/team")
 def team_results_page():
     return render_template("pages/stats_team.html")
