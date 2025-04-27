@@ -3,6 +3,8 @@
 <html lang="en">
 
 <head>
+   <!-- Web favicon -->
+   <link rel="shortcut icon" href="{{url_for('static', filename='icons/favicon.ico')}}" type="image/x-icon">
    <!-- Meta Tags -->
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,8 +24,8 @@
 
 <body class="d-flex flex-column">
    <!-- Feel free to change this structure if you have something better.  -->
-   <header class="bg-primary text-white p-3">
-      <h1>{% block header_text %}Header{% endblock %}</h1>
+   <header class="bg-dark text-white p-4">
+      <h1>{% block header_text %}Marvel Rivals Tournament Manager{% endblock %}</h1>
    </header>
 
    {% block nav %}
