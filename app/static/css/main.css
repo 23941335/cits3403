@@ -2,74 +2,114 @@ html,
 body {
   height: 100%;
 }
+
+#header-logo {
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+#header-title {
+  font-size: 1.5rem;
+  color: rgb(0, 0, 0);
+  margin-left: 1rem;
+  font-weight: bold;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.header-link {
+  text-decoration: none;
+}
+
+#header-logo:hover {
+  transform: scale(1.05);
+}
+
 /* Nav bar style */
 nav {
-    background-color: black; 
+  background-color: #2b2b2b;
+}
+
+nav:hover {
+  background-color: #595959;
+  transition: background 0.5s ease;
 }
 
 .nav-link {
-    color: rgb(255, 255, 255); 
-    font-weight: bold; 
-    letter-spacing: 1px; 
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .nav-link:hover {
   color: red;
-  text-decoration: blanchedalmond; 
+
 }
+
 /* Homepage css
    Homepage css */
-.hero {
-    padding: 4rem 2rem;
-    text-align: center;
-    background: linear-gradient(135deg, #1f1f1f, #2b2b2b);
-  }
-  
-  .hero h1 {
-    color: aliceblue;
-    font-size: 2.5rem;
-  }
-  
-  .hero p {
-    color: aliceblue;
-    font-size: 1.2rem;
-    margin: 1rem 0;
-  }
-  
-  .hero button {
-    padding: 0.7rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    background-color: #7a1d00;
-    color: white;
-    cursor: pointer;
-  }
-  .hero button:hover{
-    background-color: #ff0000;
-    transition: background-color 0.3s ease;
-    padding: 0.7rem 1.5rem;
-    font-size: 1rem;
-    }
-  
-  .section {
-    padding: 3rem 2rem;
-    max-width: 1000px;
-    margin: auto;
-  }
-  
-  .features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-around;
-  }
-  
-  .feature-card {
-    background-color: #1e1e1e;
-    color: rgb(255, 255, 255);
-    padding: 1rem;
-    border-radius: 8px;
-    flex: 1 1 200px;
-    text-align: center;
-  }
-  
+.mainFlag {
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #2b2b2b;
+  transition: background 0.5s ease;
+}
+
+.mainFlag:hover {
+  background-color: #595959;
+}
+
+.mainFlag h1 {
+  color: aliceblue;
+  font-size: 2.5rem;
+}
+
+.mainFlag p {
+  color: aliceblue;
+  font-size: 1.2rem;
+  margin: 1rem 0;
+}
+
+.mainFlag button {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #7a1d00;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  color: white;
+  cursor: pointer;
+}
+
+.mainFlag button:hover {
+  transform: scale(1.05);
+  background-color: #ff0000;
+  font-weight: bolder;
+}
+
+.section {
+  padding: 3rem 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-around;
+}
+
+.feature-card {
+  background-color: #2b2b2b;
+  transition: background 0.5s ease, transform 0.5s ease;
+  color: rgb(255, 255, 255);
+  padding: 1rem;
+  border-radius: 8px;
+  flex: 1 1 200px;
+  text-align: center;
+
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+  background-color: #ff0000;
+}

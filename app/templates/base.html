@@ -24,10 +24,12 @@
 
 <body class="d-flex flex-column">
    <!-- Feel free to change this structure if you have something better.  -->
-   <header class="bg-dark text-white p-4">
-      <h1>{% block header_text %}Marvel Rivals Tournament Manager{% endblock %}</h1>
+   <header id="page-header" class="py-1">
+      <a href="/" class="header-link d-flex align-items-center justify-content-center">
+        <img src="{{ url_for('static', filename='images/header_logo.png') }}" alt="Home" id="header-logo">
+        <span id="header-title">Marvel Rivals Tournament Manager</span>
+      </a>
    </header>
-
    {% block nav %}
    {% include 'partials/_nav.html'%}
    {% endblock %}
@@ -35,10 +37,7 @@
    <main class="flex-fill mb-4 mt-4 p-3">
       {% block main %} Main {% endblock %}
    </main>
-
-   <footer class="bg-dark text-white p-3">
-      {% block footer %} Footer {% endblock %}
-   </footer>
+   {% include 'partials/_footer.html' %}
 </body>
 
 </html>
