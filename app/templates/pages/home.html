@@ -1,3 +1,87 @@
 {% extends "base.html" %}
+
 {% block title %}Home Page{% endblock %}
-{% block header_text %} Home Page {% endblock %}
+
+{% block header_text %}Home Page{% endblock %}
+
+{% block style %}
+<style>
+  .hero {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, #1f1f1f, #2b2b2b);
+  }
+  .hero h1 {
+    color: aliceblue;
+    font-size: 2.5rem;
+  }
+  .hero p {
+    color: aliceblue;
+    font-size: 1.2rem;
+    margin: 1rem 0;
+  }
+  .hero button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    background-color: #ff3c00;
+    color: white;
+    cursor: pointer;
+  }
+  .section {
+    padding: 3rem 2rem;
+    max-width: 1000px;
+    margin: auto;
+  }
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-around;
+  }
+  .feature-card {
+    background-color: #1e1e1e;
+    color: rgb(255, 255, 255);
+    padding: 1rem;
+    border-radius: 8px;
+    flex: 1 1 200px;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<!-- Hero Section -->
+<section class="hero">
+  <h1>Capture your matches and epic moments.</h1>
+  <p>Upload your results, analyze team performance, and uncover the MVPs.</p>
+  <button>UPLOAD</button>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+  <h2 class="text-center mb-4">Core Features</h2>
+  <div class="features">
+    <div class="feature-card">
+      <h3>Upload your results</h3>
+      <p>Log every detail of your matches and build your legacy.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Team and Player Management</h3>
+      <p>View player performance and match data by team.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Match History</h3>
+      <p>Browse past games and revisit your best moments anytime.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Rank</h3>
+      <p>Discover the MVPs and witness your team’s backbone.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center mt-5">
+  CITS3403 Group Project 2025
+</footer>
+{% endblock %}
