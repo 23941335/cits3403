@@ -1,89 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Tournament</title>
+{% extends "base.html" %}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #f0f0f0;
-    }
-    header {
-      background-color: #222;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    nav a {
-      margin: 0 1rem;
-      color: #f0f0f0;
-      text-decoration: none;
-    }
-    footer {
-      background-color: #1a1a1a;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      margin-top: 2rem;
-    }
-    .title h1, .title p {
-      text-align: center;
-    }
-    .form, .input {
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: flex-start;
-      max-width: 60rem;
-    }
-    .form {
-      align-items: stretch;
-      margin: auto;
-    }
-    .input {
-      align-items: flex-start;
-      flex: 1 0;
-      background-color: #1e1e1e;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 0.5rem
-    }
-    .form-label {
-      margin-bottom: 0.5rem;
-    }
-    .submit {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: flex-start;
-      max-width: 60rem;
-      justify-content: flex-start;
-      flex: 1 0;
-      background-color: #1e1e1e;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 0.5rem
-    }
-  </style>
-</head>
+{% block title %}Tournament Manager{% endblock %}
+
+{% block header_text %}Marvel Rivals Tournament Manager{% endblock %}
+
+{% block style %}
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: #ffffff;
+  }
+
+  .title h1, .title p {
+    text-align: center;
+  }
+  .form, .input {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    max-width: 60rem;
+  }
+  .form {
+    align-items: stretch;
+    margin: auto;
+  }
+  .input {
+    align-items: flex-start;
+    flex: 1 0;
+    background-color: #1e1e1e;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem
+  }
+  .form-label {
+    margin-bottom: 0.5rem;
+  }
+  .submit {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    max-width: 60rem;
+    justify-content: flex-start;
+    flex: 1 0;
+    background-color: #1e1e1e;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem
+  }
+</style>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block main %}
 
 <body>
-  <!-- Header -->
-  <header>
-    <div class="logo"><strong>Marvel Rivals Tournament Manager</strong></div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="#">Upload Match</a>
-      <a href="#">View Tournaments</a>
-      <a href="#">Stats</a>
-      <a href="#">About</a>
-      <a href="/account/login">Log In/Sign Up</a>
-    </nav>
-  </header>
-
   <!-- Page Description -->
    <div class="title">
     <h1>Tournament Creator</h1>
@@ -140,11 +115,5 @@
       </button>
     </div>
   </form>
-
-  <!-- Footer -->
-  <footer>
-   CITS3403 Group Project 2025<br />
-  </footer>
-
 </body>
-</html>
+{%endblock %}
