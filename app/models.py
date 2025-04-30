@@ -87,7 +87,7 @@ class GameMode(db.Model):
 class Map(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     map_name: Mapped[str] = mapped_column(sa.Text, unique=True)
-    map_image: Mapped[str] = mapped_column(sa.Text)
+    map_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
 class Game(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,7 +108,7 @@ class Game(db.Model):
 class Medal(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     medal_name: Mapped[str] = mapped_column(sa.Text, unique=True)
-    medal_icon: Mapped[str] = mapped_column(sa.Text)
+    medal_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
 class GameMedals(db.Model):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
@@ -118,13 +118,13 @@ class GameMedals(db.Model):
 class HeroRole(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_name: Mapped[str] = mapped_column(sa.Text, unique=True)
-    role_icon: Mapped[str] = mapped_column(sa.Text)
+    role_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
 class Hero(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     hero_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
-    hero_image: Mapped[str] = mapped_column(sa.Text)
+    hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
 class GamePlayers(db.Model):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
