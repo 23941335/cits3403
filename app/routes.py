@@ -1,5 +1,7 @@
 from app import app
-from flask import render_template, redirect
+from flask import render_template, redirect, request
+
+from app.handle_csv import parse_csv
 
 # More pages will be added as necessary, but this will get us started.
 
@@ -56,6 +58,27 @@ def tournament_game_view():
 def tournament_player_view():
     return render_template("pages/stats_player.html")
 
+# DATA UPLOAD ROUTES
+# based on https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file_upload_name = 'results_file' # the value of the HTML `name` attribute
+    
+    def is_csv(file_name):
+        return '.' in file_name and file_name.rsplit('.', 1)[1].lower() == 'csv'
+
+    print('Files', request.files)
+
+    if file_upload_name not in request.files:
+        return "No file part", 400
+
+    file = request.files[file_upload_name]
+    if file.filename == '':
+        return "No selected file", 400
+    
+    if file and is_csv(file.filename):
+        return "File uploaded sucessfully."
 
 # 404 not found page
 @app.errorhandler(404)
