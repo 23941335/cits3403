@@ -1,5 +1,10 @@
 from app import app
-from flask import render_template, redirect
+from flask import render_template, redirect, request
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from forms import *
+from models import *
+
 
 # More pages will be added as necessary, but this will get us started.
 
@@ -15,9 +20,15 @@ def login_page():
     return render_template("pages/login.html")
 
 
-@app.route("/account/signup", methods=["GET"])
+# Added "POST" and logic
+@app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
-    return render_template("pages/signup.html")
+    form = SignupForm(request.form)
+    if request.method == "POST" and form.validate():
+        user = User(form.username.data, form.email.data, generate_password_hash(form.password.data))
+        # Insert into user table
+        return redirect("/account/login")
+    return render_template("pages/signup.html", form=form)
 
 
 @app.route("/account/login", methods=["POST"])
