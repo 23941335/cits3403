@@ -1,6 +1,8 @@
 from app import app, db, models, forms
-from flask import render_template, redirect, request
+from flask import render_template, redirect, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+import sqlalchemy as sa
+from flask_login import current_user, login_user
 
 @app.route("/")
 @app.route("/home")
@@ -10,7 +12,18 @@ def home_page():
 
 @app.route("/account/login", methods=["GET"])
 def login_page():
-    return render_template("pages/login.html")
+    if current_user.is_authenticated:
+        return redirect("/home")
+    form = forms.LoginForm()
+    if form.validate_on_submit():
+        user = db.session.scalar(
+            sa.select(forms.User).where(forms.User.username == form.username.data))
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect("/account/login")
+        login_user(user, remember=False) # Later add form.remember_me.data
+        return redirect("/home")
+    return render_template('login.html', title='Login', form=form)
 
 
 # Added "POST" and logic
