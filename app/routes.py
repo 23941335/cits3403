@@ -1,6 +1,7 @@
 from app import app, db, models, forms
 from flask import render_template, redirect, request
-from werkzeug.security import generate_password_hash, check_password_hash
+
+from app.handle_csv import parse_csv
 
 @app.route("/")
 @app.route("/home")
