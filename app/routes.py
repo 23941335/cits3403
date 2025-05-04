@@ -9,7 +9,6 @@ from flask_login import current_user, login_user
 def home_page():
     return render_template("pages/home.html")
 
-
 @app.route("/account/login", methods=["GET"])
 def login_page():
     if current_user.is_authenticated:
@@ -23,10 +22,8 @@ def login_page():
             return redirect("/account/login")
         login_user(user, remember=False) # Later add form.remember_me.data
         return redirect("/home")
-    return render_template('login.html', title='Login', form=form)
+    return render_template('pages/login.html', title='Login', form=form)
 
-
-# Added "POST" and logic
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
     form = forms.SignupForm(request.form)
