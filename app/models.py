@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 # NOTE:
 # 1) DATATYPES: I have used Text here as the datatype for strings. This is the only option
@@ -38,7 +39,7 @@ class RolePermissions(db.Model):
     role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id), primary_key=True)
     permission_id: Mapped[int] = mapped_column(sa.ForeignKey(Permission.id), primary_key=True)
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(sa.Text)
