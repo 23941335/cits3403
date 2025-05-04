@@ -4,9 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy as sa
 from flask_login import current_user, login_user
 
-# Debugging
-import sys
-
 @app.route("/")
 @app.route("/home")
 def home_page():
@@ -36,9 +33,9 @@ def signup_page():
 @app.route("/account/login", methods=["POST"])
 def api_login():
     form = forms.LoginForm()
-    print("Inside api_login()", file=sys.stdout)
+    print("Inside api_login()")
     if form.validate_on_submit():
-        print("form validated", file=sys.stdout)
+        print("form validated")
         user = db.session.scalar(
             sa.select(models.User).where(models.User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
