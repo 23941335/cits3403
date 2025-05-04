@@ -19,8 +19,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
     # May not be necessary to validate here
-    def validate_username(self, username):
-        user = db.session.scalar(sa.select(User).where(
-            User.username == username.data))
-        if user is None:
-            raise ValidationError('username is Invalid.')
+    # def validate_username(self, username):
+    #     user = db.session.scalar(sa.select(User).where(
+    #         User.username == username.data))
+    #     if user is None:
+    #         raise ValidationError('username is Invalid.')

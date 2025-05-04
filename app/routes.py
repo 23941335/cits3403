@@ -14,21 +14,23 @@ def login_page():
     if current_user.is_authenticated:
         return redirect("/home")
     form = forms.LoginForm()
-    if form.validate_on_submit():
-        user = db.session.scalar(
-            sa.select(forms.User).where(forms.User.username == form.username.data))
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
-            return redirect("/account/login")
-        login_user(user, remember=False) # Later add form.remember_me.data
-        return redirect("/home")
+    if request.method == "POST":
+        print("we have posted")
+        if form.validate_on_submit():
+            print("form has validated")
+            user = db.session.scalar(
+                sa.select(models.User).where(models.User.username == form.username.data))
+            if user is None or not user.check_password(form.password.data):
+                flash('Invalid username or password')
+                return redirect("/account/login")
+            login_user(user, remember=False) # Later add form.remember_me.data
+            return redirect("/home")
     return render_template('pages/login.html', title='Login', form=form)
 
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
     form = forms.SignupForm(request.form)
     if request.method == "POST":
-        
         if form.validate_on_submit():
             new_user = models.User(username=form.username.data, email=form.email.data, global_role_id=1)
             new_user.set_password(form.password.data)
