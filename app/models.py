@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
 from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # NOTE:
 # 1) DATATYPES: I have used Text here as the datatype for strings. This is the only option
@@ -14,14 +15,10 @@ class Team(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     team_name: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
-    players: Mapped[list["Player"]] = relationship("Player", back_populates="team")
-
 class Player(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     gamertag: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
-    # team_id: Mapped[int] = mapped_column(sa.ForeignKey(Team.id))
 
-    team: Mapped["Team"] = relationship("Team", back_populates="players")
     user: Mapped["User"] = relationship("User", back_populates="player")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="player")
 
@@ -50,11 +47,17 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     global_role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id))
-    player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id))
+    player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), nullable=True)
     is_active: Mapped[bool] = mapped_column(sa.Boolean)
 
     player: Mapped["Player"] = relationship("Player", back_populates="user")
     tournaments: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="user")
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Visibility(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
