@@ -31,12 +31,20 @@ If you want to delete the .venv:
 `rm -rf .venv` on Linux/MacOS
 
 #### Database
+<!-- 
 Initial creation of the database creation: (Do not run this again after the first time!)
 ```
 flask db init
 flask db migrate -m "Initial migration"
 flask db upgrade
+``` 
+-->
+
+If you do not yet have th app.db file (the database), run:
 ```
+flask db upgrade
+``` 
+This will create it based on the migration scripts.
 <!-- 
 To reset (PLEASE DO NOT DO THIS!):
 ```
