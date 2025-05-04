@@ -2,7 +2,7 @@ from app import app, db, models, forms
 from flask import render_template, redirect, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy as sa
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 
 @app.route("/")
 @app.route("/home")
@@ -50,6 +50,11 @@ def api_login():
 @app.route("/account/signup", methods=["POST"])
 def api_create_account():
     # temporary placeholder - go to index page
+    return redirect("/")
+
+@app.route("/account/logout")
+def user_logout():
+    logout_user()
     return redirect("/")
 
 @app.route("/account", methods=["GET"])
