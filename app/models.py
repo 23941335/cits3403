@@ -14,14 +14,10 @@ class Team(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     team_name: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
-    players: Mapped[list["Player"]] = relationship("Player", back_populates="team")
-
 class Player(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     gamertag: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
-    # team_id: Mapped[int] = mapped_column(sa.ForeignKey(Team.id))
 
-    team: Mapped["Team"] = relationship("Team", back_populates="players")
     user: Mapped["User"] = relationship("User", back_populates="player")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="player")
 
