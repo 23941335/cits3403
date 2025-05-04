@@ -4,6 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy as sa
 from flask_login import current_user, login_user
 
+# Debugging
+import sys
+
 @app.route("/")
 @app.route("/home")
 def home_page():
@@ -13,19 +16,7 @@ def home_page():
 def login_page():
     if current_user.is_authenticated:
         return redirect("/home")
-    form = forms.LoginForm()
-    if request.method == "POST":
-        print("we have posted")
-        if form.validate_on_submit():
-            print("form has validated")
-            user = db.session.scalar(
-                sa.select(models.User).where(models.User.username == form.username.data))
-            if user is None or not user.check_password(form.password.data):
-                flash('Invalid username or password')
-                return redirect("/account/login")
-            login_user(user, remember=False) # Later add form.remember_me.data
-            return redirect("/home")
-    return render_template('pages/login.html', title='Login', form=form)
+    return render_template('pages/login.html', title='Login', form=forms.LoginForm())
 
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
@@ -44,8 +35,19 @@ def signup_page():
 
 @app.route("/account/login", methods=["POST"])
 def api_login():
-    # temporary placeholder - go to index page
-    return redirect("/")
+    form = forms.LoginForm()
+    print("Inside api_login()", file=sys.stdout)
+    if form.validate_on_submit():
+        print("form validated", file=sys.stdout)
+        user = db.session.scalar(
+            sa.select(models.User).where(models.User.username == form.username.data))
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect("/account/login")
+        login_user(user, remember=False) # Later add form.remember_me.data
+        return redirect("/home")
+    flash('Invalid username or password')
+    return redirect("/account/login")
 
 
 @app.route("/account/signup", methods=["POST"])
