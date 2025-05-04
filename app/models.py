@@ -46,7 +46,7 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     global_role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id))
-    player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id))
+    player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), nullable=True)
     is_active: Mapped[bool] = mapped_column(sa.Boolean)
 
     player: Mapped["Player"] = relationship("Player", back_populates="user")
