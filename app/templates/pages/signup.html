@@ -11,7 +11,7 @@
                     <h3 class="card-title text-center mb-4">Create Account</h3>
 
                     <form method="POST" action="#">
-                        {# {{ form.csrf_token }} #}
+                        {{ form.hidden_tag() }}
 
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
