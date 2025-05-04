@@ -29,3 +29,24 @@ Any other requirements listed in the requirements.txt are dependencies of these 
 If you want to delete the .venv:
 `rd /s /q .venv` on Windows or
 `rm -rf .venv` on Linux/MacOS
+
+#### Database
+Initial creation of the database creation: (Do not run this again after the first time!)
+```
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+```
+<!-- 
+To reset (PLEASE DO NOT DO THIS!):
+```
+rm -rf migrations app.db
+``` 
+-->
+
+On subsequent (and hopefully rare) changes:
+```
+flask db migrate -m "message/comment"
+flask db upgrade
+```
+This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
