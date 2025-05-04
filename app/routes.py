@@ -52,6 +52,12 @@ def api_create_account():
     # temporary placeholder - go to index page
     return redirect("/")
 
+@app.route("/account", methods=["GET"])
+def user_account_page():
+    if current_user.is_authenticated:
+        return render_template("pages/account.html")
+    else:
+        return redirect("/account/login")
 
 @app.route("/tournament")
 def tournament_page():
