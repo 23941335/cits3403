@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
 from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # NOTE:
 # 1) DATATYPES: I have used Text here as the datatype for strings. This is the only option
@@ -51,6 +52,12 @@ class User(db.Model):
 
     player: Mapped["Player"] = relationship("Player", back_populates="user")
     tournaments: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="user")
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Visibility(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
