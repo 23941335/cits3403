@@ -2,7 +2,7 @@ from typing import Optional
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
-from app import db
+from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -146,3 +146,7 @@ class GamePlayers(db.Model):
 
     game: Mapped["Game"] = relationship("Game", back_populates="game_players")
     player: Mapped["Player"] = relationship("Player", back_populates="game_players")
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
