@@ -1,13 +1,6 @@
-from app import app
+from app import app, db, models, forms
 from flask import render_template, redirect, request
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from forms import *
-from models import *
-
-
-# More pages will be added as necessary, but this will get us started.
-
 
 @app.route("/")
 @app.route("/home")
@@ -23,13 +16,19 @@ def login_page():
 # Added "POST" and logic
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
-    form = SignupForm(request.form)
-    if request.method == "POST" and form.validate():
-        user = User(form.username.data, form.email.data, generate_password_hash(form.password.data))
-        # Insert into user table
-        return redirect("/account/login")
-    return render_template("pages/signup.html", form=form)
+    form = forms.SignupForm(request.form)
+    if request.method == "POST":
+        
+        if form.validate_on_submit():
+            new_user = models.User(username=form.username.data, email=form.email.data, global_role_id=1)
+            new_user.set_password(form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect("/account/login")
+        else:
+            return 'form validation failure', 400
 
+    return render_template("pages/signup.html", form=form)
 
 @app.route("/account/login", methods=["POST"])
 def api_login():
@@ -72,3 +71,9 @@ def tournament_player_view():
 @app.errorhandler(404)
 def not_found(err):
     return render_template("pages/404.html", error=err)
+
+# API
+# @app.route("/api/account/create", methods=["POST"])
+# def api_account_create():
+#     # TODO
+#     pass
