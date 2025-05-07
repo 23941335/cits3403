@@ -45,6 +45,9 @@ class Team(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     team_name: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
+    games_as_team_a: Mapped[list["Game"]] = relationship("Game", foreign_keys="[Game.team_a_id]", back_populates="team_a")
+    games_as_team_b: Mapped[list["Game"]] = relationship("Game", foreign_keys="[Game.team_b_id]", back_populates="team_b")
+
     def __repr__(self):
         return f"<Team '{self.team_name}'>"
 
@@ -164,6 +167,8 @@ class Game(BaseModel):
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game")
+    team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id], back_populates="games_as_team_a")
+    team_b: Mapped["Team"] = relationship("Team", foreign_keys=[team_b_id], back_populates="games_as_team_b")
 
     def __repr__(self):
         # return f"<Game '{self.team_a.team_name}' vs. '{self.team_b.team_name}'>"
