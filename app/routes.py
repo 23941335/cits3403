@@ -1,5 +1,5 @@
 from app import app, db, models, forms
-from flask import render_template, redirect, flash
+from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user
 
@@ -20,23 +20,24 @@ def login_page():
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
     form = forms.SignupForm()
-    # validate_on_submit() only takes POST, PUT, PATCH, or DELETE
-    if form.validate_on_submit():
+    if request.method == "POST" and form.validate_on_submit():
         try:
             new_user = models.User(
-                username=form.username.data, email=form.email.data, global_role_id=1
+                username=form.username.data, 
+                email=form.email.data, 
+                global_role_id=1
             )
             new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
-            flash("Congratulations, you are now a registered user!", "success")
+            flash("Your account has been created!", "success")
             return redirect("/account/login")
+        
         except Exception as e:
             db.session.rollback()
             return render_template("pages/signup.html", title="Sign Up", form=form)
-    else:
-        return render_template("pages/signup.html", title="Sign Up", form=form)
 
+    return render_template("pages/signup.html", title="Sign Up", form=form)
 
 @app.route("/account/login", methods=["POST"])
 def api_login():
