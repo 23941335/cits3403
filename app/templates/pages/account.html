@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %} Account: {{current_user.username}} {% endblock %}
+{% block header_text %} Account {{current_user.username}} {% endblock %}
+
+{% block main %}
+{% if current_user.is_authenticated %}
+{% else %}
+{% endif %}
+<div class="container my-4">
+  <div class="row">
+    <!-- player profile -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="mx-auto pt-4 pb-3">
+          <img src="{{url_for('static', filename='icons/placeholder.ico')}}" class="rounded-circle"
+            alt="player profile photo">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{current_user.username}}</h5>
+          <p class="card-text">{{current_user.email}}</p>
+          <p class="card-text">Account Created: {{current_user.created_at}}</p>
+          <p class="card-text">Account Status: {{ 'Active' if current_user.is_active else 'Suspended' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- list of games/rounds played in this tournament -->
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Games Played In <a href="/tournament">This Tournament</a></h5>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Game</th>
+                <th scope="col">Team Rank</th>
+                <th scope="col">Kills</th>
+                <th scope="col">Deaths</th>
+                <th scope="col">Assists</th>
+                <th scope="col">Medals</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="/tournament/game?id=1">Game 1</a></td>
+                <td>4th</td>
+                <td>20</td>
+                <td>5</td>
+                <td>10</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td><a href="/tournament/game?id=2">Game 2</a></td>
+                <td>2nd</td>
+                <td>25</td>
+                <td>8</td>
+                <td>12</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td><a href="/tournament/game?id=3">Game 3</a></td>
+                <td>1st (MVP)</td>
+                <td>30</td>
+                <td>6</td>
+                <td>15</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td>-</td>
+                <td><strong>75</strong></td>
+                <td><strong>19</strong></td>
+                <td><strong>37</strong></td>
+                <td><strong>4</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
