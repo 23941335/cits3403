@@ -1,7 +1,6 @@
 from app import app, db, models, forms
 from flask import render_template, redirect, request
-
-from app.handle_csv import parse_csv
+from data_import import import_csv
 
 @app.route("/")
 @app.route("/home")
@@ -87,7 +86,9 @@ def upload_file():
         return "No selected file", 400
     
     if file and is_csv(file.filename):
-        return "File uploaded sucessfully."
+        import_csv(file.stream)
+        
+        return "File uploaded successfully", 200
 
 # 404 not found page
 @app.errorhandler(404)
