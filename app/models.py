@@ -15,6 +15,9 @@ class Team(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     team_name: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
+    def __repr__(self):
+        return f"<Team '{self.team_name}'>"
+
 class Player(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     gamertag: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
@@ -22,17 +25,26 @@ class Player(db.Model):
     user: Mapped["User"] = relationship("User", back_populates="player")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="player")
 
+    def __repr__(self):
+        return f"<Player '{self.gamertag}'>"
+
 class Role(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_name: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
 
     permissions: Mapped[list["Permission"]] = relationship("Permission", secondary="role_permissions", back_populates="roles")
 
+    def __repr__(self):
+        return f"<Role '{self.role_name}'>"
+
 class Permission(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     permission: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
 
     roles: Mapped[list["Role"]] = relationship("Role", secondary="role_permissions", back_populates="permissions")
+
+    def __repr__(self):
+        return f"<Permission '{self.permission}'>"
 
 class RolePermissions(db.Model):
     role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id), primary_key=True)
@@ -59,11 +71,17 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def __repr__(self):
+        return f"<User '{self.username}', '{self.email}'>"
+
 class Visibility(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     visibility: Mapped[str] = mapped_column(sa.Text, unique=True)
 
     tournaments: Mapped[list["Tournament"]] = relationship("Tournament", back_populates="visibility")
+
+    def __repr__(self):
+        return f"<Visibility '{self.visibility}'>"
 
 class Tournament(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -74,6 +92,9 @@ class Tournament(db.Model):
     visibility: Mapped["Visibility"] = relationship("Visibility", back_populates="tournaments")
     users: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="tournament")
     games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament")
+
+    def __repr__(self):
+        return f"<Tournament '{self.title}'>"
 
 class TournamentUsers(db.Model):
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id), primary_key=True)
@@ -87,10 +108,16 @@ class GameMode(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     game_mode_name: Mapped[str] = mapped_column(sa.Text, unique=True)
 
+    def __repr__(self):
+        return f"<GameMode '{self.game_mode_name}'>"
+
 class Map(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     map_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     map_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Map '{self.map_name}'>"
 
 class Game(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,10 +135,18 @@ class Game(db.Model):
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game")
 
+    def __repr__(self):
+        # return f"<Game '{self.team_a.team_name}' vs. '{self.team_b.team_name}'>"
+        return f"<Game>"
+
 class Medal(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     medal_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     medal_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Medal '{self.medal_name}'>"
+
 
 class GameMedals(db.Model):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
@@ -123,11 +158,17 @@ class HeroRole(db.Model):
     role_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     role_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
+    def __repr__(self):
+        return f"<HeroRole '{self.role_name}'>"
+
 class Hero(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     hero_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
     hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Hero '{self.hero_name}'>"
 
 class GamePlayers(db.Model):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
@@ -145,3 +186,6 @@ class GamePlayers(db.Model):
 
     game: Mapped["Game"] = relationship("Game", back_populates="game_players")
     player: Mapped["Player"] = relationship("Player", back_populates="game_players")
+
+    def __repr__(self):
+        return f"<GamePlayers>"
