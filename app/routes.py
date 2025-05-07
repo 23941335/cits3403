@@ -1,5 +1,5 @@
 from app import app, db, models, forms
-from flask import render_template, redirect, request, flash
+from flask import render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user
@@ -17,18 +17,20 @@ def login_page():
 
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
-    form = forms.SignupForm(request.form)
-    if request.method == "POST":
-        if form.validate_on_submit():
+    form = forms.SignupForm()
+    if form.validate_on_submit():
+        try:
             new_user = models.User(username=form.username.data, email=form.email.data, global_role_id=1)
             new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
+            flash('Congratulations, you are now a registered user!', 'success')
             return redirect("/account/login")
-        else:
-            return 'form validation failure', 400
-
-    return render_template("pages/signup.html", form=form)
+        except Exception as e:
+            db.session.rollback()
+            return render_template("pages/signup.html", title='Sign Up', form=form)
+    else:
+        return render_template("pages/signup.html", title='Sign Up', form=form)
 
 @app.route("/account/login", methods=["POST"])
 def api_login():
