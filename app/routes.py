@@ -48,11 +48,11 @@ def api_login():
             sa.select(models.User).where(models.User.username == form.username.data)
         )
         if user is None or not user.check_password(form.password.data):
-            flash("Invalid username or password")
+            flash("Invalid username or password", "danger")
             return redirect("/account/login")
         login_user(user, remember=False)  # TODO: Later add form.remember_me.data
         return redirect("/home")
-    flash("Invalid username or password")
+    flash("Invalid username or password", "danger")
     return redirect("/account/login")
 
 
