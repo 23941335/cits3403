@@ -10,13 +10,6 @@ def home_page():
     return render_template("pages/home.html")
 
 
-@app.route("/account/login", methods=["GET"])
-def login_page():
-    if current_user.is_authenticated:
-        return redirect("/home")
-    return render_template("pages/login.html", title="Login", form=forms.LoginForm())
-
-
 @app.route("/account/signup", methods=["GET", "POST"])
 def signup_page():
     form = forms.SignupForm()
@@ -39,28 +32,28 @@ def signup_page():
 
     return render_template("pages/signup.html", title="Sign Up", form=form)
 
+
+@app.route("/account/login", methods=["GET"])
+def login_page():
+    if current_user.is_authenticated:
+        return redirect("/home")
+    return render_template("pages/login.html", title="Login", form=forms.LoginForm())
+
+
 @app.route("/account/login", methods=["POST"])
 def api_login():
     form = forms.LoginForm()
-    print("Inside api_login()")
     if form.validate_on_submit():
-        print("form validated")
         user = db.session.scalar(
             sa.select(models.User).where(models.User.username == form.username.data)
         )
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
             return redirect("/account/login")
-        login_user(user, remember=False)  # Later add form.remember_me.data
+        login_user(user, remember=False)  # TODO: Later add form.remember_me.data
         return redirect("/home")
     flash("Invalid username or password")
     return redirect("/account/login")
-
-
-@app.route("/account/signup", methods=["POST"])
-def api_create_account():
-    # temporary placeholder - go to index page
-    return redirect("/")
 
 
 @app.route("/account/logout")
