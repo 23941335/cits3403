@@ -1,7 +1,6 @@
 from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
-from sqlalchemy import or_
 from flask_login import current_user, login_user, logout_user
 from data_import import import_csv
 
@@ -47,7 +46,7 @@ def api_login():
         login_identifier = form.username.data
         user = db.session.scalar(
             sa.select(models.User).where(
-                or_(
+                sa.or_(
                     models.User.username == login_identifier,
                     models.User.email == login_identifier,
                 )
