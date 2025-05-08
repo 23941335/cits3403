@@ -1,6 +1,7 @@
 from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
+from sqlalchemy import or_
 from flask_login import current_user, login_user, logout_user
 from data_import import import_csv
 
@@ -17,16 +18,14 @@ def signup_page():
     if request.method == "POST" and form.validate_on_submit():
         try:
             new_user = models.User(
-                username=form.username.data, 
-                email=form.email.data, 
-                global_role_id=1
+                username=form.username.data, email=form.email.data, global_role_id=1
             )
             new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
             flash("Your account has been created!", "success")
             return redirect("/account/login")
-        
+
         except Exception as e:
             db.session.rollback()
             return render_template("pages/signup.html", title="Sign Up", form=form)
@@ -45,8 +44,14 @@ def login_page():
 def api_login():
     form = forms.LoginForm()
     if form.validate_on_submit():
+        login_identifier = form.username.data
         user = db.session.scalar(
-            sa.select(models.User).where(models.User.username == form.username.data)
+            sa.select(models.User).where(
+                or_(
+                    models.User.username == login_identifier,
+                    models.User.email == login_identifier,
+                )
+            )
         )
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
@@ -95,29 +100,32 @@ def tournament_game_view():
 def tournament_player_view():
     return render_template("pages/stats_player.html")
 
+
 # DATA UPLOAD ROUTES
 # based on https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    file_upload_name = 'results_file' # the value of the HTML `name` attribute
-    
-    def is_csv(file_name):
-        return '.' in file_name and file_name.rsplit('.', 1)[1].lower() == 'csv'
 
-    print('Files', request.files)
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    file_upload_name = "results_file"  # the value of the HTML `name` attribute
+
+    def is_csv(file_name):
+        return "." in file_name and file_name.rsplit(".", 1)[1].lower() == "csv"
+
+    print("Files", request.files)
 
     if file_upload_name not in request.files:
         return "No file part", 400
 
     file = request.files[file_upload_name]
-    if file.filename == '':
+    if file.filename == "":
         return "No selected file", 400
-    
+
     if file and is_csv(file.filename):
         import_csv(file.stream)
-        
+
         return "File uploaded successfully", 200
+
 
 # 404 not found page
 @app.errorhandler(404)
