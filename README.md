@@ -9,6 +9,28 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ## Setup
 
+### Instructions
+
+Set up virtual environment and install requirements:
+```
+python -m venv .venv
+source .venv/*/activate
+pip install -r requirements.txt
+```
+Build the database:
+```
+flask db upgrade
+python seed.py
+```
+Set the environment variables:
+```
+export SECRET_KEY='somevaluehere'
+```
+Start the server:
+```
+flask run
+```
+
 ### Backend
 
 #### Python Package Dependencies
