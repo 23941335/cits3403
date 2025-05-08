@@ -31,10 +31,8 @@ PLAYER_ACCURACY = 8
 PLAYER_HERO = 9
 
 
-def split_line(line):
-    if line.endswith('\n'):
-        trimmed = line[:-1]
-    return trimmed.split(',')
+def split_line(line: str):
+    return line.rstrip('\n').split(',')
 
 def process_lines(line_list):
     games = []
@@ -119,7 +117,7 @@ class CSV_Game:
             round=PLACEHOLDER_ID,
             team_a_id=team_a.id,
             team_b_id=team_b.id,
-            winning_team=winning_team.id,
+            winning_team=winning_team_id,
             is_draw=(winning_team_id is None),
             game_mode_id=game_mode.id,
             map_id=game_map.id
