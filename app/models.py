@@ -12,34 +12,79 @@ from flask_login import UserMixin
 # as a TEXT type. If this were needed to be ported to another database, it would be
 # better to use a specific type and specify the length, e.g. String(256).
 
-class Team(db.Model):
+# Create a base model inheriting from the db.Model
+# so that we can define custom methods shared by all models.
+class BaseModel(db.Model):
+    __abstract__ = True
+
+    @classmethod
+    def get_field(cls, field_name):
+        if hasattr(cls, field_name):
+            return getattr(cls, field_name)
+        raise AttributeError(f"{cls.__name__} has no attribute '{field_name}'")
+    
+    @classmethod
+    def populate_with_list(cls, field_name, values):
+        insertions = 0
+        already_exist = 0
+
+        for v in values:
+            v = v.lower()
+            existing_val = db.session.scalar(sa.select(cls).where(cls.get_field(field_name) == v))
+            if existing_val is None:
+                db.session.add(cls(**{field_name: v}))
+                print(f"{cls.__name__}.{field_name} '{v}' will be inserted.")
+                insertions += 1
+            else:
+                print(f"{cls.__name__}.{field_name} '{v}' already exists.")
+                already_exist += 1
+
+        db.session.commit()
+        print(f'Inserted {insertions} records. Skipped {already_exist} records.')
+
+class Team(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     team_name: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
-class Player(db.Model):
+    games_as_team_a: Mapped[list["Game"]] = relationship("Game", foreign_keys="[Game.team_a_id]", back_populates="team_a")
+    games_as_team_b: Mapped[list["Game"]] = relationship("Game", foreign_keys="[Game.team_b_id]", back_populates="team_b")
+
+    def __repr__(self):
+        return f"<Team '{self.team_name}'>"
+
+class Player(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     gamertag: Mapped[str] = mapped_column(sa.Text, unique=True, index=True)
 
     user: Mapped["User"] = relationship("User", back_populates="player")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="player")
 
-class Role(db.Model):
+    def __repr__(self):
+        return f"<Player '{self.gamertag}'>"
+
+class Role(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_name: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
 
     permissions: Mapped[list["Permission"]] = relationship("Permission", secondary="role_permissions", back_populates="roles")
 
-class Permission(db.Model):
+    def __repr__(self):
+        return f"<Role '{self.role_name}'>"
+
+class Permission(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     permission: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
 
     roles: Mapped[list["Role"]] = relationship("Role", secondary="role_permissions", back_populates="permissions")
 
-class RolePermissions(db.Model):
+    def __repr__(self):
+        return f"<Permission '{self.permission}'>"
+
+class RolePermissions(BaseModel):
     role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id), primary_key=True)
     permission_id: Mapped[int] = mapped_column(sa.ForeignKey(Permission.id), primary_key=True)
 
-class User(UserMixin, db.Model):
+class User(UserMixin, BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(sa.Text)
@@ -60,13 +105,19 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class Visibility(db.Model):
+    def __repr__(self):
+        return f"<User '{self.username}', '{self.email}'>"
+
+class Visibility(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     visibility: Mapped[str] = mapped_column(sa.Text, unique=True)
 
     tournaments: Mapped[list["Tournament"]] = relationship("Tournament", back_populates="visibility")
 
-class Tournament(db.Model):
+    def __repr__(self):
+        return f"<Visibility '{self.visibility}'>"
+
+class Tournament(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(sa.Text)
     description: Mapped[str] = mapped_column(sa.Text)
@@ -76,7 +127,10 @@ class Tournament(db.Model):
     users: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="tournament")
     games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament")
 
-class TournamentUsers(db.Model):
+    def __repr__(self):
+        return f"<Tournament '{self.title}'>"
+
+class TournamentUsers(BaseModel):
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id), primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id), primary_key=True)
     tournament_role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id))
@@ -84,16 +138,22 @@ class TournamentUsers(db.Model):
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="users")
     user: Mapped["User"] = relationship("User", back_populates="tournaments")
 
-class GameMode(db.Model):
+class GameMode(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     game_mode_name: Mapped[str] = mapped_column(sa.Text, unique=True)
 
-class Map(db.Model):
+    def __repr__(self):
+        return f"<GameMode '{self.game_mode_name}'>"
+
+class Map(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     map_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     map_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
-class Game(db.Model):
+    def __repr__(self):
+        return f"<Map '{self.map_name}'>"
+
+class Game(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id))
     round: Mapped[int]
@@ -108,29 +168,45 @@ class Game(db.Model):
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game")
+    team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id], back_populates="games_as_team_a")
+    team_b: Mapped["Team"] = relationship("Team", foreign_keys=[team_b_id], back_populates="games_as_team_b")
 
-class Medal(db.Model):
+    def __repr__(self):
+        # return f"<Game '{self.team_a.team_name}' vs. '{self.team_b.team_name}'>"
+        return f"<Game>"
+
+class Medal(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     medal_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     medal_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
-class GameMedals(db.Model):
+    def __repr__(self):
+        return f"<Medal '{self.medal_name}'>"
+
+
+class GameMedals(BaseModel):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
     medal_id: Mapped[int] = mapped_column(sa.ForeignKey(Medal.id), primary_key=True)
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), primary_key=True)
 
-class HeroRole(db.Model):
+class HeroRole(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     role_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
-class Hero(db.Model):
+    def __repr__(self):
+        return f"<HeroRole '{self.role_name}'>"
+
+class Hero(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     hero_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
     hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
-class GamePlayers(db.Model):
+    def __repr__(self):
+        return f"<Hero '{self.hero_name}'>"
+
+class GamePlayers(BaseModel):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), primary_key=True)
     team_id: Mapped[int] = mapped_column(sa.ForeignKey(Team.id))  # the team the user is representing
@@ -147,6 +223,10 @@ class GamePlayers(db.Model):
     game: Mapped["Game"] = relationship("Game", back_populates="game_players")
     player: Mapped["Player"] = relationship("Player", back_populates="game_players")
 
+    def __repr__(self):
+        return f"<GamePlayers>"
+
+# TODO: is there somewhere better to put this?
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))

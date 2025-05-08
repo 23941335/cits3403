@@ -2,6 +2,7 @@ from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user
+from data_import import import_csv
 
 
 @app.route("/")
@@ -94,6 +95,29 @@ def tournament_game_view():
 def tournament_player_view():
     return render_template("pages/stats_player.html")
 
+# DATA UPLOAD ROUTES
+# based on https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file_upload_name = 'results_file' # the value of the HTML `name` attribute
+    
+    def is_csv(file_name):
+        return '.' in file_name and file_name.rsplit('.', 1)[1].lower() == 'csv'
+
+    print('Files', request.files)
+
+    if file_upload_name not in request.files:
+        return "No file part", 400
+
+    file = request.files[file_upload_name]
+    if file.filename == '':
+        return "No selected file", 400
+    
+    if file and is_csv(file.filename):
+        import_csv(file.stream)
+        
+        return "File uploaded successfully", 200
 
 # 404 not found page
 @app.errorhandler(404)
