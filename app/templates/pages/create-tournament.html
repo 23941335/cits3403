@@ -14,20 +14,25 @@
     color: #ffffff;
   }
 
-  .title h1, .title p {
+  .title h1,
+  .title p {
     color: #000000;
     text-align: center;
   }
-  .form, .input {
+
+  .form,
+  .input {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     max-width: 60rem;
   }
+
   .form {
     align-items: stretch;
     margin: auto;
   }
+
   .input {
     align-items: flex-start;
     flex: 1 0;
@@ -36,9 +41,11 @@
     border-radius: 8px;
     margin-top: 0.5rem
   }
+
   .form-label {
     margin-bottom: 0.5rem;
   }
+
   .submit {
     display: flex;
     flex-flow: row nowrap;
@@ -55,13 +62,13 @@
 
 <body>
   <!-- Page Description -->
-   <div class="title">
+  <div class="title">
     <h1>Tournament Creator</h1>
     <p>Create your own tournament, invite players and upload the results. Share to whoever you want.</p>
-   </div>
+  </div>
 
   <!-- Input Tournament Details -->
-  <form method="POST" action="#" class="form">
+  <form method="POST" action="/upload" enctype="multipart/form-data" class="form">
     <div class="input">
       <label for="name" class="form-label">Tournament Name</label>
       <input type="text" class="form-control" id="name" name="name" required maxlength="50" style="min-width: 20rem;">
@@ -69,7 +76,8 @@
 
     <div class="input">
       <label for="description" class="form-label">Description</label>
-      <textarea class="form-control" id="description" name="description" required maxlength="1000" style="min-width: 40rem;"></textarea>
+      <textarea class="form-control" id="description" name="description" required maxlength="1000"
+        style="min-width: 40rem;"></textarea>
     </div>
 
     <div class="input">
@@ -98,7 +106,7 @@
 
     <div class="input">
       <label for="myfile" class="form-label">Results File (Optional)</label>
-      <input type="file" id="reults_file" name="results_file">
+      <input type="file" id="reults_file" name="results_file" accept=".csv">
     </div>
 
     <div class="submit">

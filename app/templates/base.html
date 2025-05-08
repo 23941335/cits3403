@@ -26,8 +26,8 @@
    <!-- Feel free to change this structure if you have something better.  -->
    <header id="page-header" class="py-2">
       <a href="/" class="header-link d-flex align-items-center justify-content-center">
-        <img src="{{ url_for('static', filename='images/header_logo.png') }}" alt="Home" id="header-logo">
-        <span id="header-title">Marvel Rivals Tournament Manager</span>
+         <img src="{{ url_for('static', filename='images/header_logo.png') }}" alt="Home" id="header-logo">
+         <span id="header-title">Marvel Rivals Tournament Manager</span>
       </a>
    </header>
    {% block nav %}
@@ -35,6 +35,16 @@
    {% endblock %}
 
    <main class="flex-fill mb-4 mt-4 p-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category if category else 'info' }} alert-dismissible fade show" role="alert">
+         {{ message }}
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
       {% block main %} Main {% endblock %}
    </main>
    {% include 'partials/_footer.html' %}

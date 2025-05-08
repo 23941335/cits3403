@@ -9,6 +9,28 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ## Setup
 
+### Instructions
+
+Set up virtual environment and install requirements:
+```
+python -m venv .venv
+source .venv/*/activate
+pip install -r requirements.txt
+```
+Build the database:
+```
+flask db upgrade
+python seed.py
+```
+Set the environment variables:
+```
+export SECRET_KEY='somevaluehere'
+```
+Start the server:
+```
+flask run
+```
+
 ### Backend
 
 #### Python Package Dependencies
@@ -29,3 +51,32 @@ Any other requirements listed in the requirements.txt are dependencies of these 
 If you want to delete the .venv:
 `rd /s /q .venv` on Windows or
 `rm -rf .venv` on Linux/MacOS
+
+#### Database
+<!-- 
+Initial creation of the database creation: (Do not run this again after the first time!)
+```
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+``` 
+-->
+
+If you do not yet have th app.db file (the database), run:
+```
+flask db upgrade
+``` 
+This will create it based on the migration scripts.
+<!-- 
+To reset (PLEASE DO NOT DO THIS!):
+```
+rm -rf migrations app.db
+``` 
+-->
+
+On subsequent (and hopefully rare) changes:
+```
+flask db migrate -m "message/comment"
+flask db upgrade
+```
+This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
