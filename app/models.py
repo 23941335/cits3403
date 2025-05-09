@@ -89,6 +89,10 @@ class User(UserMixin, BaseModel):
     username: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(sa.Text)
     email: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
+    
+    # TODO: This should be a URL to the avatar image, not the filename.
+    avatar_filename: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
+
     # Not sure if we really need create/update dates, but they are common so I included them.
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
