@@ -82,20 +82,35 @@ def tournament_page():
 
 @app.route("/create-tournament", methods=["GET"])
 def new_tournament_page():
-    return render_template("pages/create-tournament.html", form=forms.CreateTournamentForm())
+    form = forms.CreateTournamentForm()
+
+    visibilities = db.session.scalars(sa.select(models.Visibility)).all()
+    form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
+
+    return render_template("pages/create-tournament.html", form=form)
 
 @app.route("/create-tournament", methods=["POST"])
 def create_tournament():
     form = forms.CreateTournamentForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        description = form.description.data
-        visibility = form.visibility.data
-        csv_file = form.csv_file.data
 
+    visibilities = db.session.scalars(sa.select(models.Visibility)).all()
+    form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
+
+    if form.validate_on_submit():
         try:
-            vis = db.session.scalar(sa.select(models.Visibility).filter_by(visibility=visibility))
-            tournament = models.Tournament(title=name, description=description, visibility=vis)
+            print(form.visibility.data)
+            if form.visibility.data == -1:
+                form.visibility.errors.append("Please select a valid visibility option.")
+                print(form.visibility.errors) 
+                return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
+
+
+            name = form.name.data
+            description = form.description.data
+            vis_id = form.visibility.data
+            csv_file = form.csv_file.data
+
+            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id)
             db.session.add(tournament)
             
             if csv_file:
@@ -107,7 +122,6 @@ def create_tournament():
             return redirect("/tournament")
 
         except Exception as e:
-            print(e)
             db.session.rollback()
             flash("Tournament creation failed!", "danger")
             return render_template("pages/create-tournament.html", title="Create Tournament", form=form)

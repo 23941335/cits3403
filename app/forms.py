@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField
-from wtforms.validators import ValidationError, InputRequired, Email, EqualTo, Length, Regexp, AnyOf, Optional
+from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -69,16 +69,17 @@ class LoginForm(FlaskForm):
 class CreateTournamentForm(FlaskForm):
     name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
     description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
+
     visibility = SelectField(
-        'Tournament Visibility', 
-        choices=[('', 'Select'), ('public', 'Public'), ('private', 'Private')],
-        validators=[
-            InputRequired(message="You must select an option."),
-            AnyOf(['public', 'private'], message="Invalid selection.")
-        ]
+        'Tournament Visibility',  coerce=int,
+        validators=[DataRequired(message="You must select an option.")]
     )
+
+    # TODO: team validation
+
     csv_file = FileField(
         'CSV Upload (Optional)',
         validators=[Optional(), FileAllowed(['csv'], 'CSV files only.')]
     )
+
     submit = SubmitField("Create Tournament")
