@@ -1,3 +1,5 @@
+from werkzeug.utils import secure_filename
+import os
 from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
@@ -67,13 +69,27 @@ def user_logout():
     return redirect("/")
 
 
-@app.route("/account", methods=["GET"])
+@app.route("/account", methods=["GET", "POST"])
 def user_account_page():
     if current_user.is_authenticated:
         return render_template("pages/account.html")
-    else:
-        return redirect("/account/login")
 
+    form=forms.UpdateAccountForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        # Update user information:Name and email
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+
+        if form.avatar.data:
+            filename = secure_filename(form.avatar.data.filename)
+            avatar_path = os.path.join("static", "avatars", filename)
+            form.avatar.data.save(os.path.join(app.root_path, avatar_path))
+            current_user.avatar_filename = avatar_path
+
+        db.session.commit()
+        flash("Your account has been updated!", "success")
+        return redirect("/account")
 
 @app.route("/tournament")
 def tournament_page():
