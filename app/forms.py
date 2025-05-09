@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField
 from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
 from app import db
@@ -57,6 +57,7 @@ class SignupForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username or Email', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
+    remember_me = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
     # May not be necessary to validate here

@@ -55,7 +55,7 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
-        login_user(user, remember=False)  # TODO: Later add form.remember_me.data
+        login_user(user, remember=form.remember_me.data)  # TODO: Later add form.remember_me.data
         return redirect("/home")
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
