@@ -83,9 +83,11 @@ def user_account_page():
 
         if form.avatar.data:
             filename = secure_filename(form.avatar.data.filename)
-            avatar_path = os.path.join("static", "avatars", filename)
-            form.avatar.data.save(os.path.join(app.root_path, avatar_path))
-            current_user.avatar_filename = avatar_path
+            avatar_path = os.path.join(app.root_path, "static", "avatars", filename)
+            form.avatar.data.save(avatar_path)
+
+            current_user.avatar_filename = f"avatars/{filename}"
+
 
         db.session.commit()
         flash("Your account has been updated!", "success")
