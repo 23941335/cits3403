@@ -16,32 +16,8 @@
             alt="player profile photo">
         </div>
         <div class="card-body">
-          <div class="text-center mb-3">
-            <img src="{{ url_for('static', filename=current_user.avatar_filename or 'icons/placeholder.ico') }}"
-              class="rounded-circle" alt="Avatar" class="rounded-circle" width="128" height="128"></i>
-          </div>
-          <form method="POST" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-
-            <div class="mb-3">
-              {{ form.username.label(class="form-label") }}
-              {{ form.username(class="form-control") }}
-            </div>
-
-            <div class="mb-3">
-              {{ form.email.label(class="form-label") }}
-              {{ form.email(class="form-control") }}
-            </div>
-
-            <div class="mb-3">
-              {{ form.avatar.label(class="form-label") }}
-              {{ form.avatar(class="form-control") }}
-            </div>
-
-            <div class="d-grid">
-              {{ form.submit(class="btn btn-primary") }}
-            </div>
-          </form>
+          <h5 class="card-title">{{current_user.username}}</h5>
+          <p class="card-text">{{current_user.email}}</p>
           <p class="card-text">Account Created: {{current_user.created_at}}</p>
           <p class="card-text">Account Status: {{ 'Active' if current_user.is_active else 'Suspended' }}</p>
         </div>
@@ -104,4 +80,4 @@
     </div>
   </div>
 
-  {% endblock %}
+{% endblock %}
