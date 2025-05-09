@@ -1,7 +1,7 @@
 from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
 
 
@@ -79,8 +79,8 @@ def user_account_page():
 def tournament_page():
     return render_template("pages/tournament.html")
 
-
 @app.route("/create-tournament", methods=["GET"])
+@login_required
 def new_tournament_page():
     form = forms.CreateTournamentForm()
 
@@ -141,6 +141,7 @@ def tournament_game_view():
 @app.route("/tournament/player")
 def tournament_player_view():
     return render_template("pages/stats_player.html")
+
 
 # 404 not found page
 @app.errorhandler(404)
