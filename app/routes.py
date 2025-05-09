@@ -80,10 +80,39 @@ def tournament_page():
     return render_template("pages/tournament.html")
 
 
-@app.route("/create-tournament")
+@app.route("/create-tournament", methods=["GET"])
 def new_tournament_page():
-    return render_template("pages/create-tournament.html")
+    return render_template("pages/create-tournament.html", form=forms.CreateTournamentForm())
 
+@app.route("/create-tournament", methods=["POST"])
+def create_tournament():
+    form = forms.CreateTournamentForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+        visibility = form.visibility.data
+        csv_file = form.csv_file.data
+
+        try:
+            vis = db.session.scalar(sa.select(models.Visibility).filter_by(visibility=visibility))
+            tournament = models.Tournament(title=name, description=description, visibility=vis)
+            db.session.add(tournament)
+            
+            if csv_file:
+                db.session.flush() # ensure we can reference the new tournament
+                import_csv(csv_file.stream, tournament=tournament, commit_changes=False)
+
+            db.session.commit()
+            flash("Tournament created!", "success")
+            return redirect("/tournament")
+
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            flash("Tournament creation failed!", "danger")
+            return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
+
+    # TODO: Add error handling
 
 @app.route("/tournament/team")
 def team_results_page():
@@ -99,41 +128,7 @@ def tournament_game_view():
 def tournament_player_view():
     return render_template("pages/stats_player.html")
 
-
-# DATA UPLOAD ROUTES
-# based on https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
-
-
-@app.route("/upload", methods=["POST"])
-def upload_file():
-    file_upload_name = "results_file"  # the value of the HTML `name` attribute
-
-    def is_csv(file_name):
-        return "." in file_name and file_name.rsplit(".", 1)[1].lower() == "csv"
-
-    print("Files", request.files)
-
-    if file_upload_name not in request.files:
-        return "No file part", 400
-
-    file = request.files[file_upload_name]
-    if file.filename == "":
-        return "No selected file", 400
-
-    if file and is_csv(file.filename):
-        import_csv(file.stream)
-
-        return "File uploaded successfully", 200
-
-
 # 404 not found page
 @app.errorhandler(404)
 def not_found(err):
     return render_template("pages/404.html", error=err)
-
-
-# API
-# @app.route("/api/account/create", methods=["POST"])
-# def api_account_create():
-#     # TODO
-#     pass
