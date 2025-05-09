@@ -71,8 +71,8 @@ def user_logout():
 
 @app.route("/account", methods=["GET", "POST"])
 def user_account_page():
-    if current_user.is_authenticated:
-        return render_template("pages/account.html")
+    if not current_user.is_authenticated:
+        return redirect("/account/login")
 
     form=forms.UpdateAccountForm()
     
@@ -90,6 +90,9 @@ def user_account_page():
         db.session.commit()
         flash("Your account has been updated!", "success")
         return redirect("/account")
+    form.username.data = current_user.username
+    form.email.data = current_user.email
+    return render_template("pages/account.html", form=form)
 
 @app.route("/tournament")
 def tournament_page():
