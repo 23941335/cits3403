@@ -68,35 +68,43 @@
   </div>
 
   <!-- Input Tournament Details -->
-  <form method="POST" action="/upload" enctype="multipart/form-data" class="form">
+  <form method="POST" action="/create-tournament" enctype="multipart/form-data" class="form">
+    {{ form.hidden_tag() }}
+
     <div class="input">
-      <label for="name" class="form-label">Tournament Name</label>
-      <input type="text" class="form-control" id="name" name="name" required maxlength="50" style="min-width: 20rem;">
+      {{ form.name.label(class="form-label", for="name") }}
+      {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
+      {% if form.name.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.name.errors %}
+        <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="input">
-      <label for="description" class="form-label">Description</label>
-      <textarea class="form-control" id="description" name="description" required maxlength="1000"
-        style="min-width: 40rem;"></textarea>
+      {{ form.description.label(class="form-label", for="description") }}
+      {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description") }}
+      {% if form.description.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.description.errors %}
+        <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="input">
-      <label for="view" class="form-label">View</label>
-      <select name="view" id="veiw">
-        <option value="bracket">Public</option>
-        <option value="elimintation">Link only</option>
-        <option value="round_robin">Invite Only</option>
-      </select>
-    </div>
-
-    <div class="input">
-      <label for="type" class="form-label">Type</label>
-      <select name="type" id="type">
-        <option value="bracket">Bracket</option>
-        <option value="elimintation">Elimination</option>
-        <option value="round_robin">Round Robin</option>
-        <option value="swiss">Swiss</option>
-      </select>
+      {{ form.visibility.label(class="form-label", for="view") }}
+      {{ form.visibility(class="form-control" + (" is-invalid" if form.visibility.errors else ""), id="view") }}
+      {% if form.visibility.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.visibility.errors %}
+        <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="input">
@@ -105,17 +113,20 @@
     </div>
 
     <div class="input">
-      <label for="myfile" class="form-label">Results File (Optional)</label>
-      <input type="file" id="reults_file" name="results_file" accept=".csv">
+      {{ form.csv_file.label(class="form-label", for="results_file") }}
+      {{ form.csv_file(class="form-control" + (" is-invalid" if form.csv_file.errors else ""), id="results_file") }}
+      {% if form.csv_file.errors %}
+      <div class="invalid-feedback">
+        {% for error in form.csv_file.errors %}
+        <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="submit">
-      <button type="submit" class="btn btn-primary" style="margin-right: 0.5rem;">
-        Confirm
-      </button>
-      <button type="submit" class="btn btn-primary">
-        Cancel
-      </button>
+      {{ form.submit(class="btn btn-primary", id="submit") }}
+      <button type="button" class="btn btn-primary">Cancel</button>
     </div>
   </form>
 </body>
