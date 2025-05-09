@@ -78,3 +78,21 @@ class UpdateAccountForm(FlaskForm):
     #         User.username == username.data))
     #     if user is None:
     #         raise ValidationError('username is Invalid.')
+
+class CreateTournamentForm(FlaskForm):
+    name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
+    description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
+
+    visibility = SelectField(
+        'Tournament Visibility',  coerce=int,
+        validators=[DataRequired(message="You must select an option.")]
+    )
+
+    # TODO: team validation
+
+    csv_file = FileField(
+        'CSV Upload (Optional)',
+        validators=[Optional(), FileAllowed(['csv'], 'CSV files only.')]
+    )
+
+    submit = SubmitField("Create Tournament")
