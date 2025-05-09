@@ -107,11 +107,6 @@ def new_tournament_page():
     return render_template("pages/create-tournament.html")
 
 
-@app.route("/create-tournament", methods=["POST"])
-@login_required
-def new_tournament_page():
-    return render_template("pages/create-tournament.html")
-
 
 @app.route("/tournament/team")
 def team_results_page():
