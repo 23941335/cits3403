@@ -65,8 +65,7 @@ def process_lines(line_list):
 
 
 class CSV_Game:
-    def __init__(self, tournament: m.Tournament, game_header_row, game_medal_rows, game_player_rows):
-        self.tournament = tournament
+    def __init__(self, game_header_row, game_medal_rows, game_player_rows):
         self.game = None
         self.header_row = game_header_row
         self.medal_rows = game_medal_rows
@@ -114,7 +113,7 @@ class CSV_Game:
         db.session.flush()
         
         new_game = m.Game(
-            tournament_id=self.tournament.id, 
+            tournament_id=PLACEHOLDER_ID, 
             round=PLACEHOLDER_ID,
             team_a_id=team_a.id,
             team_b_id=team_b.id,
@@ -223,7 +222,7 @@ class CSV_Game:
     def commit_changes(self):
         db.session.commit()
 
-def import_csv(csv, tournament: m.Tournament, commit_changes=True):
+def import_csv(csv):
     # if a file path (for local testing)
     if isinstance(csv, str):
         with open(csv, 'r') as rf:
@@ -238,11 +237,10 @@ def import_csv(csv, tournament: m.Tournament, commit_changes=True):
     game_list = process_lines(lines)
     
     for game in game_list:
-        csvg = CSV_Game(tournament, game[0], game[1], game[2])
+        csvg = CSV_Game(game[0], game[1], game[2])
         csvg.create_changes()
         # error checking here
-        if commit_changes:
-            csvg.commit_changes()
+        csvg.commit_changes()
     
     return True
     
