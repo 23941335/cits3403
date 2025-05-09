@@ -3,7 +3,7 @@ import os
 from app import app, db, models, forms
 from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
 
 
@@ -101,7 +101,14 @@ def tournament_page():
     return render_template("pages/tournament.html")
 
 
-@app.route("/create-tournament")
+@app.route("/create-tournament", methods=["GET"])
+@login_required
+def new_tournament_page():
+    return render_template("pages/create-tournament.html")
+
+
+@app.route("/create-tournament", methods=["POST"])
+@login_required
 def new_tournament_page():
     return render_template("pages/create-tournament.html")
 
