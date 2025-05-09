@@ -79,8 +79,8 @@ def user_account_page():
 def tournament_page():
     return render_template("pages/tournament.html")
 
-
 @app.route("/create-tournament", methods=["GET"])
+@login_required
 def new_tournament_page():
     form = forms.CreateTournamentForm()
 
@@ -141,32 +141,6 @@ def tournament_game_view():
 @app.route("/tournament/player")
 def tournament_player_view():
     return render_template("pages/stats_player.html")
-
-
-# DATA UPLOAD ROUTES
-# based on https://flask.palletsprojects.com/en/stable/patterns/fileuploads/
-
-
-@app.route("/upload", methods=["POST"])
-def upload_file():
-    file_upload_name = "results_file"  # the value of the HTML `name` attribute
-
-    def is_csv(file_name):
-        return "." in file_name and file_name.rsplit(".", 1)[1].lower() == "csv"
-
-    print("Files", request.files)
-
-    if file_upload_name not in request.files:
-        return "No file part", 400
-
-    file = request.files[file_upload_name]
-    if file.filename == "":
-        return "No selected file", 400
-
-    if file and is_csv(file.filename):
-        import_csv(file.stream)
-
-        return "File uploaded successfully", 200
 
 
 # 404 not found page
