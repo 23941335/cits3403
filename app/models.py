@@ -95,6 +95,8 @@ class User(UserMixin, BaseModel):
     global_role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id))
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), nullable=True)
     is_active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    profile_picture: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
+
 
     player: Mapped["Player"] = relationship("Player", back_populates="user")
     tournaments: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="user")
