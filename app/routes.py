@@ -67,12 +67,45 @@ def user_logout():
     return redirect("/")
 
 
-@app.route("/account", methods=["GET"])
+@app.route("/account", methods=["GET", "POST"])
+@login_required
 def user_account_page():
-    if current_user.is_authenticated:
-        return render_template("pages/account.html")
-    else:
-        return redirect("/account/login")
+    form = forms.UpdateAccountForm()
+
+    if form.validate_on_submit():
+        # Change username(Unique only)
+        if form.username.data and form.username.data != current_user.username:
+            existing_user = db.session.scalar(
+                sa.select(models.User).where(models.User.username == form.username.data)
+            )
+            if existing_user:
+                flash("Username already taken.", "danger")
+                return redirect("/account")
+            current_user.username = form.username.data
+
+        # Change email(Unique only)
+        if form.email.data and form.email.data != current_user.email:
+            existing_user = db.session.scalar(
+                sa.select(models.User).where(models.User.email == form.email.data)
+            )
+            if existing_user:
+                flash("Email already registered.", "danger")
+                return redirect("/account")
+            current_user.email = form.email.data
+
+        # Upload profile picture to path static/profile_pics
+        if form.picture.data:
+            picture_file = form.picture.data
+            filename = secure_filename(picture_file.filename)
+            save_path = os.path.join("static", "profile_pics", filename)
+            picture_file.save(save_path)
+            current_user.profile_picture = f"profile_pics/{filename}"
+
+        db.session.commit()
+        flash("Account updated successfully!", "success")
+        return redirect("/account")
+
+    return render_template("pages/account.html", form=form)
 
 
 @app.route("/tournament")
