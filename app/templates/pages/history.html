@@ -32,30 +32,50 @@
       </tr>
       <tr class="collapse" id="collapse-{{ t.id }}">
         <td colspan="7">
-          <strong>Games:</strong>
-          <ul>
-            {% for g in t.games %}
-            <li>
-              {{ g.team_a.team_name }} {{ 'draw' if g.is_draw else 'vs' }} {{ g.team_b.team_name }}
-              {% if not g.is_draw %}
-              - Winner: {{ g.team_a.team_name if g.winning_team == g.team_a.id else g.team_b.team_name }}
+          <div class="border p-3 mb-3">
+
+            <div class="text-center fw-bold fs-5">
+              <!-- In case the game information is-invalid -->
+
+              {% if t.team_a and t.team_b %}
+                {{ t.team_a.team_name }} VS {{ t.team_b.team_name }}
+              {% else %}
+                Incomplete Tournament
               {% endif %}
-              <br>
-              <u>Team {{ g.team_a.team_name }}</u>:
-              <ul>
-                {% for p in g.game_players if p.team_id == g.team_a_id %}
-                <li>{{ p.player.gamertag }}</li>
-                {% endfor %}
-              </ul>
-              <u>Team {{ g.team_b.team_name }}</u>:
-              <ul>
-                {% for p in g.game_players if p.team_id == g.team_b_id %}
-                <li>{{ p.player.gamertag }}</li>
-                {% endfor %}
-              </ul>
-            </li>
-            {% endfor %}
-          </ul>
+            </div>
+            <div class="text-center fs-4">
+              {{ t.team_a_score }} : {{ t.team_b_score }}
+            </div>
+            <div class="text-center mb-2">
+              <strong>
+                {% if t.team_a_score > t.team_b_score %}
+                Winner: {{ t.team_a.team_name }}
+                {% elif t.team_b_score > t.team_a_score %}
+                Winner: {{ t.team_b.team_name }}
+                {% else %}
+                Result: DRAW
+                {% endif %}
+              </strong>
+            </div>
+            <div class="row">
+              <div class="col">
+                <strong>{{ t.team_a.team_name }}</strong>
+                <ul class="list-unstyled">
+                  {% for p in t.team_a_players %}
+                  <li>{{ p }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div class="col">
+                <strong>{{ t.team_b.team_name }}</strong>
+                <ul class="list-unstyled">
+                  {% for p in t.team_b_players %}
+                  <li>{{ p }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
         </td>
       </tr>
       {% endfor %}
