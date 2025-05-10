@@ -20,13 +20,43 @@
     </thead>
     <tbody>
       {% for t in tournaments %}
-      <tr>
+      <tr data-bs-toggle="collapse" data-bs-target="#collapse-{{ t.id }}" aria-expanded="false"
+        aria-controls="collapse-{{ t.id }}">
         <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
         <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
         <td>{{ t.id }}</td>
         <td>{{ t.title }}</td>
         <td>{{ t.description }}</td>
         <td>{{ t.visibility.visibility }}</td>
+        <td>▶</td>
+      </tr>
+      <tr class="collapse" id="collapse-{{ t.id }}">
+        <td colspan="7">
+          <strong>Games:</strong>
+          <ul>
+            {% for g in t.games %}
+            <li>
+              {{ g.team_a.team_name }} {{ 'draw' if g.is_draw else 'vs' }} {{ g.team_b.team_name }}
+              {% if not g.is_draw %}
+              - Winner: {{ g.team_a.team_name if g.winning_team == g.team_a.id else g.team_b.team_name }}
+              {% endif %}
+              <br>
+              <u>Team {{ g.team_a.team_name }}</u>:
+              <ul>
+                {% for p in g.game_players if p.team_id == g.team_a_id %}
+                <li>{{ p.player.gamertag }}</li>
+                {% endfor %}
+              </ul>
+              <u>Team {{ g.team_b.team_name }}</u>:
+              <ul>
+                {% for p in g.game_players if p.team_id == g.team_b_id %}
+                <li>{{ p.player.gamertag }}</li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
