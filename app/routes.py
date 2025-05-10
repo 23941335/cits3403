@@ -146,6 +146,10 @@ def create_tournament():
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
     form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
 
+    start_time = form.start_time.data
+    tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
+
+
     if form.validate_on_submit():
         try:
             print(form.visibility.data)

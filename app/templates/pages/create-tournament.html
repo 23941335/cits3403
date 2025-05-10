@@ -82,10 +82,16 @@
       </div>
       {% endif %}
     </div>
+    
+    <div class="input">
+      {{ form.start_time.label(class="form-label") }}
+      {{ form.start_time(class="form-control") }}
+    </div>
 
     <div class="input">
       {{ form.description.label(class="form-label", for="description") }}
-      {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description") }}
+      {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description")
+      }}
       {% if form.description.errors %}
       <div class="invalid-feedback">
         {% for error in form.description.errors %}

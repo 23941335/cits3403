@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed,FileField
+from wtforms.fields import DateTimeLocalField
 from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField
 from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
@@ -69,6 +70,7 @@ class LoginForm(FlaskForm):
 
 class CreateTournamentForm(FlaskForm):
     name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
+    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[Optional()])
     description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
 
     visibility = SelectField(
