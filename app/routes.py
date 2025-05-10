@@ -106,6 +106,12 @@ def tournament_page():
 def new_tournament_page():
     return render_template("pages/create-tournament.html")
 
+@app.route("/history")
+def history_page():
+    from app.models import Tournament
+
+    tournaments = db.session.scalars(sa.select(models.Tournament)).all()
+    return render_template("pages/history.html", tournaments=tournaments)
 
 
 @app.route("/tournament/team")
