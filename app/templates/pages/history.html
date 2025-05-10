@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Tournament History{% endblock %}
+{% block header_text %}Tournament History{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+  <h2 class="mb-3">All Tournaments</h2>
+  {% if tournaments %}
+  <table class="table table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Visibility</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tournaments %}
+      <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.description }}</td>
+        <td>{{ t.visibility.visibility }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No tournaments found.</p>
+  {% endif %}
+</div>
+{% endblock %}

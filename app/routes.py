@@ -104,6 +104,12 @@ def create_tournament():
                 print(form.visibility.errors) 
                 return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
 
+@app.route("/history")
+def history_page():
+    from app.models import Tournament
+
+    tournaments = db.session.scalars(sa.select(models.Tournament)).all()
+    return render_template("pages/history.html", tournaments=tournaments)
 
             name = form.name.data
             description = form.description.data
