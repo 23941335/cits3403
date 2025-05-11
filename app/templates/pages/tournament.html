@@ -38,7 +38,7 @@
           <td>{{ g.round }}</td>
           <td>{{ g.team_a.team_name }}</td>
           <td>{{ g.team_b.team_name }}</td>
-          <!--<td>{{ g.game_mode.game_mode_name }}</td> -->
+          <td>{{ g.game_mode.game_mode_name }}</td>
           <td>{{ g.map.map_name }}</td>
           <td>
             {% if g.is_draw %}
@@ -51,8 +51,37 @@
               Unknown
             {% endif %}
           </td>
-          <td><a href="/tournament/game?id={{ g.id }}">View</a></td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary me-2" href="/tournament/game?id={{ g.id }}">Full View</a>
+              <button class="btn btn-sm btn-outline-secondary"
+                data-bs-toggle="collapse"
+                data-bs-target="#details-{{ g.id }}"
+                aria-expanded="false"
+                aria-controls="details-{{ g.id }}">
+                  Players
+              </button>
+            </td>
         </tr>
+        <tr class="collapse" id="details-{{ g.id }}">
+          <td colspan="7">
+            <div class="border p-3">
+              <h5>Players in this Game</h5>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                  {% for gp in g.game_players %}
+                <div class="col">
+              <div class="card h-100 p-2">
+              <h6 class="card-title">{{ gp.player.gamertag }}</h6>
+              <p class="mb-1">Hero: {{ gp.hero.hero_name if gp.hero else 'Unknown' }}</p>
+              <p class="mb-1">Kills / Deaths / Assists: {{ gp.kills }} / {{ gp.deaths }} / {{ gp.assists }}</p>
+              <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </td>
+</tr>
+
         {% endfor %}
       </tbody>
     </table>
