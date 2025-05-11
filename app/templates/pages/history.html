@@ -10,9 +10,9 @@
   <table class="table table-hover">
     <thead class="table-dark">
       <tr>
-        <th>Created At</th>
+        <th>Upload Time</th>
         <th>Start Time</th>
-        <th>ID</th>
+        <th>tID</th>
         <th>Tournament</th>
         <th>Description</th>
         <th>Visibility</th>
@@ -27,46 +27,6 @@
         <td><a href="/tournament?id={{ t.id }}">{{ t.title }}</a></td>
         <td>{{ t.description }}</td>
         <td>{{ t.visibility.visibility }}</td>
-        <td class="text-center">
-          <span role="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ t.id }}" aria-expanded="false"
-            aria-controls="collapse-{{ t.id }}">
-            ▼
-          </span>
-        </td>
-      </tr>
-      <tr class="collapse" id="collapse-{{ t.id }}">
-        <td colspan="7">
-          <div class="border p-3 mb-3">
-
-            <div class="text-center fw-bold fs-5">
-              <!-- In case the game information is-invalid -->
-
-              {% if t.team_a and t.team_b %}
-              {{ t.team_a.team_name }} VS {{ t.team_b.team_name }}
-              {% else %}
-              Incomplete Tournament
-              {% endif %}
-            </div>
-            <div class="row">
-              <div class="col">
-                <strong>{{ t.team_a.team_name }}</strong>
-                <ul class="list-unstyled">
-                  {% for p in t.team_a_players %}
-                  <li>{{ p }}</li>
-                  {% endfor %}
-                </ul>
-              </div>
-              <div class="col">
-                <strong>{{ t.team_b.team_name }}</strong>
-                <ul class="list-unstyled">
-                  {% for p in t.team_b_players %}
-                  <li>{{ p }}</li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </td>
       </tr>
       {% endfor %}
     </tbody>
