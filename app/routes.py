@@ -240,7 +240,7 @@ def create_tournament():
 
             db.session.commit()
             flash("Tournament created!", "success")
-            return redirect("/tournament")
+            return redirect(f"/tournament?id={tournament.id}")
 
         except Exception as e:
             db.session.rollback()
