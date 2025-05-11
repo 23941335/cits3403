@@ -125,8 +125,8 @@ class Tournament(BaseModel):
     description: Mapped[str] = mapped_column(sa.Text)
     visibility_id: Mapped[int] = mapped_column(sa.ForeignKey(Visibility.id))
 
-    created_at = mapped_column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
-    #created_at = Column(DateTime, default=datetime.now())
+
+    created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
     start_time: Mapped[Optional[datetime]] = mapped_column(sa.DateTime, nullable=True)
 
     visibility: Mapped["Visibility"] = relationship("Visibility", back_populates="tournaments")
