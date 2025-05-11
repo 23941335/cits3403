@@ -204,10 +204,7 @@ class GameMedals(BaseModel):
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), primary_key=True)
     player: Mapped["Player"] = relationship("Player")
     medal: Mapped["Medal"] = relationship("Medal")
-    player = relationship("Player")
-    medal = relationship("Medal")
-    game = relationship("Game")
-    
+
 class HeroRole(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     role_name: Mapped[str] = mapped_column(sa.Text, unique=True)
