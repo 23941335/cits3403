@@ -302,7 +302,27 @@ def tournament_game_view():
 
 @app.route("/tournament/team")
 def team_results_page():
-    return render_template("pages/stats_team.html")
+    tid = request.args.get("t", type=int)
+    team_id = request.args.get("id", type=int)
+
+    if not tid or not team_id:
+        flash("Missing tournament or team ID", "warning")
+        return redirect("/history")
+
+    tournament = db.session.get(models.Tournament, tid)
+    team = db.session.get(models.Team, team_id)
+
+    if not tournament or not team:
+        return render_template("pages/404.html", error="Invalid tournament or team ID"), 404
+
+    # Display tournament details for the team
+    game_players = db.session.scalars(
+        sa.select(models.GamePlayers).where(models.GamePlayers.team_id == team_id)
+    ).all()
+
+    # read data depending on the game id
+    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players)
+
 
 
 @app.route("/tournament/player")
