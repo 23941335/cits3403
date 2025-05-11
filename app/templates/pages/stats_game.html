@@ -28,23 +28,20 @@
     <h3 class="pb-2">{{ game.team_a.team_name }} vs. {{ game.team_b.team_name }}</h3>
     <div class="pb-4"><em><a href="/tournament?id={{ game.tournament.id }}">{{ game.tournament.title }}</a>, Round {{
             game.round }}</em></div>
-    <div id="winning-team">Winner: {{ game.team_a.team_name if game.winning_team == game.team_a.id else
-        game.team_b.team_name }}</div>
-    <div id="mvp">MVP: {{ mvp }}</div>
-    <div id="svp">SVP: {{ svp }}</div>
     <div class="summary-panel border border-dark p-3 mb-4 text-white rounded col-8" style="background-color: #333;">
         <div class="d-flex justify-content-around text-center">
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
                 <p class="mb-1" style="font-size: 0.9rem;">Winning Team</p>
-                <p id="winning-team" style="font-size: 1.5rem; font-weight: bold;">Team Name B</p>
+                <p id="winning-team" style="font-size: 1.5rem; font-weight: bold;">{{ game.team_a.team_name if game.winning_team == game.team_a.id else
+        game.team_b.team_name }}</p>
             </div>
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
                 <p class="mb-1" style="font-size: 0.9rem;">MVP</p>
-                <p id="mvp" style="font-size: 1.5rem; font-weight: bold;">Player 12</p>
+                <p id="mvp" style="font-size: 1.5rem; font-weight: bold;">{{ mvp }}</p>
             </div>
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
                 <p class="mb-1" style="font-size: 0.9rem;">SVP</p>
-                <p id="svp" style="font-size: 1.5rem; font-weight: bold;">Player 10</p>
+                <p id="svp" style="font-size: 1.5rem; font-weight: bold;">{{ svp }}</p>
             </div>
         </div>
     </div>
