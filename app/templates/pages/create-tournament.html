@@ -82,6 +82,11 @@
       </div>
       {% endif %}
     </div>
+    
+    <div class="input">
+      {{ form.start_time.label(class="form-label") }}
+      {{ form.start_time(class="form-control") }}
+    </div>
 
     <div class="input">
       {{ form.description.label(class="form-label", for="description") }}

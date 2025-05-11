@@ -3,6 +3,10 @@ from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
+from werkzeug.utils import secure_filename
+import os
+from datetime import datetime
+from collections import defaultdict, Counter
 
 
 @app.route("/")
@@ -67,12 +71,60 @@ def user_logout():
     return redirect("/")
 
 
-@app.route("/account", methods=["GET"])
+@app.route("/account", methods=["GET", "POST"])
+@login_required
 def user_account_page():
-    if current_user.is_authenticated:
-        return render_template("pages/account.html")
-    else:
-        return redirect("/account/login")
+    form = forms.UpdateAccountForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        form_type = request.form.get("form_type")
+
+        if form_type == "edit_username":
+            if form.username.data and form.username.data != current_user.username:
+                existing_user = db.session.scalar(
+                    sa.select(models.User).where(models.User.username == form.username.data)
+                )
+                if existing_user:
+                    flash("Username already taken.", "danger")
+                    return redirect("/account")
+                current_user.username = form.username.data
+                db.session.commit()
+                flash("Username updated successfully.", "success")
+                return redirect("/account")
+
+        elif form_type == "edit_email":
+            if form.email.data and form.email.data != current_user.email:
+                existing_user = db.session.scalar(
+                    sa.select(models.User).where(models.User.email == form.email.data)
+                )
+                if existing_user:
+                    flash("Email already registered.", "danger")
+                    return redirect("/account")
+                current_user.email = form.email.data
+                db.session.commit()
+                flash("Email updated successfully.", "success")
+                return redirect("/account")
+
+        elif form_type == "edit_picture":
+            if form.picture.data:
+                picture_file = form.picture.data
+                filename = secure_filename(picture_file.filename)
+
+                # Makesure path is secure
+                base_dir = os.path.abspath(os.path.dirname(__file__))
+                upload_folder = os.path.join(base_dir, "static", "profile_pics")
+                os.makedirs(upload_folder, exist_ok=True)
+
+                save_path = os.path.join(upload_folder, filename)
+                picture_file.save(save_path)
+
+                current_user.profile_picture = f"profile_pics/{filename}"
+                db.session.commit()
+                flash("Profile picture updated successfully.", "success")
+                return redirect("/account")
+
+    return render_template("pages/account.html", form=form)
+
 
 
 @app.route("/tournament")
@@ -96,6 +148,7 @@ def create_tournament():
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
     form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
 
+
     if form.validate_on_submit():
         try:
             print(form.visibility.data)
@@ -107,9 +160,10 @@ def create_tournament():
             name = form.name.data
             description = form.description.data
             vis_id = form.visibility.data
+            start_time = form.start_time.data
             csv_file = form.csv_file.data
 
-            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id)
+            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
             db.session.add(tournament)
             
             if csv_file:
@@ -129,10 +183,37 @@ def create_tournament():
 
 @app.route("/history")
 def history_page():
-    from app.models import Tournament
-
     tournaments = db.session.scalars(sa.select(models.Tournament)).all()
+    for t in tournaments:
+        team_wins = Counter()
+        team_players = defaultdict(set)
+
+        for g in t.games:
+            if not g.is_draw and g.winning_team:
+                team_wins[g.winning_team] += 1
+            for gp in g.game_players:
+                team_players[gp.team_id].add(gp.player.gamertag)
+        if t.games:
+            t.team_a = t.games[0].team_a
+            t.team_b = t.games[0].team_b
+            t.team_a_score = team_wins.get(t.team_a.id, 0)
+            t.team_b_score = team_wins.get(t.team_b.id, 0)
+            t.team_a_players = sorted(team_players.get(t.team_a.id, []))
+            t.team_b_players = sorted(team_players.get(t.team_b.id, []))
+        else:
+            # in case there are no games, set default values
+            t.team_a = None
+            t.team_b = None
+            t.team_a_score = 0
+            t.team_b_score = 0
+            t.team_a_players = []
+            t.team_b_players = []
+        if isinstance(t.created_at, str):
+            t.created_at = datetime.fromisoformat(t.created_at)
+        if isinstance(t.start_time, str):
+            t.start_time = datetime.fromisoformat(t.start_time)
     return render_template("pages/history.html", tournaments=tournaments)
+
 
 @app.route("/tournament/team")
 def team_results_page():
