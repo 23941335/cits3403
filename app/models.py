@@ -130,8 +130,8 @@ class Tournament(BaseModel):
     start_time: Mapped[Optional[datetime]] = mapped_column(sa.DateTime, nullable=True)
 
     visibility: Mapped["Visibility"] = relationship("Visibility", back_populates="tournaments")
-    users: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="tournament")
-    games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament")
+    users: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="tournament", cascade="all, delete-orphan")
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Tournament '{self.title}'>"
@@ -177,11 +177,11 @@ class Game(BaseModel):
     map_id: Mapped[int] = mapped_column(sa.ForeignKey(Map.id))
     game_mode: Mapped["GameMode"] = relationship("GameMode")
     map: Mapped["Map"] = relationship("Map")
-    gamemedals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game")
+    gamemedals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game",cascade="all, delete-orphan")
 
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
-    game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game")
+    game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game",cascade="all, delete-orphan")
     team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id], back_populates="games_as_team_a")
     team_b: Mapped["Team"] = relationship("Team", foreign_keys=[team_b_id], back_populates="games_as_team_b")
 
