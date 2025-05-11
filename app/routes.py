@@ -140,6 +140,26 @@ def tournament_page():
     
     games = tournament.games
     teams = list({g.team_a for g in games} | {g.team_b for g in games})
+    for g in games:
+        mvp_medal = db.session.query(models.GameMedals)\
+            .join(models.Medal)\
+            .join(models.Player)\
+            .filter(
+                models.GameMedals.game_id == g.id,
+                models.Medal.medal_name.ilike("mvp")
+            ).first()
+
+        svp_medal = db.session.query(models.GameMedals)\
+            .join(models.Medal)\
+            .join(models.Player)\
+            .filter(
+                models.GameMedals.game_id == g.id,
+                models.Medal.medal_name.ilike("svp")
+            ).first()
+
+    g.mvp = mvp_medal.player if mvp_medal else None
+    g.svp = svp_medal.player if svp_medal else None
+
 
     return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams)
 
