@@ -5,6 +5,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 
 
 @app.route("/")
@@ -146,6 +147,7 @@ def create_tournament():
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
     form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
 
+
     if form.validate_on_submit():
         try:
             print(form.visibility.data)
@@ -157,9 +159,10 @@ def create_tournament():
             name = form.name.data
             description = form.description.data
             vis_id = form.visibility.data
+            start_time = form.start_time.data
             csv_file = form.csv_file.data
 
-            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id)
+            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
             db.session.add(tournament)
             
             if csv_file:
@@ -182,7 +185,13 @@ def history_page():
     from app.models import Tournament
 
     tournaments = db.session.scalars(sa.select(models.Tournament)).all()
+    for t in tournaments:
+        if isinstance(t.created_at, str):
+            t.created_at = datetime.fromisoformat(t.created_at)
+        if isinstance(t.start_time, str):
+            t.start_time = datetime.fromisoformat(t.start_time)
     return render_template("pages/history.html", tournaments=tournaments)
+
 
 @app.route("/tournament/team")
 def team_results_page():
