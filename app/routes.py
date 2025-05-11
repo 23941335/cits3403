@@ -139,7 +139,11 @@ def tournament_page():
         return render_template("pages/404.html", error=f"Tournament with ID {tid} not found."), 404
     
     games = tournament.games
-    teams = list({g.team_a for g in games} | {g.team_b for g in games})
+    teams = sorted(
+        list({g.team_a for g in games} | {g.team_b for g in games}),
+        key=lambda t: t.team_name.lower()
+    )
+
     for g in games:
         mvp_medal = db.session.query(models.GameMedals)\
             .join(models.Medal)\
