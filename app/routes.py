@@ -319,26 +319,12 @@ def team_results_page():
     game_players = db.session.scalars(
         sa.select(models.GamePlayers).where(models.GamePlayers.team_id == team_id)
     ).all()
-    wins = 0
-    losses = 0
-    draws = 0
-    kills = 0
-    deaths = 0
-    assists = 0
-    damage = 0
-    healing = 0
+    games_played = set()
+    kills = deaths = assists = damage = healing = 0
     accuracy_list = []
 
     for gp in game_players:
-        game = gp.game
-        if game.tournament_id != tid:
-            continue
-        if game.is_draw:
-            draws += 1
-        elif game.winning_team == team_id:
-            wins += 1
-        else:
-            losses += 1
+        games_played.add(gp.game_id)
         kills += gp.kills
         deaths += gp.deaths
         assists += gp.assists
@@ -346,24 +332,19 @@ def team_results_page():
         healing += gp.healing
         accuracy_list.append(gp.accuracy_pct)
 
-    total_games = wins + losses + draws
     kda_ratio = round((kills + assists) / (deaths if deaths > 0 else 1), 2)
     avg_accuracy = round(sum(accuracy_list) / len(accuracy_list), 1) if accuracy_list else 0
-    win_rate = round(100 * wins / total_games, 1) if total_games > 0 else 0
 
     team_summary = {
-        'wins': wins,
-        'losses': losses,
-        'draws': draws,
+        'games': len(games_played),
         'kda_ratio': kda_ratio,
         'total_kills': kills,
-        'total_deaths': deaths,
         'total_assists': assists,
         'total_damage': damage,
         'total_healing': healing,
-        'avg_accuracy': avg_accuracy,
-        'win_rate': win_rate
+        'avg_accuracy': avg_accuracy
     }
+
 
     return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary)
 

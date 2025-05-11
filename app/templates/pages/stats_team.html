@@ -3,17 +3,20 @@
 {% block header_text %} Team Performance During Tournament {% endblock %}
 
 {% block main %}
-<div class="container my-4">
-    <div class="text-center">
-        <h3>{{ team.team_name }} Performance</h3>
-        <p>During <a href="/tournament?id={{ tournament.id }}">{{ tournament.title }}</a></p>
-    </div>
-    <div class="row mb-4">
+<div class="row mb-4">
   <div class="col-md-3">
     <div class="card text-center bg-light">
       <div class="card-body">
-        <h6 class="card-title">Win / Loss / Draw</h6>
-        <p class="card-text fs-4">{{ team_summary.wins }} / {{ team_summary.losses }} / {{ team_summary.draws }}</p>
+        <h6 class="card-title">Games Played</h6>
+        <p class="card-text fs-4">{{ team_summary.games }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center bg-light">
+      <div class="card-body">
+        <h6 class="card-title">Total Kills</h6>
+        <p class="card-text fs-4">{{ team_summary.total_kills }}</p>
       </div>
     </div>
   </div>
@@ -28,20 +31,13 @@
   <div class="col-md-3">
     <div class="card text-center bg-light">
       <div class="card-body">
-        <h6 class="card-title">Avg Accuracy</h6>
+        <h6 class="card-title">Accuracy</h6>
         <p class="card-text fs-4">{{ team_summary.avg_accuracy }}%</p>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card text-center bg-light">
-      <div class="card-body">
-        <h6 class="card-title">Win Rate</h6>
-        <p class="card-text fs-4">{{ team_summary.win_rate }}%</p>
-      </div>
-    </div>
-  </div>
 </div>
+
 
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
     <div class="mb-4">
