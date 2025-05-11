@@ -70,7 +70,14 @@
                   {% for gp in g.game_players %}
                 <div class="col">
               <div class="card h-100 p-2">
-              <h6 class="card-title">{{ gp.player.gamertag }}</h6>
+              <h6 class="card-title">
+                {{ gp.player.gamertag }}
+                {% if g.mvp and gp.player.id == g.mvp.id %}
+                  <span class="badge bg-warning text-dark ms-2">MVP</span>
+                {% elif g.svp and gp.player.id == g.svp.id %}
+                  <span class="badge bg-info text-dark ms-2">SVP</span>
+                {% endif %}
+              </h6>
               <p class="mb-1">Hero: {{ gp.hero.hero_name if gp.hero else 'Unknown' }}</p>
               <p class="mb-1">Kills / Deaths / Assists: {{ gp.kills }} / {{ gp.deaths }} / {{ gp.assists }}</p>
               <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%</p>
