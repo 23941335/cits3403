@@ -151,10 +151,8 @@ def create_tournament():
 
     if form.validate_on_submit():
         try:
-            print(form.visibility.data)
             if form.visibility.data == -1:
                 form.visibility.errors.append("Please select a valid visibility option.")
-                print(form.visibility.errors) 
                 return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
 
             name = form.name.data
@@ -176,6 +174,7 @@ def create_tournament():
 
         except Exception as e:
             db.session.rollback()
+            print(e)
             flash("Tournament creation failed!", "danger")
             return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
 
