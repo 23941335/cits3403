@@ -218,6 +218,7 @@ class Hero(BaseModel):
     hero_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
     hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
+    hero_role: Mapped["HeroRole"] = relationship("HeroRole")
 
     def __repr__(self):
         return f"<Hero '{self.hero_name}'>"
