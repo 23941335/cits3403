@@ -8,5 +8,13 @@
 {% endblock %}
 
 {% block main %}
+<h1>{{ tournament.title }}</h1>
+<p>{{ tournament.description }}</p>
+<p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+<p>Visibility: {{ tournament.visibility.visibility }}</p>
+
+{% for team in teams %}
+<p>{{ team.team_name }}</p>
+{% endfor %}
 
 {% endblock %}
