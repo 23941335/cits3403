@@ -97,41 +97,5 @@
         </table>
     </div>
 </div>
-<script>
-    function assignMedal(player_num, row) {
-        let medals = [];
-        switch (player_num) {
-            case 1:
-                medals = ['🥈'];
-                break;
-            case 7:
-                medals = ['🛡️'];
-                break;
-            case 9:
-                medals = ['4️⃣'];
-                break;
-            case 10:
-                medals = ['⚔️', '🔥', '3️⃣'];
-                break;
-            case 12:
-                medals = ['🥇', '➕', '✊'];
-                break;
-            default:
-                break;
-        }
-        row.querySelector('.medals').textContent = medals.join(' ');
-    };
-
-    const rows = document.querySelectorAll('tbody tr');
-    let player_num = 0
-    rows.forEach((row, index) => {
-        if (row.classList.contains('blue-header') || row.classList.contains('orange-header')) {
-            return;
-        }
-        player_num += 1
-        // Adjust player_num to account for non-player rows
-        assignMedal(player_num, row);
-    });
-</script>
 
 {% endblock %}
