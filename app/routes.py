@@ -157,8 +157,8 @@ def tournament_page():
                 models.Medal.medal_name.ilike("svp")
             ).first()
 
-    g.mvp = mvp_medal.player if mvp_medal else None
-    g.svp = svp_medal.player if svp_medal else None
+        g.mvp = mvp_medal.player if mvp_medal else None
+        g.svp = svp_medal.player if svp_medal else None
 
 
     return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams)
