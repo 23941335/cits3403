@@ -63,10 +63,25 @@ def generate_csv(file_path, heroes, medals, maps, modes, num_teams):
             # PLEASE NOTE: this does not really generate realistic medal assignments
             # and its not based on the numbers, but should be ok for testing, for now.
             # Generate medals
-            medals_shuffled = medals.copy()
-            random.shuffle(medals_shuffled)
+            # Assign players to teams
+            team_a_players = players[:6]
+            team_b_players = players[6:]
 
-            for medal in medals_shuffled:
+            # Assign MVP and SVP to different teams
+            mvp = random.choice(team_a_players)
+            svp_candidates = [p for p in team_b_players if p != mvp]
+            svp = random.choice(svp_candidates) if svp_candidates else random.choice(team_b_players)
+
+            # Write MVP and SVP to the CSV
+            writer.writerow(['', "MVP", mvp, '', '', '', '', '', '', ''])
+            writer.writerow(['', "SVP", svp, '', '', '', '', '', '', ''])
+
+            # Assign other medals
+            medals_remaining = [m for m in medals if m not in ["MVP", "SVP"]]
+            random.shuffle(medals_remaining)
+            # This modification is to ensure MVP and SVP assigned to different teams and different players
+
+            for medal in medals_remaining:
                 player = random.choice(players)
                 writer.writerow(['', medal, player, '', '', '', '', '', '', ''])
 
