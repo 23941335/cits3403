@@ -177,6 +177,7 @@ class Game(BaseModel):
     map_id: Mapped[int] = mapped_column(sa.ForeignKey(Map.id))
     game_mode: Mapped["GameMode"] = relationship("GameMode")
     map: Mapped["Map"] = relationship("Map")
+    gamemedals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game")
 
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
