@@ -267,15 +267,42 @@ def history_page():
             t.start_time = datetime.fromisoformat(t.start_time)
     return render_template("pages/history.html", tournaments=tournaments)
 
+@app.route("/tournament/game")
+def tournament_game_view():
+    gid = request.args.get("id", type=int)
+    if not gid:
+        flash("Game ID missing in request", "warning")
+        return redirect("/history")
+
+    game = db.session.get(models.Game, gid)
+    if not game:
+        return render_template("pages/404.html", error=f"Game with ID {gid} not found."), 404
+
+    players = db.session.scalars(
+        sa.select(models.GamePlayers).where(models.GamePlayers.game_id == gid)
+    ).all()
+
+    medal_entries = db.session.scalars(
+        sa.select(models.GameMedals).where(models.GameMedals.game_id == gid)
+    ).all()
+
+    medal_by_player = {}
+    for gm in medal_entries:
+        medal = db.session.get(models.Medal, gm.medal_id)
+        if gm.player_id not in medal_by_player:
+            medal_by_player[gm.player_id] = []
+        medal_by_player[gm.player_id].append(medal.medal_name)
+
+    mvp_name = next((p.player.gamertag for p in players if 'MVP' in medal_by_player.get(p.player_id, [])), "N/A")
+    svp_name = next((p.player.gamertag for p in players if 'SVP' in medal_by_player.get(p.player_id, [])), "N/A")
+
+    return render_template("pages/stats_game.html", game=game, players=players, medals=medal_by_player, mvp=mvp_name, svp=svp_name)
+
+
 
 @app.route("/tournament/team")
 def team_results_page():
     return render_template("pages/stats_team.html")
-
-
-@app.route("/tournament/game")
-def tournament_game_view():
-    return render_template("pages/stats_game.html")
 
 
 @app.route("/tournament/player")
