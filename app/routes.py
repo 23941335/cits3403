@@ -3,6 +3,8 @@ from flask import render_template, redirect, flash, request
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
+from werkzeug.utils import secure_filename
+import os
 
 
 @app.route("/")
@@ -67,12 +69,60 @@ def user_logout():
     return redirect("/")
 
 
-@app.route("/account", methods=["GET"])
+@app.route("/account", methods=["GET", "POST"])
+@login_required
 def user_account_page():
-    if current_user.is_authenticated:
-        return render_template("pages/account.html")
-    else:
-        return redirect("/account/login")
+    form = forms.UpdateAccountForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        form_type = request.form.get("form_type")
+
+        if form_type == "edit_username":
+            if form.username.data and form.username.data != current_user.username:
+                existing_user = db.session.scalar(
+                    sa.select(models.User).where(models.User.username == form.username.data)
+                )
+                if existing_user:
+                    flash("Username already taken.", "danger")
+                    return redirect("/account")
+                current_user.username = form.username.data
+                db.session.commit()
+                flash("Username updated successfully.", "success")
+                return redirect("/account")
+
+        elif form_type == "edit_email":
+            if form.email.data and form.email.data != current_user.email:
+                existing_user = db.session.scalar(
+                    sa.select(models.User).where(models.User.email == form.email.data)
+                )
+                if existing_user:
+                    flash("Email already registered.", "danger")
+                    return redirect("/account")
+                current_user.email = form.email.data
+                db.session.commit()
+                flash("Email updated successfully.", "success")
+                return redirect("/account")
+
+        elif form_type == "edit_picture":
+            if form.picture.data:
+                picture_file = form.picture.data
+                filename = secure_filename(picture_file.filename)
+
+                # Makesure path is secure
+                base_dir = os.path.abspath(os.path.dirname(__file__))
+                upload_folder = os.path.join(base_dir, "static", "profile_pics")
+                os.makedirs(upload_folder, exist_ok=True)
+
+                save_path = os.path.join(upload_folder, filename)
+                picture_file.save(save_path)
+
+                current_user.profile_picture = f"profile_pics/{filename}"
+                db.session.commit()
+                flash("Profile picture updated successfully.", "success")
+                return redirect("/account")
+
+    return render_template("pages/account.html", form=form)
+
 
 
 @app.route("/tournament")

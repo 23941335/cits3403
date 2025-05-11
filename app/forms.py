@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileAllowed
+from flask_wtf.file import FileAllowed,FileField
 from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField
 from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
@@ -84,3 +84,16 @@ class CreateTournamentForm(FlaskForm):
     )
 
     submit = SubmitField("Create Tournament")
+
+class UpdateAccountForm(FlaskForm):
+    username = StringField('New Username', validators=[
+        Optional(), Length(min=3, max=25)
+    ])
+    email = StringField('New Email', validators=[
+        Optional(), Email(), Length(min=6, max=254)
+    ])
+    picture = FileField('Update Profile Picture', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')
+    ])
+    submit = SubmitField('Update')
+
