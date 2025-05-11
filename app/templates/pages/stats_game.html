@@ -68,7 +68,7 @@
                 {% for side, team in [('blue', game.team_a), ('orange', game.team_b)] %}
                 <tr class="{{ side }}-header">
                     <td colspan="12">
-                        <a href="/tournament/team?id={{ team.id }}" class="text-dark">{{ team.team_name }}</a>
+                        <a href="/tournament/team?id={{ team.id }}&t={{ game.tournament.id }}" class="text-dark">{{ team.team_name }}</a>
                     </td>
                 </tr>
                 {% for p in players if p.team_id == team.id %}
