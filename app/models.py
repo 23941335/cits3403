@@ -147,6 +147,8 @@ class TournamentUsers(BaseModel):
 class GameMode(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     game_mode_name: Mapped[str] = mapped_column(sa.Text, unique=True)
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="game_mode")
+
 
     def __repr__(self):
         return f"<GameMode '{self.game_mode_name}'>"
@@ -155,6 +157,8 @@ class Map(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     map_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     map_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="map")
+
 
     def __repr__(self):
         return f"<Map '{self.map_name}'>"
@@ -171,6 +175,9 @@ class Game(BaseModel):
     is_draw: Mapped[bool] = mapped_column(sa.Boolean)
     game_mode_id: Mapped[int] = mapped_column(sa.ForeignKey(GameMode.id))
     map_id: Mapped[int] = mapped_column(sa.ForeignKey(Map.id))
+    game_mode: Mapped["GameMode"] = relationship("GameMode")
+    map: Mapped["Map"] = relationship("Map")
+
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game")
