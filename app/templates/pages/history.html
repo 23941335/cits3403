@@ -21,8 +21,7 @@
     </thead>
     <tbody>
       {% for t in tournaments %}
-      <tr data-bs-toggle="collapse" data-bs-target="#collapse-{{ t.id }}" aria-expanded="false"
-        aria-controls="collapse-{{ t.id }}">
+      <tr>
         <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
         <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
         <td>
@@ -36,7 +35,12 @@
         <td><a href="/tournament?id={{ t.id }}">{{ t.title }}</a></td>
         <td>{{ t.description }}</td>
         <td>{{ t.visibility.visibility }}</td>
-        <td>▶</td>
+        <td class="text-center">
+          <span role="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ t.id }}" aria-expanded="false"
+            aria-controls="collapse-{{ t.id }}">
+            ▼
+          </span>
+        </td>
       </tr>
       <tr class="collapse" id="collapse-{{ t.id }}">
         <td colspan="7">
@@ -57,13 +61,13 @@
             <div class="text-center mb-2">
               <strong>
                 {% if not t.team_a or not t.team_b %}
-                  Result: NONE
+                Result: NONE
                 {% elif t.team_a_score > t.team_b_score %}
-                  Winner: {{ t.team_a.team_name }}
+                Winner: {{ t.team_a.team_name }}
                 {% elif t.team_b_score > t.team_a_score %}
-                  Winner: {{ t.team_b.team_name }}
+                Winner: {{ t.team_b.team_name }}
                 {% else %}
-                  Result: DRAW
+                Result: DRAW
                 {% endif %}
               </strong>
             </div>
