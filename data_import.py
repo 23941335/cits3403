@@ -15,6 +15,7 @@ MATCH_TEAM_B = 2
 MATCH_WINNER = 3
 MATCH_GAME_MODE = 4
 MATCH_MAP = 5
+MATCH_ROUND = 6
 
 MEDAL_NAME = 1
 MEDAL_PLAYER = 2
@@ -78,6 +79,7 @@ class CSV_Game:
         team_a_name = header_row[MATCH_TEAM_A].lower()
         team_b_name = header_row[MATCH_TEAM_B].lower()
         winning_team_name = header_row[MATCH_WINNER].lower()
+        round_num = int(header_row[MATCH_ROUND])
 
         game_mode_name = header_row[MATCH_GAME_MODE].lower()
         map_name = header_row[MATCH_MAP].lower()
@@ -115,7 +117,7 @@ class CSV_Game:
         
         new_game = m.Game(
             tournament_id=self.tournament.id, 
-            round=PLACEHOLDER_ID,
+            round=round_num,
             team_a_id=team_a.id,
             team_b_id=team_b.id,
             winning_team=winning_team_id,

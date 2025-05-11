@@ -1,7 +1,7 @@
 # This script should be run to populate the database with initial values.
 
 from app import app, db
-from app.models import Role, Hero, HeroRole, GameMode, Visibility
+from app.models import Role, Hero, HeroRole, GameMode, Visibility, Map
 import sqlalchemy as sa
 import sqlalchemy.exc as sa_exc
 
@@ -78,6 +78,28 @@ HEROS = {
     ]
 }
 
+MAPS = {
+    'convergence': [
+        { 'name': 'Central Park',         'image': '' },
+        { 'name': 'Hall of Djalia',       'image': '' },
+        { 'name': 'Symbiotic Surface',    'image': '' },
+        { 'name': 'Shin-Shibuya',         'image': '' },
+    ],
+    'convoy': [
+        { 'name': 'Midtown',              'image': '' },
+        { 'name': 'Spider-Islands',       'image': '' },
+        { 'name': 'Yggdrasill Path',      'image': '' },
+    ],
+    'domination': [
+        { 'name': "Birnin T'Challa",      'image': '' },
+        { 'name': "Hell's Heaven",        'image': '' },
+        { 'name': "Krakoa",               'image': '' },
+        { 'name': "Royal Palace",         'image': '' },
+    ]
+}
+
+map_list = [map_item['name'] for gamemode in MAPS.values() for map_item in gamemode]
+
 def populate_heros():
     inserted = 0
     skipped = 0
@@ -95,4 +117,5 @@ if __name__ == '__main__':
         HeroRole.populate_with_list('role_name', ['vanguard', 'duelist', 'strategist'])
         GameMode.populate_with_list('game_mode_name', ['domination', 'convoy', 'convergence'])
         Visibility.populate_with_list('visibility', ['public', 'private'])
+        Map.populate_with_list('map_name', map_list, use_casefold=False)
         populate_heros()

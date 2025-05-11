@@ -24,12 +24,12 @@ class BaseModel(db.Model):
         raise AttributeError(f"{cls.__name__} has no attribute '{field_name}'")
     
     @classmethod
-    def populate_with_list(cls, field_name, values):
+    def populate_with_list(cls, field_name, values, use_casefold=True):
         insertions = 0
         already_exist = 0
 
         for v in values:
-            v = v.lower()
+            v = v.casefold() if use_casefold else v
             existing_val = db.session.scalar(sa.select(cls).where(cls.get_field(field_name) == v))
             if existing_val is None:
                 db.session.add(cls(**{field_name: v}))
