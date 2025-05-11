@@ -217,29 +217,6 @@ def create_tournament():
 def history_page():
     tournaments = db.session.scalars(sa.select(models.Tournament)).all()
     for t in tournaments:
-        team_wins = Counter()
-        team_players = defaultdict(set)
-
-        for g in t.games:
-            if not g.is_draw and g.winning_team:
-                team_wins[g.winning_team] += 1
-            for gp in g.game_players:
-                team_players[gp.team_id].add(gp.player.gamertag)
-        if t.games:
-            t.team_a = t.games[0].team_a
-            t.team_b = t.games[0].team_b
-            t.team_a_score = team_wins.get(t.team_a.id, 0)
-            t.team_b_score = team_wins.get(t.team_b.id, 0)
-            t.team_a_players = sorted(team_players.get(t.team_a.id, []))
-            t.team_b_players = sorted(team_players.get(t.team_b.id, []))
-        else:
-            # in case there are no games, set default values
-            t.team_a = None
-            t.team_b = None
-            t.team_a_score = 0
-            t.team_b_score = 0
-            t.team_a_players = []
-            t.team_b_players = []
         if isinstance(t.created_at, str):
             t.created_at = datetime.fromisoformat(t.created_at)
         if isinstance(t.start_time, str):
