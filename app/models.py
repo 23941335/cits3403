@@ -238,6 +238,8 @@ class GamePlayers(BaseModel):
 
     game: Mapped["Game"] = relationship("Game", back_populates="game_players")
     player: Mapped["Player"] = relationship("Player", back_populates="game_players")
+    hero: Mapped["Hero"] = relationship("Hero")
+
 
     def __repr__(self):
         return f"<GamePlayers>"
