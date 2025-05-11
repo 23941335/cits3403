@@ -11,5 +11,6 @@
 **/.DS_Store
 
 app/static/profile_pics/*
-# 忽略整个 testing 文件夹
-app/testing/
+app/testing/*
+!app/testing/.gitkeep
+
