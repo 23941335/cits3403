@@ -129,7 +129,19 @@ def user_account_page():
 
 @app.route("/tournament")
 def tournament_page():
-    return render_template("pages/tournament.html")
+    tid = request.args.get("id", type=int)
+    if not tid:
+        flash("Tournament ID missing in request", "warning")
+        return redirect("/history")
+
+    tournament = db.session.get(models.Tournament, tid)
+    if not tournament:
+        return render_template("pages/404.html", error=f"Tournament with ID {tid} not found."), 404
+    
+    games = tournament.games
+    teams = list({g.team_a for g in games} | {g.team_b for g in games})
+
+    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams)
 
 @app.route("/create-tournament", methods=["GET"])
 @login_required
