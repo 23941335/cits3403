@@ -13,7 +13,7 @@
 
 <div class="d-flex flex-column justify-content-center align-items-center">
     <h3 class="pb-2">{{ game.team_a.team_name }} vs. {{ game.team_b.team_name }}</h3>
-    <div class="pb-4"><em><a href="/tournament?id=0">Tournament Name</em></a>, Round 7</div>
+    <div class="pb-4"><em><a href="/tournament?id={{ game.tournament.id }}">{{ game.tournament.title }}</a>, Round {{ game.round }}</em></div>
     <div class="summary-panel border border-dark p-3 mb-4 text-white rounded col-8" style="background-color: #333;">
         <div class="d-flex justify-content-around text-center">
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
