@@ -6,7 +6,7 @@ from data_import import import_csv
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
-from collections import defaultdict, Counter
+from sqlalchemy.orm import selectinload
 
 
 @app.route("/")
@@ -163,6 +163,35 @@ def tournament_page():
 
     return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams)
 
+
+@app.route("/tournament/delete/<int:tid>", methods=["POST"])
+@login_required
+def delete_tournament(tid):
+    tournament = db.session.get(models.Tournament, tid)
+    if not tournament:
+        flash("Tournament not found.", "danger")
+        return redirect("/history")
+
+    is_owner = db.session.scalar(sa.select(models.TournamentUsers).where(
+        models.TournamentUsers.tournament_id == tid,
+        models.TournamentUsers.user_id == current_user.id
+    ))
+
+    if not is_owner:
+        flash("You do not have permission to delete this tournament.", "danger")
+        return redirect(f"/tournament?id={tid}")
+
+    try:
+        db.session.delete(tournament)
+        db.session.commit()
+        flash("Tournament deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Failed to delete tournament.", "danger")
+
+    return redirect("/history")
+
+
 @app.route("/create-tournament", methods=["GET"])
 @login_required
 def new_tournament_page():
@@ -195,9 +224,18 @@ def create_tournament():
 
             tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
             db.session.add(tournament)
+            db.session.flush()  # Ensure we can reference the new tournament
+
+            
+            tournament_user = models.TournamentUsers(
+                tournament_id=tournament.id,
+                user_id=current_user.id,
+                tournament_role_id=1  # Assuming 1 is the ID for the owner role
+            )
+            db.session.add(tournament_user)
+
             
             if csv_file:
-                db.session.flush() # ensure we can reference the new tournament
                 import_csv(csv_file.stream, tournament=tournament, commit_changes=False)
 
             db.session.commit()
@@ -214,8 +252,11 @@ def create_tournament():
 
 @app.route("/history")
 def history_page():
-    tournaments = db.session.scalars(sa.select(models.Tournament)).all()
+    stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))
+    tournaments = db.session.scalars(stmt).all()
+    print(f"Current user id = {current_user.id}")
     for t in tournaments:
+        print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
         if isinstance(t.created_at, str):
             t.created_at = datetime.fromisoformat(t.created_at)
         if isinstance(t.start_time, str):
