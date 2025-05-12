@@ -8,6 +8,8 @@ import os
 from datetime import datetime
 from collections import defaultdict, Counter
 
+if not app.config.get('SECRET_KEY'):
+    raise ValueError("Please set the environment variable SECRET_KEY")
 
 @app.route("/")
 @app.route("/home")
