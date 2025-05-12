@@ -177,7 +177,6 @@ def tournament_page():
         g.mvp = mvp_medal.player if mvp_medal else None
         g.svp = svp_medal.player if svp_medal else None
     
-    # Query to be reviewed
     users = db.session.query(models.User).all()
     form = forms.UserSelectionForm()
     form.tid.data = tournament.id
