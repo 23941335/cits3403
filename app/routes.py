@@ -143,6 +143,18 @@ def tournament_page():
         list({g.team_a for g in games} | {g.team_b for g in games}),
         key=lambda t: t.team_name.lower()
     )
+    # Find the final game to determine the winner
+    final_game = max(games, key=lambda g: g.round, default=None)
+    final_winner_id = final_game.winning_team if final_game else None
+
+    # Assign status to teams based on the final winner
+    team_status = {}
+    for team in teams:
+        if team.id == final_winner_id:
+            team_status[team.id] = "winner"
+        else:
+            team_status[team.id] = "loser"
+
 
     for g in games:
         mvp_medal = db.session.query(models.GameMedals)\
@@ -165,7 +177,7 @@ def tournament_page():
         g.svp = svp_medal.player if svp_medal else None
 
 
-    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams)
+    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status)
 
 
 @app.route("/tournament/delete/<int:tid>", methods=["POST"])

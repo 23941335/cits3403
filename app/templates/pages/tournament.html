@@ -23,9 +23,14 @@
 <h4 class="mt-4 mb-3">Teams Participating</h4>
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
   {% for team in teams %}
+  {% set status = team_status.get(team.id, 'unknown') %}
+  {% set card_color = 
+      'bg-warning text-dark' if status == 'winner' else 
+      'bg-light text-muted' if status == 'loser' else 
+      'bg-light text-dark' %}
   <div class="col">
-    <a href="/tournament/team?id={{ team.id }}&t={{ tournament.id }}" class="text-decoration-none text-dark">
-      <div class="card h-100 text-center hover-shadow">
+    <a href="/tournament/team?id={{ team.id }}&t={{ tournament.id }}" class="text-decoration-none">
+      <div class="card h-100 text-center {{ card_color }} hover-shadow">
         <div class="card-body">
           <h5 class="card-title">{{ team.team_name }}</h5>
         </div>
