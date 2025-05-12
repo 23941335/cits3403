@@ -270,7 +270,6 @@ def create_tournament():
 def history_page():
     stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))
     tournaments = db.session.scalars(stmt).all()
-    print(f"Current user id = {current_user.id}")
     for t in tournaments:
         print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
         if isinstance(t.created_at, str):
