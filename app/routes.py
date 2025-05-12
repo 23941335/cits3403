@@ -225,7 +225,6 @@ def create_tournament():
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
     form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
 
-
     if form.validate_on_submit():
         try:
             if form.visibility.data == -1:
@@ -237,19 +236,17 @@ def create_tournament():
             vis_id = form.visibility.data
             start_time = form.start_time.data
             csv_file = form.csv_file.data
-
+            
             tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
             db.session.add(tournament)
             db.session.flush()  # Ensure we can reference the new tournament
-
             
             tournament_user = models.TournamentUsers(
                 tournament_id=tournament.id,
                 user_id=current_user.id,
-                tournament_role_id=1  # Assuming 1 is the ID for the owner role
+                tournament_role_id=1            # TODO
             )
             db.session.add(tournament_user)
-
             
             if csv_file:
                 import_csv(csv_file.stream, tournament=tournament, commit_changes=False)
@@ -289,25 +286,16 @@ def tournament_game_view():
     if not game:
         return render_template("pages/404.html", error=f"Game with ID {gid} not found."), 404
 
-    players = db.session.scalars(
-        sa.select(models.GamePlayers).where(models.GamePlayers.game_id == gid)
-    ).all()
-
-    medal_entries = db.session.scalars(
-        sa.select(models.GameMedals).where(models.GameMedals.game_id == gid)
-    ).all()
-
     medal_by_player = {}
-    for gm in medal_entries:
+    for gm in game.game_medals:
         medal = db.session.get(models.Medal, gm.medal_id)
         if gm.player_id not in medal_by_player:
             medal_by_player[gm.player_id] = []
         medal_by_player[gm.player_id].append(medal.medal_name)
 
-    mvp_name = next((p.player.gamertag for p in players if 'MVP' in medal_by_player.get(p.player_id, [])), "N/A")
-    svp_name = next((p.player.gamertag for p in players if 'SVP' in medal_by_player.get(p.player_id, [])), "N/A")
-
-    return render_template("pages/stats_game.html", game=game, players=players, medals=medal_by_player, mvp=mvp_name, svp=svp_name)
+    mvp_name = next((p.player.gamertag for p in game.game_players if 'MVP' in medal_by_player.get(p.player_id, [])), "N/A")
+    svp_name = next((p.player.gamertag for p in game.game_players if 'SVP' in medal_by_player.get(p.player_id, [])), "N/A")
+    return render_template("pages/stats_game.html", game=game, players=game.game_players, medals=medal_by_player, mvp=mvp_name, svp=svp_name)
 
 
 
@@ -328,7 +316,11 @@ def team_results_page():
 
     # Display tournament details for the team
     game_players = db.session.scalars(
-        sa.select(models.GamePlayers).where(models.GamePlayers.team_id == team_id)
+        sa.select(models.GamePlayers)
+        .where(
+            models.GamePlayers.team_id == team_id,
+            models.GamePlayers.game.has(models.Game.tournament_id == tid)
+        )
     ).all()
     games_played = set()
     kills = deaths = assists = damage = healing = 0
