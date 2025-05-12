@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed,FileField
 from wtforms.fields import DateTimeLocalField
-from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField, HiddenField
 from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
 from app import db
@@ -99,3 +99,7 @@ class UpdateAccountForm(FlaskForm):
     ])
     submit = SubmitField('Update')
 
+class UserSelectionForm(FlaskForm):
+    tid = HiddenField("tid", validators=[DataRequired()])
+    selected_users = HiddenField("Selected Users", validators=[DataRequired()])
+    submit = SubmitField("Submit")
