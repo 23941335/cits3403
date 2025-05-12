@@ -186,13 +186,27 @@ def tournament_page():
     return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status, users=users, form=form)
 
 
-@app.route("/tournament", methods=["POST"])
+@app.route("/tournament/share", methods=["POST"])
 def share():
+
+    # TODO
+    DEFAULT_ROLE_ID = 1
+
     form = forms.UserSelectionForm()
     if form.validate_on_submit():
         try:
             # Process form to insert values into the database
-            print("trying")
+            user_ids = [int(uid) for uid in form.selected_users.data.split(',')]
+            for user_id in user_ids:
+                user = db.session.query(models.User).where(models.User.id == user_id).one()
+                tournament_user = models.TournamentUsers(
+                    tournament_id=form.tid.data,
+                    user_id=user.id,
+                    tournament_role_id=DEFAULT_ROLE_ID
+                )
+                db.session.add(tournament_user)
+            
+            db.session.commit()
 
         except Exception as e:
             db.session.rollback()
