@@ -89,14 +89,12 @@ class User(UserMixin, BaseModel):
     username: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(sa.Text)
     email: Mapped[str] = mapped_column(sa.Text, index=True, unique=True)
-    # Not sure if we really need create/update dates, but they are common so I included them.
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(sa.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     global_role_id: Mapped[int] = mapped_column(sa.ForeignKey(Role.id))
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), nullable=True)
     is_active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
     profile_picture: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
-
 
     player: Mapped["Player"] = relationship("Player", back_populates="user")
     tournaments: Mapped[list["TournamentUsers"]] = relationship("TournamentUsers", back_populates="user")
@@ -147,8 +145,8 @@ class TournamentUsers(BaseModel):
 class GameMode(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     game_mode_name: Mapped[str] = mapped_column(sa.Text, unique=True)
-    games: Mapped[list["Game"]] = relationship("Game", back_populates="game_mode")
 
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="game_mode")
 
     def __repr__(self):
         return f"<GameMode '{self.game_mode_name}'>"
@@ -157,8 +155,8 @@ class Map(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     map_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     map_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
-    games: Mapped[list["Game"]] = relationship("Game", back_populates="map")
 
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="map")
 
     def __repr__(self):
         return f"<Map '{self.map_name}'>"
@@ -175,11 +173,10 @@ class Game(BaseModel):
     is_draw: Mapped[bool] = mapped_column(sa.Boolean)
     game_mode_id: Mapped[int] = mapped_column(sa.ForeignKey(GameMode.id))
     map_id: Mapped[int] = mapped_column(sa.ForeignKey(Map.id))
+    
     game_mode: Mapped["GameMode"] = relationship("GameMode")
     map: Mapped["Map"] = relationship("Map")
     gamemedals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game",cascade="all, delete-orphan")
-
-
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
     game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game",cascade="all, delete-orphan")
     team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id], back_populates="games_as_team_a")
@@ -202,6 +199,7 @@ class GameMedals(BaseModel):
     game_id: Mapped[int] = mapped_column(sa.ForeignKey(Game.id), primary_key=True)
     medal_id: Mapped[int] = mapped_column(sa.ForeignKey(Medal.id), primary_key=True)
     player_id: Mapped[int] = mapped_column(sa.ForeignKey(Player.id), primary_key=True)
+
     player: Mapped["Player"] = relationship("Player")
     medal: Mapped["Medal"] = relationship("Medal")
 
@@ -218,6 +216,7 @@ class Hero(BaseModel):
     hero_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
     hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
+    
     hero_role: Mapped["HeroRole"] = relationship("HeroRole")
 
     def __repr__(self):
