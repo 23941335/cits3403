@@ -128,8 +128,7 @@ def user_account_page():
     return render_template("pages/account.html", form=form)
 
 
-
-@app.route("/tournament")
+@app.route("/tournament", methods=["GET"])
 def tournament_page():
     tid = request.args.get("id", type=int)
     if not tid:
@@ -177,9 +176,28 @@ def tournament_page():
 
         g.mvp = mvp_medal.player if mvp_medal else None
         g.svp = svp_medal.player if svp_medal else None
+    
+    # Query to be reviewed
+    users = db.session.query(models.User).all()
+    form = forms.UserSelectionForm()
+    form.tid.data = tournament.id
 
 
-    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status)
+    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status, users=users, form=form)
+
+
+@app.route("/tournament", methods=["POST"])
+def share():
+    form = forms.UserSelectionForm()
+    if form.validate_on_submit():
+        try:
+            # Process form to insert values into the database
+            print("trying")
+
+        except Exception as e:
+            db.session.rollback()
+    
+    return redirect(f"/tournament?id={form.tid.data}")
 
 
 @app.route("/tournament/delete/<int:tid>", methods=["POST"])
