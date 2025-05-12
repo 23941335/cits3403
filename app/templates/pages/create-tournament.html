@@ -6,133 +6,87 @@
 
 
 {% block main %}
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    color: #ffffff;
-  }
+<!-- Page Description -->
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card p-4 shadow-sm">
+        <h1>Tournament Creator</h1>
+        <p>Create your own tournament, invite players and upload the results. Share to whoever you want.</p>
 
-  .title h1,
-  .title p {
-    color: #000000;
-    text-align: center;
-  }
+        <!-- Input Tournament Details -->
+        <form method="POST" action="/create-tournament" enctype="multipart/form-data" class="form">
+          {{ form.hidden_tag() }}
 
-  .form,
-  .input {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    max-width: 60rem;
-  }
+          <div class="mb-3">
+            {{ form.name.label(class="form-label", for="name") }}
+            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
+            {% if form.name.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.name.errors %}
+              <span>{{ error }}</span><br>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
 
-  .form {
-    align-items: stretch;
-    margin: auto;
-  }
+          <div class="mb-3">
+            {{ form.start_time.label(class="form-label") }}
+            {{ form.start_time(class="form-control") }}
+          </div>
 
-  .input {
-    align-items: flex-start;
-    flex: 1 0;
-    background-color: #1e1e1e;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 0.5rem
-  }
+          <div class="mb-3">
+            {{ form.description.label(class="form-label", for="description") }}
+            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""),
+            id="description")
+            }}
+            {% if form.description.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.description.errors %}
+              <span>{{ error }}</span><br>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
 
-  .form-label {
-    margin-bottom: 0.5rem;
-  }
+          <div class="mb-3">
+            {{ form.visibility.label(class="form-label", for="view") }}
+            {{ form.visibility(class="form-control" + (" is-invalid" if form.visibility.errors else ""), id="view") }}
+            {% if form.visibility.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.visibility.errors %}
+              <span>{{ error }}</span><br>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
 
-  .submit {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    max-width: 60rem;
-    justify-content: flex-start;
-    flex: 1 0;
-    background-color: #1e1e1e;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 0.5rem
-  }
-</style>
+          <div class="mb-3">
+            <label for="description" class="form-label">Teams</label>
+            <textarea class="form-control" id="teams" name="teams" required maxlength="1000"></textarea>
+          </div>
 
-<body>
-  <!-- Page Description -->
-  <div class="title">
-    <h1>Tournament Creator</h1>
-    <p>Create your own tournament, invite players and upload the results. Share to whoever you want.</p>
+          <div class="mb-3">
+            {{ form.csv_file.label(class="form-label", for="results_file") }}
+            {{ form.csv_file(class="form-control" + (" is-invalid" if form.csv_file.errors else ""), id="results_file")
+            }}
+            {% if form.csv_file.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.csv_file.errors %}
+              <span>{{ error }}</span><br>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex justify-content-between mt-3">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="/" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
+</div>
 
-  <!-- Input Tournament Details -->
-  <form method="POST" action="/create-tournament" enctype="multipart/form-data" class="form">
-    {{ form.hidden_tag() }}
-
-    <div class="input">
-      {{ form.name.label(class="form-label", for="name") }}
-      {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
-      {% if form.name.errors %}
-      <div class="invalid-feedback">
-        {% for error in form.name.errors %}
-        <span>{{ error }}</span><br>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-    
-    <div class="input">
-      {{ form.start_time.label(class="form-label") }}
-      {{ form.start_time(class="form-control") }}
-    </div>
-
-    <div class="input">
-      {{ form.description.label(class="form-label", for="description") }}
-      {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description") }}
-      {% if form.description.errors %}
-      <div class="invalid-feedback">
-        {% for error in form.description.errors %}
-        <span>{{ error }}</span><br>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-
-    <div class="input">
-      {{ form.visibility.label(class="form-label", for="view") }}
-      {{ form.visibility(class="form-control" + (" is-invalid" if form.visibility.errors else ""), id="view") }}
-      {% if form.visibility.errors %}
-      <div class="invalid-feedback">
-        {% for error in form.visibility.errors %}
-        <span>{{ error }}</span><br>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-
-    <div class="input">
-      <label for="description" class="form-label">Teams</label>
-      <textarea class="form-control" id="teams" name="teams" required maxlength="1000"></textarea>
-    </div>
-
-    <div class="input">
-      {{ form.csv_file.label(class="form-label", for="results_file") }}
-      {{ form.csv_file(class="form-control" + (" is-invalid" if form.csv_file.errors else ""), id="results_file") }}
-      {% if form.csv_file.errors %}
-      <div class="invalid-feedback">
-        {% for error in form.csv_file.errors %}
-        <span>{{ error }}</span><br>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-
-    <div class="submit">
-      {{ form.submit(class="btn btn-primary", id="submit") }}
-      <button type="button" class="btn btn-primary">Cancel</button>
-    </div>
-  </form>
-</body>
 {%endblock %}

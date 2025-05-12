@@ -27,53 +27,78 @@
     <div class="col-md-8">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">Games Played In <a href="/tournament">This Tournament</a></h5>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Game</th>
-                <th scope="col">Team Rank</th>
-                <th scope="col">Kills</th>
-                <th scope="col">Deaths</th>
-                <th scope="col">Assists</th>
-                <th scope="col">Medals</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><a href="/tournament/game?id=1">Game 1</a></td>
-                <td>4th</td>
-                <td>20</td>
-                <td>5</td>
-                <td>10</td>
-                <td>0</td>
-              </tr>
-              <tr>
-                <td><a href="/tournament/game?id=2">Game 2</a></td>
-                <td>2nd</td>
-                <td>25</td>
-                <td>8</td>
-                <td>12</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <td><a href="/tournament/game?id=3">Game 3</a></td>
-                <td>1st (MVP)</td>
-                <td>30</td>
-                <td>6</td>
-                <td>15</td>
-                <td>3</td>
-              </tr>
-              <tr>
-                <td><strong>Total</strong></td>
-                <td>-</td>
-                <td><strong>75</strong></td>
-                <td><strong>19</strong></td>
-                <td><strong>37</strong></td>
-                <td><strong>4</strong></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Games Played</h5>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                This Tournament
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">This Tournament</a>
+                </li>
+                <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">This Game</a></li>
+                <li><a class="dropdown-item" href="#" onclick="switchGameView('overall')">Overall</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="game-view-tournament" class="game-table-view">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">Game</th>
+                  <th scope="col">Team Rank</th>
+                  <th scope="col">Kills</th>
+                  <th scope="col">Deaths</th>
+                  <th scope="col">Assists</th>
+                  <th scope="col">Medals</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="/tournament/game?id=1">Game 1</a></td>
+                  <td>4th</td>
+                  <td>20</td>
+                  <td>5</td>
+                  <td>10</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td><a href="/tournament/game?id=2">Game 2</a></td>
+                  <td>2nd</td>
+                  <td>25</td>
+                  <td>8</td>
+                  <td>12</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td><a href="/tournament/game?id=3">Game 3</a></td>
+                  <td>1st (MVP)</td>
+                  <td>30</td>
+                  <td>6</td>
+                  <td>15</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td>-</td>
+                  <td><strong>75</strong></td>
+                  <td><strong>19</strong></td>
+                  <td><strong>37</strong></td>
+                  <td><strong>4</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="game-view-game" class="game-table-view" style="display:none;">
+            <p>Only this game stats shown here (to be filled)</p>
+          </div>
+
+          <div id="game-view-overall" class="game-table-view" style="display:none;">
+            <p>Overall stats across tournaments (to be filled)</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -160,4 +185,18 @@
     </div>
   </div>
 </div>
+<script>
+  function switchGameView(view) {
+    document.getElementById("viewDropdown").textContent =
+      view === "tournament" ? "This Tournament" :
+        view === "game" ? "This Game" :
+          "Overall";
+    document.querySelectorAll(".dropdown-item").forEach(item => item.classList.remove("active"));
+    document.querySelector(`.dropdown-item[onclick="switchGameView('${view}')"]`).classList.add("active");
+    // display hidden sections
+    document.querySelectorAll(".game-table-view").forEach(div => div.style.display = "none");
+    const section = document.getElementById(`game-view-${view}`);
+    if (section) section.style.display = "block";
+  }
+</script>
 {% endblock %}

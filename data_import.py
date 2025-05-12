@@ -76,13 +76,13 @@ class CSV_Game:
     def create_game(self):
         header_row = self.header_row
 
-        team_a_name = header_row[MATCH_TEAM_A].lower()
-        team_b_name = header_row[MATCH_TEAM_B].lower()
-        winning_team_name = header_row[MATCH_WINNER].lower()
+        team_a_name = header_row[MATCH_TEAM_A]
+        team_b_name = header_row[MATCH_TEAM_B]
+        winning_team_name = header_row[MATCH_WINNER]
         round_num = int(header_row[MATCH_ROUND])
 
-        game_mode_name = header_row[MATCH_GAME_MODE].lower()
-        map_name = header_row[MATCH_MAP].lower()
+        game_mode_name = header_row[MATCH_GAME_MODE]
+        map_name = header_row[MATCH_MAP]
 
         # Find or create teams
         team_a = db.session.query(m.Team).filter_by(team_name=team_a_name).first()
@@ -99,20 +99,8 @@ class CSV_Game:
             winning_team = db.session.query(m.Team).filter_by(team_name=winning_team_name).first()
             winning_team_id = winning_team.id
 
-        # Find or create game mode and map
-        # NOTE: this shouldn't be needed if we just include all modes
-        # and same goes for maps. This also prevents good error checking.
-
-        game_mode = db.session.query(m.GameMode).filter_by(game_mode_name=game_mode_name).first()
-        if not game_mode:
-            game_mode = m.GameMode(game_mode_name=game_mode_name)
-            db.session.add(game_mode)
-        
-        game_map = db.session.query(m.Map).filter_by(map_name=map_name).first()
-        if not game_map:
-            game_map = m.Map(map_name=map_name)
-            db.session.add(game_map)
-
+        game_mode = db.session.query(m.GameMode).filter_by(game_mode_name=game_mode_name).one()
+        game_map = db.session.query(m.Map).filter_by(map_name=map_name).one()
         db.session.flush()
         
         new_game = m.Game(
@@ -149,12 +137,8 @@ class CSV_Game:
             # First 6 players are Team A, the next 6 are Team B. 
             team = self.game.team_a if i < 6 else self.game.team_b
 
-            # TODO: If these are added in the DB, dont need to to do this.
-            hero_name = player_row[PLAYER_HERO].lower()
+            hero_name = player_row[PLAYER_HERO]
             hero = db.session.query(m.Hero).filter_by(hero_name=hero_name).first()
-            if not hero:
-                hero = m.Hero(hero_name=hero_name, hero_role_id=PLACEHOLDER_ID)
-                db.session.add(hero)
 
             kills = player_row[PLAYER_KILLS]
             deaths = player_row[PLAYER_DEATHS]
