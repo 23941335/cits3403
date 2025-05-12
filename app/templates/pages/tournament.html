@@ -20,6 +20,108 @@
 <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
 <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
+
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Share
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <!-- <div class="modal-body">
+        <p>Contents</p>
+      </div> -->
+      <div class="container"></div>
+        <h2>Select Users</h2>
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            <label for="selectUser" class="form-label">Share</label>
+            <select id="selectUser" class="form-select">
+              <option value="" disabled selected>Select a User</option>
+              {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {{ form.tid() }}
+
+          <div class="mb-3">
+            <h5>Selected Users</h5>
+            <ul id="selectedUsersList" class="list-group mb-2"></ul>
+            {{ form.selected_users }}
+          </div>
+
+          <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const selectUser = document.getElementById('selectUser');
+  const selectedUsersList = document.getElementById('selectedUsersList');
+  const selectedUsersInput = document.getElementById('selected_users');
+  let selectedUserIds = new Set();
+
+  selectUser.addEventListener('change', function () {
+      const selectedId = this.value;
+      const selectedName = this.options[this.selectedIndex].text;
+
+      if (!selectedUserIds.has(selectedId)) {
+          selectedUserIds.add(selectedId);
+
+          const listItem = document.createElement('li');
+          listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+          listItem.textContent = selectedName;
+
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'btn btn-sm btn-danger';
+          removeBtn.textContent = 'Remove';
+          removeBtn.onclick = () => {
+              selectedUsersList.removeChild(listItem);
+              selectedUserIds.delete(selectedId);
+              updateHiddenInput();
+              // Add back to dropdown
+              const option = document.createElement('option');
+              option.value = selectedId;
+              option.textContent = selectedName;
+              selectUser.appendChild(option);
+          };
+
+          listItem.appendChild(removeBtn);
+          selectedUsersList.appendChild(listItem);
+          updateHiddenInput();
+
+          // Remove the selected user from the dropdown
+          const selectedOption = selectUser.querySelector(`option[value="${selectedId}"]`);
+          if (selectedOption) {
+              selectUser.removeChild(selectedOption);
+          }
+      }
+  });
+
+  function updateHiddenInput() {
+      selectedUsersInput.value = Array.from(selectedUserIds).join(',');
+  }
+</script>
+
+
+
 <h4 class="mt-4 mb-3">Teams Participating</h4>
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
   {% for team in teams %}
