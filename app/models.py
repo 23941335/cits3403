@@ -176,9 +176,9 @@ class Game(BaseModel):
     
     game_mode: Mapped["GameMode"] = relationship("GameMode")
     map: Mapped["Map"] = relationship("Map")
-    gamemedals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game",cascade="all, delete-orphan")
+    game_medals: Mapped[list["GameMedals"]] = relationship("GameMedals", backref="game", cascade="all, delete-orphan")
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games")
-    game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game",cascade="all, delete-orphan")
+    game_players: Mapped[list["GamePlayers"]] = relationship("GamePlayers", back_populates="game", cascade="all, delete-orphan")
     team_a: Mapped["Team"] = relationship("Team", foreign_keys=[team_a_id], back_populates="games_as_team_a")
     team_b: Mapped["Team"] = relationship("Team", foreign_keys=[team_b_id], back_populates="games_as_team_b")
 
@@ -208,6 +208,8 @@ class HeroRole(BaseModel):
     role_name: Mapped[str] = mapped_column(sa.Text, unique=True)
     role_icon: Mapped[str] = mapped_column(sa.Text, nullable=True)
 
+    hero: Mapped["Hero"] = relationship("Hero", back_populates="hero_role")
+
     def __repr__(self):
         return f"<HeroRole '{self.role_name}'>"
 
@@ -217,7 +219,8 @@ class Hero(BaseModel):
     hero_role_id: Mapped[int] = mapped_column(sa.ForeignKey(HeroRole.id))
     hero_image: Mapped[str] = mapped_column(sa.Text, nullable=True)
     
-    hero_role: Mapped["HeroRole"] = relationship("HeroRole")
+    hero_role: Mapped["HeroRole"] = relationship("HeroRole", back_populates="hero")
+    game_players: Mapped["GamePlayers"] = relationship("GamePlayers", back_populates="hero")
 
     def __repr__(self):
         return f"<Hero '{self.hero_name}'>"
@@ -238,7 +241,7 @@ class GamePlayers(BaseModel):
 
     game: Mapped["Game"] = relationship("Game", back_populates="game_players")
     player: Mapped["Player"] = relationship("Player", back_populates="game_players")
-    hero: Mapped["Hero"] = relationship("Hero")
+    hero: Mapped["Hero"] = relationship("Hero", back_populates="game_players")
 
 
     def __repr__(self):
