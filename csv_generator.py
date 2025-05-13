@@ -42,50 +42,67 @@ def generate_csv(file_path, heroes, medals, maps, modes, num_teams):
 
 
         # Generate game header
-        for _ in range(num_games):
-            team_a = random_name(prefix='team_')
-            team_b = random_name(prefix='team_')
-            winning_team = random.choice([team_a, team_b])
-            game_mode = random.choice(modes)
-            game_map = random.choice(maps)
-            round_num = get_round()
+        teams = [f"Team{i+1}" for i in range(num_teams)]
+        # Initialize fixed teams and assign 6 players to each
+        players_by_team = {team: [f"{team}_Player{j+1}" for j in range(6)] for team in teams}
+        
+        
+        # Simulate elimination bracket (single-elimination)
+        round_teams = teams.copy()
+        round_number = 1
 
-            writer.writerow(['', team_a, team_b, winning_team, game_mode, game_map, round_num, '', '', ''])
+        while len(round_teams) > 1:
+            next_round_teams = []
 
-            heroes_shuffled = heroes.copy()
-            random.shuffle(heroes_shuffled)
+            # Pair up teams for current round
+            for i in range(0, len(round_teams), 2):
+                team_a = round_teams[i]
+                team_b = round_teams[i+1]
+                winning_team = random.choice([team_a, team_b])
+                game_mode = random.choice(modes)
+                game_map = random.choice(maps)
 
-            # Generate players
-            players = []
-            for i in range(12):
-                players.append(random_name(prefix='player_'))
+                writer.writerow(['', team_a, team_b, winning_team, game_mode, game_map, round_number, '', '', ''])
 
-            # PLEASE NOTE: this does not really generate realistic medal assignments
-            # and its not based on the numbers, but should be ok for testing, for now.
-            # Generate medals
-            medals_shuffled = medals.copy()
-            random.shuffle(medals_shuffled)
+                team_a_players = players_by_team[team_a]
+                team_b_players = players_by_team[team_b]
+                all_players = team_a_players + team_b_players
 
-            for medal in medals_shuffled:
-                player = random.choice(players)
-                writer.writerow(['', medal, player, '', '', '', '', '', '', ''])
+                heroes_shuffled = heroes.copy()
+                random.shuffle(heroes_shuffled)
+                # Assign MVP and SVP (from different teams)
+                mvp = random.choice(team_a_players)
+                svp_candidates = [p for p in team_b_players if p != mvp]
+                svp = random.choice(svp_candidates) if svp_candidates else random.choice(team_b_players)
+                writer.writerow(['', "MVP", mvp, '', '', '', '', '', '', ''])
+                writer.writerow(['', "SVP", svp, '', '', '', '', '', '', ''])
 
-            for i in range(12):
-                player_name = players[i]
-                kills = random_stat(0, 30)
-                deaths = random_stat(0, 30)
-                assists = random_stat(0, 30)
-                final_hits = random_stat(0, 10)
-                damage = random_stat(1000, 10000)
-                damage_blocked = random_stat(0, 10000)
-                healing = random_stat(0, 10000)
-                accuracy = random_stat(0, 100)
-                hero = heroes_shuffled.pop()
+                medals_remaining = [m for m in medals if m not in ["MVP", "SVP"]]
+                random.shuffle(medals_remaining)
+                for medal in medals_remaining:
+                    writer.writerow(['', medal, random.choice(all_players), '', '', '', '', '', '', ''])
 
-                writer.writerow([
-                    player_name, kills, deaths, assists, final_hits, damage,
-                    damage_blocked, healing, accuracy, hero
-                ])
+                for player_name in all_players:
+                    kills = random_stat(0, 30)
+                    deaths = random_stat(0, 30)
+                    assists = random_stat(0, 30)
+                    final_hits = random_stat(0, 10)
+                    damage = random_stat(1000, 10000)
+                    damage_blocked = random_stat(0, 10000)
+                    healing = random_stat(0, 10000)
+                    accuracy = random_stat(0, 100)
+                    hero = heroes_shuffled.pop()
+
+                    writer.writerow([
+                        player_name, kills, deaths, assists, final_hits, damage,
+                        damage_blocked, healing, accuracy, hero
+                    ])
+
+                next_round_teams.append(winning_team)
+
+            round_teams = next_round_teams
+            round_number += 1
+
 
 def fetch_heroes():
     return [hero.hero_name for hero in db.session.query(Hero).all()]
