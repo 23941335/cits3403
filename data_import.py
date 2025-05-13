@@ -244,61 +244,25 @@ class CSV_Game:
 
 
 def import_csv(csv, tournament: m.Tournament, commit_changes=True):
+    if isinstance(csv, str):
+        with open(csv, "r") as rf:
+            lines = [split_line(l) for l in rf]
 
-    try:
-        # if a file path (for local testing)
-        if isinstance(csv, str):
+    else:
+        csv_file = TextIOWrapper(csv, encoding="utf-8")
+        lines = []
+        for l in csv_file:
+            line = split_line(l)
+            lines.append(line)
 
-            with open(csv, "r") as rf:
-                lines = [split_line(l) for l in rf]
+    game_list = process_lines(lines)
 
-        # uploaded from website
-        else:
-
-            # convert it from bytes into readable text
-            try:
-                csv = TextIOWrapper(csv, encoding="utf-8")
-
-                lines = []
-                for l in csv:
-                    try:
-                        line = split_line(l)
-                        lines.append(line)
-
-                    except Exception as line_error:
-
-                        raise
-            except Exception as wrapper_error:
-
-                raise
-
-        try:
-            game_list = process_lines(lines)
-
-        except Exception as process_error:
-
-            raise
-
-        for i, game in enumerate(game_list):
-
-            try:
-                csvg = CSV_Game(tournament, game[0], game[1], game[2])
-
-                csvg.create_changes()
-
-                # error checking here
-                if commit_changes:
-
-                    csvg.commit_changes()
-
-            except Exception as game_error:
-
-                raise
-
-        return True
-    except Exception as e:
-
-        raise
+    for i, game in enumerate(game_list):
+        csvg = CSV_Game(tournament, game[0], game[1], game[2])
+        csvg.create_changes()
+        if commit_changes:
+            csvg.commit_changes()
+    return True
 
 
 if __name__ == "__main__":
