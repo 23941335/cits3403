@@ -74,6 +74,15 @@
 
 
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
+    <!-- 👇 Player selector block -->
+    <div id="player-selector" class="mb-3 d-none">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            {% for gp in game_players|groupby("player.gamertag") %}
+            <button class="btn btn-outline-dark btn-sm">{{ gp.grouper }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- Round selector block -->
     <div id="round-selector" class="mb-3 d-none">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
@@ -104,9 +113,6 @@
     </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         {% set stats = [
-        {'name': 'Wins', 'value': 4},
-        {'name': 'Losses', 'value': 2},
-        {'name': 'Draws', 'value': 0},
         {'name': 'Total Kills', 'value': 245},
         {'name': 'Total Deaths', 'value': 198},
         {'name': 'Average K/D Ratio', 'value': 1.24},
@@ -192,8 +198,11 @@
    */
     function updateVisibleSection() {
         const allSections = document.querySelectorAll(".mode-block");
+        // Show or hide player selector based on mode and view
+        const playerSelector = document.getElementById("player-selector");
+        playerSelector.classList.toggle("d-none", currentMode !== "player");
         allSections.forEach(div => div.classList.add("d-none"));
-        
+
         // Compute the ID of the section to show
         const targetId = `mode-${currentMode}-${currentView}`;
         const section = document.getElementById(targetId);
