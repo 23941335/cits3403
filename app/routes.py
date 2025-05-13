@@ -59,7 +59,9 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
-        login_user(user, remember=form.remember_me.data)  # TODO: Later add form.remember_me.data
+        login_user(
+            user, remember=form.remember_me.data
+        )  # TODO: Later add form.remember_me.data
         return redirect("/home")
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
@@ -82,7 +84,9 @@ def user_account_page():
         if form_type == "edit_username":
             if form.username.data and form.username.data != current_user.username:
                 existing_user = db.session.scalar(
-                    sa.select(models.User).where(models.User.username == form.username.data)
+                    sa.select(models.User).where(
+                        models.User.username == form.username.data
+                    )
                 )
                 if existing_user:
                     flash("Username already taken.", "danger")
@@ -126,10 +130,10 @@ def user_account_page():
     return render_template("pages/account.html", form=form)
 
 
-
 @app.route("/tournament")
 def tournament_page():
     return render_template("pages/tournament.html")
+
 
 @app.route("/create-tournament", methods=["GET"])
 @login_required
@@ -137,23 +141,33 @@ def new_tournament_page():
     form = forms.CreateTournamentForm()
 
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
-    form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
+    form.visibility.choices = [(-1, "- Select -")] + [
+        (v.id, v.visibility.capitalize()) for v in visibilities
+    ]
 
     return render_template("pages/create-tournament.html", form=form)
+
 
 @app.route("/create-tournament", methods=["POST"])
 def create_tournament():
     form = forms.CreateTournamentForm()
 
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
-    form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
-
+    form.visibility.choices = [(-1, "- Select -")] + [
+        (v.id, v.visibility.capitalize()) for v in visibilities
+    ]
 
     if form.validate_on_submit():
+
         try:
             if form.visibility.data == -1:
-                form.visibility.errors.append("Please select a valid visibility option.")
-                return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
+                form.visibility.errors.append(
+                    "Please select a valid visibility option."
+                )
+
+                return render_template(
+                    "pages/create-tournament.html", title="Create Tournament", form=form
+                )
 
             name = form.name.data
             description = form.description.data
@@ -161,24 +175,48 @@ def create_tournament():
             start_time = form.start_time.data
             csv_file = form.csv_file.data
 
-            tournament = models.Tournament(title=name, description=description, visibility_id=vis_id, start_time=start_time)
+            tournament = models.Tournament(
+                title=name,
+                description=description,
+                visibility_id=vis_id,
+                start_time=start_time,
+            )
             db.session.add(tournament)
-            
+
             if csv_file:
-                db.session.flush() # ensure we can reference the new tournament
-                import_csv(csv_file.stream, tournament=tournament, commit_changes=False)
+
+                db.session.flush()  # ensure we can reference the new tournament
+
+                try:
+
+                    import_csv(
+                        csv_file.stream, tournament=tournament, commit_changes=False
+                    )
+
+                except Exception as import_error:
+
+                    raise  # Re-raise to be caught by outer try-except
 
             db.session.commit()
+
             flash("Tournament created!", "success")
-            return redirect("/tournament")
+            return redirect("/history")
 
         except Exception as e:
             db.session.rollback()
-            print(e)
-            flash("Tournament creation failed!", "danger")
-            return render_template("pages/create-tournament.html", title="Create Tournament", form=form)
+            error_type = type(e).__name__
+            error_msg = str(e)
 
-    # TODO: Add error handling
+            flash(f"Tournament creation failed! Error: {error_type}", "danger")
+            return render_template(
+                "pages/create-tournament.html", title="Create Tournament", form=form
+            )
+
+    # If form validation fails, return the form with errors
+    return render_template(
+        "pages/create-tournament.html", title="Create Tournament", form=form
+    )
+
 
 @app.route("/history")
 def history_page():

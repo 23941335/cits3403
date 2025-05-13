@@ -80,3 +80,27 @@ flask db migrate -m "message/comment"
 flask db upgrade
 ```
 This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
+
+### Testing
+
+Separated into unit tests and Selenium tests in `app/testing/unit` and `app/testing/selenium`.
+
+#### Running Unit Tests
+
+Navigate to the project's root directory
+
+```bash
+python -m unittest discover -s app/testing/unit
+```
+
+This command will discover and run all test files within the `app/testing/unit` directory.
+
+#### Running Selenium Tests
+
+Navigate to the project's root directory
+
+```bash
+python -m unittest discover -s app/testing/selenium
+```
+
+This will discover and run all test files in the `app/testing/selenium` directory.

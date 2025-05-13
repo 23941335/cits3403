@@ -63,7 +63,7 @@
 <body>
   <!-- Page Description -->
   <div class="title">
-    <h1>Tournament Creator</h1>
+    <h1 id="tournament-creator-heading">Tournament Creator</h1>
     <p>Create your own tournament, invite players and upload the results. Share to whoever you want.</p>
   </div>
 
@@ -83,7 +83,7 @@
       {% endif %}
     </div>
     
-    <div class="input">
+    <div class="input" id="start-time">
       {{ form.start_time.label(class="form-label") }}
       {{ form.start_time(class="form-control") }}
     </div>
@@ -103,7 +103,7 @@
     <div class="input">
       {{ form.visibility.label(class="form-label", for="view") }}
       {{ form.visibility(class="form-control" + (" is-invalid" if form.visibility.errors else ""), id="view") }}
-      {% if form.visibility.errors %}
+      {% if form.visibility.errors %} 
       <div class="invalid-feedback">
         {% for error in form.visibility.errors %}
         <span>{{ error }}</span><br>

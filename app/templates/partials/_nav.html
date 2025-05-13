@@ -1,48 +1,45 @@
 <nav>
   <ul class="nav justify-content-center">
     <li class="nav-item">
-      <a class="nav-link" href="/">Home</a>
+      <a class="nav-link" href="/" id="nav-home">Home</a>
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="/tournament">View Tournament</a>
+      <a class="nav-link" href="/tournament" id="nav-tournament">View Tournament</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="/create-tournament">New Tournament</a>
+      <a class="nav-link" href="/create-tournament" id="nav-create-tournament">New Tournament</a>
     </li>
-     <li class="nav-item">
-    <a class="nav-link" href="/history">History</a>
-  </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/history" id="nav-history">History</a>
+    </li>
+
     <!-- Dropdown Result -->
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" 
+         aria-expanded="false" id="nav-results-dropdown">
         Result
       </a>
       <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="/tournament/game">Game Results</a></li>
-        <li><a class="dropdown-item" href="/tournament/team">Team Results</a></li>
-        <li><a class="dropdown-item" href="/tournament/player">Player Results</a></li>
+        <li><a class="dropdown-item" href="/tournament/game" id="nav-results-game">Game Results</a></li>
+        <li><a class="dropdown-item" href="/tournament/team" id="nav-results-team">Team Results</a></li>
+        <li><a class="dropdown-item" href="/tournament/player" id="nav-results-player">Player Results</a></li>
       </ul>
     </li>
 
-    <!-- Don't show this yet since we don't have this page -->
-    <!-- <li class="nav-item">
-        <a class="nav-link" href="/account">Account</a>
-      </li> -->
-
     {% if current_user.is_authenticated %}
       <li class="nav-item">
-        <a class="nav-link" href="/account">My Account</a>
+        <a class="nav-link" href="/account" id="nav-account">My Account</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/account/logout">Log Out</a>
+        <a class="nav-link" href="/account/logout" id="logout-link">Log Out</a>
       </li>
     {% else %}
       <li class="nav-item">
-        <a class="nav-link" href="/account/login">Log In</a>
+        <a class="nav-link" href="/account/login" id="login-link">Log In</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/account/signup">Sign Up</a>
+        <a class="nav-link" href="/account/signup" id="signup-link">Sign Up</a>
       </li>
     {% endif %}
   </ul>

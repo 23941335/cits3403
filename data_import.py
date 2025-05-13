@@ -1,14 +1,12 @@
 from app import models as m
 from app import app, db
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from io import TextIOWrapper
 
 TEST_FILE = "app/testing/test.csv"
 
 # CONSTANTS
 TEAM_SIZE = 6
-PLACEHOLDER_ID = 1
-
 # Indexes
 MATCH_TEAM_A = 1
 MATCH_TEAM_B = 2
@@ -33,7 +31,8 @@ PLAYER_HERO = 9
 
 
 def split_line(line: str):
-    return line.rstrip('\n').split(',')
+    return line.rstrip("\n").split(",")
+
 
 def process_lines(line_list):
     games = []
@@ -66,12 +65,18 @@ def process_lines(line_list):
 
 
 class CSV_Game:
-    def __init__(self, tournament: m.Tournament, game_header_row, game_medal_rows, game_player_rows):
+    def __init__(
+        self,
+        tournament: m.Tournament,
+        game_header_row,
+        game_medal_rows,
+        game_player_rows,
+    ):
         self.tournament = tournament
         self.game = None
         self.header_row = game_header_row
         self.medal_rows = game_medal_rows
-        self.player_rows = game_player_rows 
+        self.player_rows = game_player_rows
 
     def create_game(self):
         header_row = self.header_row
@@ -96,39 +101,48 @@ class CSV_Game:
 
         winning_team_id = None
         if winning_team_name in (team_a_name, team_b_name):
-            winning_team = db.session.query(m.Team).filter_by(team_name=winning_team_name).first()
+            winning_team = (
+                db.session.query(m.Team).filter_by(team_name=winning_team_name).first()
+            )
             winning_team_id = winning_team.id
 
-        # Find or create game mode and map
-        # NOTE: this shouldn't be needed if we just include all modes
-        # and same goes for maps. This also prevents good error checking.
-
-        game_mode = db.session.query(m.GameMode).filter_by(game_mode_name=game_mode_name).first()
+        # Find game mode and map (case-insensitive) - Raise error if not found (validate against seed data)
+        game_mode = (
+            db.session.query(m.GameMode)
+            .filter(func.lower(m.GameMode.game_mode_name) == game_mode_name.lower())
+            .first()
+        )
         if not game_mode:
-            game_mode = m.GameMode(game_mode_name=game_mode_name)
-            db.session.add(game_mode)
-        
-        game_map = db.session.query(m.Map).filter_by(map_name=map_name).first()
-        if not game_map:
-            game_map = m.Map(map_name=map_name)
-            db.session.add(game_map)
+            raise ValueError(
+                f"Invalid game mode found in CSV: '{header_row[MATCH_GAME_MODE]}'. Please ensure it matches seeded game modes."
+            )
 
-        db.session.flush()
-        
+        game_map = (
+            db.session.query(m.Map)
+            .filter(func.lower(m.Map.map_name) == map_name.lower())
+            .first()
+        )
+        if not game_map:
+            raise ValueError(
+                f"Invalid map found in CSV: '{header_row[MATCH_MAP]}'. Please ensure it matches seeded maps."
+            )
+
+        # No need to flush here as we are only reading
+
         new_game = m.Game(
-            tournament_id=self.tournament.id, 
+            tournament_id=self.tournament.id,
             round=round_num,
             team_a_id=team_a.id,
             team_b_id=team_b.id,
             winning_team=winning_team_id,
             is_draw=(winning_team_id is None),
             game_mode_id=game_mode.id,
-            map_id=game_map.id
+            map_id=game_map.id,
         )
 
         db.session.add(new_game)
         db.session.flush()
-        
+
         self.game = new_game
 
     def insert_players(self):
@@ -137,7 +151,7 @@ class CSV_Game:
         for i, player_row in enumerate(player_row_list):
             if i > 11:
                 raise ValueError("Too many players in CSV file")
-            
+
             player_name = player_row[PLAYER_NAME]
 
             # Find or create players
@@ -145,17 +159,23 @@ class CSV_Game:
             if not player:
                 player = m.Player(gamertag=player_name)
                 db.session.add(player)
-            
-            # First 6 players are Team A, the next 6 are Team B. 
+
+            # First 6 players are Team A, the next 6 are Team B.
             team = self.game.team_a if i < 6 else self.game.team_b
 
-            # TODO: If these are added in the DB, dont need to to do this.
-            hero_name = player_row[PLAYER_HERO].lower()
-            hero = db.session.query(m.Hero).filter_by(hero_name=hero_name).first()
+            # Find hero (case-insensitive) - Raise error if not found (validate against seed data)
+            hero_name = player_row[PLAYER_HERO]  # Keep original case for error message
+            hero = (
+                db.session.query(m.Hero)
+                .filter(func.lower(m.Hero.hero_name) == hero_name.lower())
+                .first()
+            )
             if not hero:
-                hero = m.Hero(hero_name=hero_name, hero_role_id=PLACEHOLDER_ID)
-                db.session.add(hero)
+                raise ValueError(
+                    f"Invalid hero found in CSV: '{hero_name}'. Please ensure it matches seeded heroes."
+                )
 
+            # Get stats from row
             kills = player_row[PLAYER_KILLS]
             deaths = player_row[PLAYER_DEATHS]
             assists = player_row[PLAYER_ASSISTS]
@@ -164,7 +184,7 @@ class CSV_Game:
             damage_blocked = player_row[PLAYER_DAMAGE_BLOCKED]
             healing = player_row[PLAYER_HEALING]
             accuracy_pct = player_row[PLAYER_ACCURACY]
-            
+
             db.session.flush()
 
             game_players = m.GamePlayers(
@@ -185,7 +205,6 @@ class CSV_Game:
             db.session.add(game_players)
             db.session.flush()
 
-
     def insert_medals(self):
         medal_row_list = self.medal_rows
 
@@ -198,20 +217,18 @@ class CSV_Game:
             if not player:
                 player = m.Player(gamertag=player_name)
                 db.session.add(player)
-            
+
             # Find or create medals
             # TODO: these should just be stored in the DB, but need to know them all.
             medal = db.session.query(m.Medal).filter_by(medal_name=medal_name).first()
             if not medal:
                 medal = m.Medal(medal_name=medal_name)
                 db.session.add(medal)
-            
+
             db.session.flush()
 
             game_medals = m.GameMedals(
-                game_id=self.game.id, 
-                medal_id=medal.id, 
-                player_id=player.id
+                game_id=self.game.id, medal_id=medal.id, player_id=player.id
             )
 
             db.session.add(game_medals)
@@ -225,29 +242,65 @@ class CSV_Game:
     def commit_changes(self):
         db.session.commit()
 
-def import_csv(csv, tournament: m.Tournament, commit_changes=True):
-    # if a file path (for local testing)
-    if isinstance(csv, str):
-        with open(csv, 'r') as rf:
-            lines = [split_line(l) for l in rf]
-    
-    # uploaded from website
-    else:
-        # convert it from bytes into readable text
-        csv = TextIOWrapper(csv, encoding='utf-8')
-        lines = [split_line(l) for l in csv]
 
-    game_list = process_lines(lines)
-    
-    for game in game_list:
-        csvg = CSV_Game(tournament, game[0], game[1], game[2])
-        csvg.create_changes()
-        # error checking here
-        if commit_changes:
-            csvg.commit_changes()
-    
-    return True
-    
-if __name__ == '__main__':
+def import_csv(csv, tournament: m.Tournament, commit_changes=True):
+
+    try:
+        # if a file path (for local testing)
+        if isinstance(csv, str):
+
+            with open(csv, "r") as rf:
+                lines = [split_line(l) for l in rf]
+
+        # uploaded from website
+        else:
+
+            # convert it from bytes into readable text
+            try:
+                csv = TextIOWrapper(csv, encoding="utf-8")
+
+                lines = []
+                for l in csv:
+                    try:
+                        line = split_line(l)
+                        lines.append(line)
+
+                    except Exception as line_error:
+
+                        raise
+            except Exception as wrapper_error:
+
+                raise
+
+        try:
+            game_list = process_lines(lines)
+
+        except Exception as process_error:
+
+            raise
+
+        for i, game in enumerate(game_list):
+
+            try:
+                csvg = CSV_Game(tournament, game[0], game[1], game[2])
+
+                csvg.create_changes()
+
+                # error checking here
+                if commit_changes:
+
+                    csvg.commit_changes()
+
+            except Exception as game_error:
+
+                raise
+
+        return True
+    except Exception as e:
+
+        raise
+
+
+if __name__ == "__main__":
     with app.app_context():
         import_csv(TEST_FILE)
