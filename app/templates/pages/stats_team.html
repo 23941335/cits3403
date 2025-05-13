@@ -6,17 +6,32 @@
 <div class="container my-4">
     <div class="text-center">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0">{{ team.team_name }} Performance</h3>
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    This Tournament
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="viewDropdown">
-                    <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">Tournament
-                            view</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game view</a></li>
-                </ul>
+            <h2 class="mb-0">{{ team.team_name }} Performance</h2>
+            <div class="d-flex gap-2">
+                <!-- View Mode dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="modeDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Team View
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="modeDropdown">
+                        <li><a class="dropdown-item active" href="#" onclick="switchModeView('team')">Team View</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="switchModeView('player')">Player View</a></li>
+                    </ul>
+                </div>
+
+                <!-- Game View dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        This Tournament
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                        <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">Tournament
+                                view</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game view</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -115,6 +130,7 @@
     </div>
 </div>
 <script>
+
     function switchGameView(view) {
         document.getElementById("viewDropdown").textContent =
             view === "tournament" ? "This Tournament" : "Game View";
@@ -136,6 +152,16 @@
         } else {
             roundSelector.classList.add("d-none");
         }
+    }
+    function switchModeView(mode) {
+        document.getElementById("modeDropdown").textContent =
+            mode === "team" ? "Team View" : "Player View";
+
+        // Set active style
+        document.querySelectorAll("#modeDropdown + .dropdown-menu .dropdown-item")
+            .forEach(item => item.classList.remove("active"));
+        document.querySelector(`#modeDropdown + .dropdown-menu .dropdown-item[onclick="switchModeView('${mode}')"]`)
+            .classList.add("active");
     }
 </script>
 
