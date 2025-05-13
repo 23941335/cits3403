@@ -5,7 +5,21 @@
 {% block main %}
 <div class="container my-4">
     <div class="text-center">
-        <h3>{{ team.team_name }} Performance</h3>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">{{ team.team_name }} Performance</h3>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    This Tournament
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                    <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">Tournament
+                            view</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game view</a></li>
+                </ul>
+            </div>
+        </div>
+
         <p>During <a href="/tournament?id={{ tournament.id }}">{{ tournament.title }}</a></p>
     </div>
     <div class="row mb-4">
@@ -45,6 +59,25 @@
 
 
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
+    <!-- Round selector block -->
+    <div id="round-selector" class="mb-3 d-none">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            {% for r in range(1, max_round + 1) %}
+            <button class="btn btn-outline-primary btn-sm">Round {{ r }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Tournament view (Dealt) -->
+    <div id="game-view-tournament" class="game-table-view">
+        <p class="text-muted">This Tournament view content here (placeholder).</p>
+    </div>
+
+    <!-- Game view  -->
+    <div id="game-view-game" class="game-table-view" style="display: none;">
+        <p class="text-muted">This Game view content here (placeholder).</p>
+    </div>
+
     <div class="mb-4">
         <div class="bg-light border rounded">
             <img src="{{ url_for('static', filename='images/placeholder-graph.png') }}" class="img-fluid">
@@ -81,4 +114,29 @@
         {% endfor %}
     </div>
 </div>
+<script>
+    function switchGameView(view) {
+        document.getElementById("viewDropdown").textContent =
+            view === "tournament" ? "This Tournament" : "Game View";
+
+        // Set active class for the clicked dropdown item
+        document.querySelectorAll(".dropdown-item").forEach(item => item.classList.remove("active"));
+        document.querySelector(`.dropdown-item[onclick="switchGameView('${view}')"]`).classList.add("active");
+
+        // switch game view
+        document.querySelectorAll(".game-table-view").forEach(div => div.style.display = "none");
+        const section = document.getElementById(`game-view-${view}`);
+        if (section) section.style.display = "block";
+
+        // Control round selector visibility
+        // Show round selector only for game view
+        const roundSelector = document.getElementById("round-selector");
+        if (view === "game") {
+            roundSelector.classList.remove("d-none");
+        } else {
+            roundSelector.classList.add("d-none");
+        }
+    }
+</script>
+
 {% endblock %}

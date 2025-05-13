@@ -350,8 +350,17 @@ def team_results_page():
         'avg_accuracy': avg_accuracy
     }
 
+    # Caluculate the max round number for specific team
+    # This is the max round number for the team in the tournament
+    # This round number is used to display the correct round in the game view
+    round_numbers = [
+        gp.game.round for gp in game_players if gp.game and gp.game.round is not None
+    ]
+    max_round = max(round_numbers) if round_numbers else 1
 
-    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary)
+
+
+    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round)
 
 
 
