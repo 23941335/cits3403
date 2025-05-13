@@ -357,7 +357,18 @@ def team_results_page():
 
 @app.route("/tournament/player")
 def tournament_player_view():
-    return render_template("pages/stats_player.html")
+    pid = request.args.get("id", type=int)
+    tid = request.args.get("t", type=int)
+    gid = request.args.get("g", type=int)
+    if not pid:
+        flash("Player ID missing in request", "warning")
+        return redirect("/history")
+    player = db.session.get(models.Player, pid)
+    if not player:
+        return render_template("pages/404.html", error=f"Player with ID {pid} not found."), 404
+    player_games = [gp.game for gp in player.game_players]
+    current_game = db.session.get(models.Game, gid) if gid else None
+    return render_template("pages/stats_player.html", player=player, player_games=player_games,current_game=current_game)
 
 
 # 404 not found page

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %} Player Performance {% endblock %}
-{% block header_text %} Player Performance During Tournament {% endblock %}
+{% block title %} {{ player.gamertag }} - Player Stats {% endblock %}
+{% block header_text %} Player Performance: {{ player.gamertag }} {% endblock %}
 
 {% block main %}
 <div class="container my-4">
@@ -14,11 +14,7 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">Player Name</h5>
-          <p class="card-text">@playergamertag</p>
-          <p class="card-text">Tournament Rank: <strong>7th</strong></p>
-          <p class="card-text">Tournament K/D: <strong>2.4</strong></p>
-          <p class="card-text">Playstyle: <strong>Strategist</strong></p>
-          <p class="card-text">Additional information about the player.</p>
+          <p class="card-text">@{{ player.gamertag }}</p>
         </div>
       </div>
     </div>
@@ -28,7 +24,7 @@
       <div class="card h-100">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Games Played</h5>
+            <h5 class="card-title mb-0">Games Stats</h5>
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -37,8 +33,8 @@
               <ul class="dropdown-menu" aria-labelledby="viewDropdown">
                 <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">This Tournament</a>
                 </li>
-                <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">This Game</a></li>
-                <li><a class="dropdown-item" href="#" onclick="switchGameView('overall')">Overall</a></li>
+                <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game View</a></li>
+                <li><a class="dropdown-item" href="#" onclick="switchGameView('overall')">Career</a></li>
               </ul>
             </div>
           </div>
@@ -47,7 +43,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th scope="col">Game</th>
+                  <th scope="col">Round</th>
                   <th scope="col">Team Rank</th>
                   <th scope="col">Kills</th>
                   <th scope="col">Deaths</th>
@@ -92,11 +88,86 @@
             </table>
           </div>
           <div id="game-view-game" class="game-table-view" style="display:none;">
-            <p>Only this game stats shown here (to be filled)</p>
+            {% if current_game %}
+            {% set gp = player.game_players | selectattr("game_id", "equalto", current_game.id) | list | first %}
+            {% if gp %}
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Hero</th>
+                  <th>Kills</th>
+                  <th>Deaths</th>
+                  <th>Assists</th>
+                  <th>Damage</th>
+                  <th>Healing</th>
+                  <th>Accuracy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ gp.hero.hero_name if gp.hero else "Unknown" }}</td>
+                  <td>{{ gp.kills }}</td>
+                  <td>{{ gp.deaths }}</td>
+                  <td>{{ gp.assists }}</td>
+                  <td>{{ gp.damage }}</td>
+                  <td>{{ gp.healing }}</td>
+                  <td>{{ gp.accuracy_pct }}%</td>
+                </tr>
+              </tbody>
+            </table>
+            {% else %}
+            <p>This player did not participate in this game.</p>
+            {% endif %}
+            {% else %}
+            <p>No game selected. Please provide a game ID using `?g=GAME_ID` in the URL.</p>
+            {% endif %}
           </div>
 
+
           <div id="game-view-overall" class="game-table-view" style="display:none;">
-            <p>Overall stats across tournaments (to be filled)</p>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Game ID</th>
+                  <th>Tournament</th>
+                  <th>Team</th>
+                  <th>Kills</th>
+                  <th>Deaths</th>
+                  <th>Assists</th>
+                  <th>Damage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for gp in player.game_players %}
+                <tr>
+                  <td>
+                    <a href="/tournament/game?id={{ gp.game.id }}">
+                      Round {{ gp.game.round }}
+                    </a>
+                  </td>
+                  <td>
+                    <a href="/tournament?id={{ gp.game.tournament.id }}">
+                      {{ gp.game.tournament.title }}
+                    </a>
+                  </td>
+                  <td>
+                    {% if gp.team_id == gp.game.team_a.id %}
+                    {{ gp.game.team_a.team_name }}
+                    {% elif gp.team_id == gp.game.team_b.id %}
+                    {{ gp.game.team_b.team_name }}
+                    {% else %}
+                    Unknown
+                    {% endif %}
+                  </td>
+                  <td>{{ gp.kills }}</td>
+                  <td>{{ gp.deaths }}</td>
+                  <td>{{ gp.assists }}</td>
+                  <td>{{ gp.damage }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
           </div>
 
         </div>

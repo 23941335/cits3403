@@ -56,12 +56,13 @@
 <div class="table-responsive">
   <table class="table table-striped table-bordered">
     <thead class="table-dark">
+      
       <tr>
-        <th>Round</th>
-        <th>Team A</th>
-        <th>Team B</th>
-        <th>Game Mode</th>
-        <th>Map</th>
+        <th>KDA</th>
+        <th>Final Hits</th>
+        <th>Damage</th>
+        <th>Damage Blocked</th>
+        <th>Healing</th>
         <th>Result</th>
         <th>Details</th>
       </tr>
@@ -102,7 +103,8 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_a.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_a.id %}
-                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}" class="text-decoration-none text-dark">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
+
                   <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
@@ -126,7 +128,7 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_b.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_b.id %}
-                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}" class="text-decoration-none text-dark">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
                   <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
