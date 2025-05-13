@@ -94,9 +94,10 @@ class TestUIDataImport(BaseSeleniumTests):
         driver.find_element(By.ID, "name").send_keys(tournament_name)
         driver.find_element(By.ID, "description").send_keys("Testing valid CSV upload.")
         # Ensure the date format matches the input type="datetime-local"
-        date_string = "2017-06-30T16:30"
+        start_time_element = driver.find_element(By.ID, "start_time")
+        date_string = "2025-03-20T16:30"
         # Js to set the value
-        driver.execute_script(f"arguments[0].value = '{date_string}';", date_string)
+        driver.execute_script("arguments[0].value = arguments[1];", start_time_element, date_string)
 
         # Select visibility
         visibility_select_element = WebDriverWait(driver, 10).until(
@@ -187,7 +188,7 @@ class TestUIDataImport(BaseSeleniumTests):
         driver.find_element(By.ID, "name").send_keys(tournament_name)
         driver.find_element(By.ID, "description").send_keys("Testing invalid CSV upload.")
 
-        date_string = "2017-06-30T16:30"
+        date_string = "2025-02-20T16:30"
         print(f"DEBUG: Setting start_time value using JavaScript to: {date_string}")
         driver.execute_script(f"arguments[0].value = '{date_string}';", date_string)
 
