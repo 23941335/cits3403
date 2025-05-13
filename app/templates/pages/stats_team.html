@@ -24,7 +24,7 @@
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        This Tournament
+                        Tournament view
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="viewDropdown">
                         <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">Tournament
@@ -82,16 +82,20 @@
             {% endfor %}
         </div>
     </div>
-
-    <!-- Tournament view (Dealt) -->
-    <div id="game-view-tournament" class="game-table-view">
-        <p class="text-muted">This Tournament view content here (placeholder).</p>
+    <!-- 👇 4 mode-view combination container -->
+    <div id="mode-team-tournament" class="mode-block">
+        <p class="text-muted">[Team + Tournament view placeholder]</p>
+    </div>
+    <div id="mode-team-game" class="mode-block d-none">
+        <p class="text-muted">[Team + Game view placeholder]</p>
+    </div>
+    <div id="mode-player-tournament" class="mode-block d-none">
+        <p class="text-muted">[Player + Tournament view placeholder]</p>
+    </div>
+    <div id="mode-player-game" class="mode-block d-none">
+        <p class="text-muted">[Player + Game view placeholder]</p>
     </div>
 
-    <!-- Game view  -->
-    <div id="game-view-game" class="game-table-view" style="display: none;">
-        <p class="text-muted">This Game view content here (placeholder).</p>
-    </div>
 
     <div class="mb-4">
         <div class="bg-light border rounded">
@@ -130,39 +134,72 @@
     </div>
 </div>
 <script>
+    // Track the current selected mode (either 'team' or 'player')
+    let currentMode = "team";
 
-    function switchGameView(view) {
-        document.getElementById("viewDropdown").textContent =
-            view === "tournament" ? "This Tournament" : "Game View";
+    // Track the current selected view (either 'tournament' or 'game')
+    let currentView = "tournament";
 
-        // Set active class for the clicked dropdown item
-        document.querySelectorAll(".dropdown-item").forEach(item => item.classList.remove("active"));
-        document.querySelector(`.dropdown-item[onclick="switchGameView('${view}')"]`).classList.add("active");
-
-        // switch game view
-        document.querySelectorAll(".game-table-view").forEach(div => div.style.display = "none");
-        const section = document.getElementById(`game-view-${view}`);
-        if (section) section.style.display = "block";
-
-        // Control round selector visibility
-        // Show round selector only for game view
-        const roundSelector = document.getElementById("round-selector");
-        if (view === "game") {
-            roundSelector.classList.remove("d-none");
-        } else {
-            roundSelector.classList.add("d-none");
-        }
-    }
+    /**
+   * Handle switching between 'Team View' and 'Player View'
+   * - Updates dropdown text
+   * - Highlights active menu item
+   * - Triggers section update
+   */
     function switchModeView(mode) {
+        currentMode = mode;
+
+        // Update dropdown button label
         document.getElementById("modeDropdown").textContent =
             mode === "team" ? "Team View" : "Player View";
 
-        // Set active style
+        // Highlight the selected menu item
         document.querySelectorAll("#modeDropdown + .dropdown-menu .dropdown-item")
             .forEach(item => item.classList.remove("active"));
         document.querySelector(`#modeDropdown + .dropdown-menu .dropdown-item[onclick="switchModeView('${mode}')"]`)
             .classList.add("active");
+
+        updateVisibleSection();
     }
+
+    /**
+   * Handle switching between 'Tournament View' and 'Game View'
+   * - Updates dropdown text
+   * - Highlights active menu item
+   * - Toggles round selector visibility
+   * - Triggers section update
+   */
+    function switchGameView(view) {
+        currentView = view;
+        document.getElementById("viewDropdown").textContent =
+            view === "tournament" ? "This Tournament" : "Game View";
+
+        document.querySelectorAll("#viewDropdown + .dropdown-menu .dropdown-item")
+            .forEach(item => item.classList.remove("active"));
+        document.querySelector(`#viewDropdown + .dropdown-menu .dropdown-item[onclick="switchGameView('${view}')"]`)
+            .classList.add("active");
+
+        // Round display control 
+        const roundSelector = document.getElementById("round-selector");
+        roundSelector.classList.toggle("d-none", view !== "game");
+
+        updateVisibleSection();
+    }
+
+    /**
+   * Show only the relevant content block based on current mode and view
+   * e.g. show #mode-player-game and hide the other 3 combinations
+   */
+    function updateVisibleSection() {
+        const allSections = document.querySelectorAll(".mode-block");
+        allSections.forEach(div => div.classList.add("d-none"));
+        
+        // Compute the ID of the section to show
+        const targetId = `mode-${currentMode}-${currentView}`;
+        const section = document.getElementById(targetId);
+        if (section) section.classList.remove("d-none");
+    }
+
 </script>
 
 {% endblock %}
