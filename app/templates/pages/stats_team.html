@@ -289,6 +289,23 @@
     // Ensure title and visible section are initialized on page load
     document.addEventListener("DOMContentLoaded", () => {
         updateVisibleSection();
+        // Enable click selection for player buttons
+        document.querySelectorAll("#player-selector button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#player-selector button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVisibleSection();
+            });
+        });
+
+        // Enable click selection for round buttons
+        document.querySelectorAll("#round-selector button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#round-selector button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVisibleSection();
+            });
+        });
     });
 
 </script>
