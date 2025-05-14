@@ -213,7 +213,9 @@ def share():
             
             
             # Process form to insert values into the database
-            user_ids_to_share = [int(uid) for uid in form.selected_users.data.split(',')]
+            user_ids_to_share = []
+            if form.selected_users.data:
+                user_ids_to_share = [int(uid) for uid in form.selected_users.data.split(',')]
 
             for user_id in user_ids_to_share:
                 existing_tu = db.session.query(models.TournamentUsers).filter_by(
