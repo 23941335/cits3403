@@ -206,21 +206,39 @@ def share():
     form = forms.UserSelectionForm()
     if form.validate_on_submit():
         try:
-            # Process form to insert values into the database
-            user_ids = [int(uid) for uid in form.selected_users.data.split(',')]
-            for user_id in user_ids:
-                user = db.session.query(models.User).where(models.User.id == user_id).one()
-                tournament_user = models.TournamentUsers(
-                    tournament_id=form.tid.data,
-                    user_id=user.id,
-                    tournament_role_id=DEFAULT_ROLE_ID
-                )
-                db.session.add(tournament_user)
+            tournament = db.session.query(models.Tournament).filter_by(id=form.tid.data).one()
+            owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+            tourn_users_shared = [tu for tu in tournament.users if tu.user_id not in owners]
             
+            
+            # Process form to insert values into the database
+            user_ids_to_share = [int(uid) for uid in form.selected_users.data.split(',')]
+
+            for user_id in user_ids_to_share:
+                existing_tu = db.session.query(models.TournamentUsers).filter_by(
+                    tournament_id=form.tid.data,
+                    user_id=user_id
+                ).first()
+                
+                if not existing_tu:
+                    user = db.session.query(models.User).where(models.User.id == user_id).one()
+                    tournament_user = models.TournamentUsers(
+                        tournament_id=form.tid.data,
+                        user_id=user.id,
+                        tournament_role_id=DEFAULT_ROLE_ID
+                    )
+                    db.session.add(tournament_user)
+
+            # Revoke access to users who have already if deselected
+            for tourn_user in tourn_users_shared:
+                if tourn_user.user_id not in user_ids_to_share:
+                    db.session.delete(tourn_user)
+
             db.session.commit()
 
         except Exception as e:
             db.session.rollback()
+            raise e
     
     return redirect(f"/tournament?id={form.tid.data}")
 
@@ -315,7 +333,7 @@ def history_page():
     stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))
     tournaments = db.session.scalars(stmt).all()
     for t in tournaments:
-        print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
+        # print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
         if isinstance(t.created_at, str):
             t.created_at = datetime.fromisoformat(t.created_at)
         if isinstance(t.start_time, str):
