@@ -193,7 +193,7 @@ def tournament_page():
 
 
     return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status,
-                           sharedUsers=users_shared, unsharedUsers=users_unshared, form=form)
+                           sharedUsers=users_shared, unsharedUsers=users_unshared, owners=owners, form=form)
 
 
 @app.route("/tournament/share", methods=["POST"])

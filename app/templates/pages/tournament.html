@@ -20,9 +20,11 @@
 <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
 <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-<button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
-  Share
-</button>
+{% if current_user.id in owners | map(attribute='id') | list %}
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
+    Share
+  </button>
+{% endif %}
 
 <!-- Modal -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
