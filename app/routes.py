@@ -182,7 +182,7 @@ def tournament_page():
     # All users who have the owner role for this tournament (usually will be one, but could support more)
     owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
     # All users this tournament has been shared with (i.e. all that have access to it, minus owners).
-    users_shared = [tu.user for tu in tournament.users if tu not in owners]
+    users_shared = [tu.user for tu in tournament.users if tu.user not in owners]
 
     # All users who don't have access to the tournament
     users_unshared = db.session.query(models.User).filter(
