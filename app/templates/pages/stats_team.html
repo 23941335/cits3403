@@ -3,6 +3,8 @@
 {% block header_text %} Team Performance During Tournament {% endblock %}
 
 {% block main %}
+    <!-- Debug output -->
+<p>{{ chart_data.kills }}</p>
 <div class="container my-4">
     <div class="text-center">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -42,6 +44,8 @@
         👈 Back to Tournament "{{ tournament.title }}"
     </a>
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
+     <canvas id="teamStatsChart" class="mb-4 bg-white rounded border" height="100"></canvas>
+
     <!-- 👇 Player selector block -->
     <div id="player-selector" class="mb-3 d-none">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
@@ -92,15 +96,10 @@
     <div id="mode-player-game" class="mode-block d-none">
         <p class="text-muted">[Player + Game view placeholder]</p>
     </div>
-
-
-    <div class="mb-4">
-        <div class="bg-light border rounded">
-            <img src="{{ url_for('static', filename='images/placeholder-graph.png') }}" class="img-fluid">
-        </div>
-    </div>
 </div>
+
 <script>
+    
     // Track the current selected mode (either 'team' or 'player')
     let currentMode = "team";
 
@@ -256,8 +255,81 @@
                 updateVisibleSection();
             });
         });
-    });
-
+    });    
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById('teamStatsChart').getContext('2d');
+
+    const teamStatsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: JSON.parse(`{{ chart_data.rounds | tojson | safe }}`),
+        datasets: [
+          {
+            label: 'Kills',
+            data: JSON.parse(`{{ chart_data.kills | tojson | safe }}`),
+            yAxisID: 'yKills',
+            borderColor: 'blue',
+            backgroundColor: 'blue',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 4
+          },
+          {
+            label: 'Damage',
+            data: JSON.parse(`{{ chart_data.damage | tojson | safe }}`),
+            yAxisID: 'yBig',
+            borderColor: 'red',
+            backgroundColor: 'red',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Healing',
+            data: JSON.parse(`{{ chart_data.healing | tojson | safe }}`),
+            yAxisID: 'yBig',
+            borderColor: 'orange',
+            backgroundColor: 'orange',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Team Performance Over Rounds'
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          yBig: {
+            type: 'linear',
+            position: 'left',
+            beginAtZero: true,
+            title: { display: true, text: 'Damage / Healing' }
+          },
+          yKills: {
+            type: 'linear',
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'Kills' }
+          }
+        }
+      }
+    });
+  });
+</script>
+
 
 {% endblock %}

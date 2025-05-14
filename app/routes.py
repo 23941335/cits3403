@@ -447,7 +447,32 @@ def team_results_page():
     {"title": "FMVP", "value": team_summary.get("fmvp_player", "N/A")},
     ]
 
-    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round, stats_cards=stats_cards)
+    games = db.session.scalars(
+    sa.select(models.Game).where(models.Game.tournament_id == tid)
+    ).all()
+
+    chart_data = {
+        "rounds": [],
+        "kills": [],
+        "damage": [],
+        "healing": []
+    }
+
+    for g in sorted(games, key=lambda x: x.round):
+        if g.team_a_id != team.id and g.team_b_id != team.id:
+            continue # Skip games not involving the team
+
+        round_label = f"R{g.round}"
+        team_gps = [gp for gp in g.game_players if gp.team_id == team.id]
+
+        chart_data["rounds"].append(round_label)
+        chart_data["kills"].append(sum(gp.kills for gp in team_gps))
+        chart_data["damage"].append(sum(gp.damage for gp in team_gps))
+        chart_data["healing"].append(sum(gp.healing for gp in team_gps))
+
+
+
+    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round, stats_cards=stats_cards, chart_data=chart_data)
 
 
 
