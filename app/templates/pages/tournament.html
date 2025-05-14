@@ -135,7 +135,13 @@
 
   function updateHiddenInput() {
     selectedUsersInput.value = Array.from(selectedUserIds).join(',');
+    console.log("Updated selected_users:", selectedUsersInput.value);
   }
+
+  document.querySelectorAll('#selectedUsersList li[data-user-id]').forEach(li => {
+    selectedUserIds.add(li.getAttribute('data-user-id'));
+  });
+  updateHiddenInput();
 </script>
 
 <h4 class="mt-4 mb-3">Teams Participating</h4>
