@@ -41,43 +41,6 @@
     <a href="/tournament?id={{ tournament.id }}" class="btn btn-outline-primary mb-3">
         👈 Back to Tournament "{{ tournament.title }}"
     </a>
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Total Kills</h6>
-                    <p class="card-text fs-4">{{ team_summary.total_kills }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Total Deaths</h6>
-                    <p class="card-text fs-4">{{ team_summary.total_deaths }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Total Assists</h6>
-                    <p class="card-text fs-4">{{ team_summary.total_assists }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Total Medals</h6>
-                    <p class="card-text fs-4">{{ team_summary.total_medals }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
     <!-- 👇 Player selector block -->
     <div id="player-selector" class="mb-3 d-none">
@@ -105,7 +68,20 @@
     </div>
     <!-- 👇 4 mode-view combination container -->
     <div id="mode-team-tournament" class="mode-block">
-        <p class="text-muted">[Team + Tournament view placeholder]</p>
+        <div class="row mb-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {% for stat in stats_cards %}
+                <div class="col">
+                    <div class="card h-100 text-center bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ stat.title }}</h6>
+                            <p class="card-text fs-4">{{ stat.value }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
     <div id="mode-team-game" class="mode-block d-none">
         <p class="text-muted">[Team + Game view placeholder]</p>
@@ -122,33 +98,6 @@
         <div class="bg-light border rounded">
             <img src="{{ url_for('static', filename='images/placeholder-graph.png') }}" class="img-fluid">
         </div>
-    </div>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% set stats = [
-        {'name': 'Total Kills', 'value': 245},
-        {'name': 'Total Deaths', 'value': 198},
-        {'name': 'Average K/D Ratio', 'value': 1.24},
-        {'name': 'Total Assists', 'value': 112},
-        {'name': 'Total Medals', 'value': 34},
-        {'name': 'Total Final Hits', 'value': 67},
-        {'name': 'Total Damage Dealt', 'value': '58,935'},
-        {'name': 'Total Damage Blocked', 'value': '46,278'},
-        {'name': 'Total Healing', 'value': '27,763'},
-        {'name': 'Average Accuracy', 'value': '62.4%'},
-        {'name': 'Average Kills', 'value': '42'},
-        {'name': 'Average Damage', 'value': '9,822'},
-        {'name': 'Average Healing', 'value': '4,627'}
-        ] %}
-        {% for stat in stats %}
-        <div class="col">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h5 class="card-title">{{ stat.name }}</h5>
-                    <p class="card-text" style="font-size: 2rem;">{{ stat.value }}</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
     </div>
 </div>
 <script>

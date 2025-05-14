@@ -350,7 +350,6 @@ def team_results_page():
         .count()
     )
 
-
     team_summary = {
         'games': len(games_played),
         'kda_ratio': kda_ratio,
@@ -371,9 +370,27 @@ def team_results_page():
     ]
     max_round = max(round_numbers) if round_numbers else 1
 
+    stats_cards = [
+    {"title": "Total Kills", "value": team_summary["total_kills"]},
+    {"title": "Total Deaths", "value": team_summary["total_deaths"]},
+    {"title": "Total Assists", "value": team_summary["total_assists"]},
+    {"title": "Total Medals", "value": team_summary["total_medals"]},
+    {"title": "Total Damage", "value": team_summary["total_damage"]},
+    {"title": "Total Healing", "value": team_summary["total_healing"]},
+    {"title": "Total Blocked", "value": team_summary.get("total_blocked", "N/A")},
+    {"title": "Average Accuracy", "value": f"{team_summary['avg_accuracy']}%"},
+    {"title": "Total K/D Ratio", "value": team_summary["kda_ratio"]},
+    {"title": "Avg K/D Ratio per Game", "value": team_summary.get("avg_kda_ratio", "N/A")},
+    {"title": "Avg Damage per Game", "value": team_summary.get("avg_damage", "N/A")},
+    {"title": "Avg Healing per Game", "value": team_summary.get("avg_healing", "N/A")},
+    {"title": "Avg Blocked per Game", "value": team_summary.get("avg_blocked", "N/A")},
+    {"title": "Top Damage Player", "value": team_summary.get("top_damage_player", "N/A")},
+    {"title": "Top Healing Player", "value": team_summary.get("top_healing_player", "N/A")},
+    {"title": "Top Blocked Player", "value": team_summary.get("top_blocked_player", "N/A")},
+    {"title": "Most Valuable Player", "value": team_summary.get("mvp_player", "N/A")},
+    ]
 
-
-    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round)
+    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round, stats_cards=stats_cards)
 
 
 
