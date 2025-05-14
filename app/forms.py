@@ -101,5 +101,5 @@ class UpdateAccountForm(FlaskForm):
 
 class UserSelectionForm(FlaskForm):
     tid = HiddenField("tid", validators=[DataRequired()])
-    selected_users = HiddenField("Selected Users", validators=[DataRequired()])
+    selected_users = HiddenField("Selected Users")
     submit = SubmitField("Submit")
