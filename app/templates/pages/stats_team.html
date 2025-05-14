@@ -45,14 +45,6 @@
         <div class="col-md-3">
             <div class="card text-center bg-light">
                 <div class="card-body">
-                    <h6 class="card-title">Games Played</h6>
-                    <p class="card-text fs-4">{{ team_summary.games }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
                     <h6 class="card-title">Total Kills</h6>
                     <p class="card-text fs-4">{{ team_summary.total_kills }}</p>
                 </div>
@@ -61,20 +53,29 @@
         <div class="col-md-3">
             <div class="card text-center bg-light">
                 <div class="card-body">
-                    <h6 class="card-title">KDA Ratio</h6>
-                    <p class="card-text fs-4">{{ team_summary.kda_ratio }}</p>
+                    <h6 class="card-title">Total Deaths</h6>
+                    <p class="card-text fs-4">{{ team_summary.total_deaths }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-center bg-light">
                 <div class="card-body">
-                    <h6 class="card-title">Accuracy</h6>
-                    <p class="card-text fs-4">{{ team_summary.avg_accuracy }}%</p>
+                    <h6 class="card-title">Total Assists</h6>
+                    <p class="card-text fs-4">{{ team_summary.total_assists }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">Total Medals</h6>
+                    <p class="card-text fs-4">{{ team_summary.total_medals }}</p>
                 </div>
             </div>
         </div>
     </div>
+
 
 
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->

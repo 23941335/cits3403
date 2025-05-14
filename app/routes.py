@@ -339,14 +339,27 @@ def team_results_page():
 
     kda_ratio = round((kills + assists) / (deaths if deaths > 0 else 1), 2)
     avg_accuracy = round(sum(accuracy_list) / len(accuracy_list), 1) if accuracy_list else 0
+    # Gather all medals belonging to players in this team and this tournament
+    total_medals = (
+        db.session.query(models.GameMedals)
+        .join(models.GameMedals.game)  # JOIN to game
+        .filter(
+            models.GameMedals.player_id.in_([gp.player_id for gp in game_players]),
+            models.Game.tournament_id == tid
+        )
+        .count()
+    )
+
 
     team_summary = {
         'games': len(games_played),
         'kda_ratio': kda_ratio,
         'total_kills': kills,
+        'total_deaths': deaths,
         'total_assists': assists,
         'total_damage': damage,
         'total_healing': healing,
+        'total_medals': total_medals,
         'avg_accuracy': avg_accuracy
     }
 
