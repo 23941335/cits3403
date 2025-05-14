@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 from sqlalchemy.orm import selectinload
+from collections import defaultdict
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
@@ -349,19 +350,75 @@ def team_results_page():
         )
         .count()
     )
+    total_blocked = 0
+
+    # player stastics list
+    player_stats = defaultdict(lambda: {"damage": 0, "healing": 0, "blocked": 0, "games": 0})
+
+    for gp in game_players:
+        total_blocked += gp.damage_blocked or 0
+        pid = gp.player_id
+        player_stats[pid]["damage"] += gp.damage or 0
+        player_stats[pid]["healing"] += gp.healing or 0
+        player_stats[pid]["blocked"] += gp.damage_blocked or 0
+        player_stats[pid]["games"] += 1
+
+    # Average stats
+    games_played_count = len(games_played) if games_played else 1
+
+    avg_kda_ratio = round(kda_ratio / games_played_count, 2)
+    avg_damage = round(damage / games_played_count, 2)
+    avg_healing = round(healing / games_played_count, 2)
+    avg_blocked = round(total_blocked / games_played_count, 2)
+
+    player_ids = list(player_stats.keys())
+    players_by_id = {
+        p.id: p.gamertag for p in db.session.query(models.Player).filter(models.Player.id.in_(player_ids)).all()
+    }
+
+    # top players
+    def get_top_player(metric):
+        best = max(player_stats.items(), key=lambda x: x[1][metric] / max(x[1]["games"], 1), default=None)
+        return players_by_id.get(best[0], "N/A") if best else "N/A"
+
+    top_damage_player = get_top_player("damage")
+    top_healing_player = get_top_player("healing")
+    top_blocked_player = get_top_player("blocked")
+
+    # FMVP
+    final_game = db.session.query(models.Game).filter(
+        models.Game.tournament_id == tid
+    ).order_by(models.Game.round.desc()).first()
+
+    fmvp_player = "N/A"
+    if final_game:
+        fmvp_medal = next(
+            (gm for gm in final_game.game_medals if gm.medal.medal_name.lower() == "mvp"),
+            None
+        )
+        if fmvp_medal and fmvp_medal.player_id in player_ids:
+            fmvp_player = players_by_id.get(fmvp_medal.player_id, "N/A")
 
     team_summary = {
-        'games': len(games_played),
-        'kda_ratio': kda_ratio,
+        'games': games_played_count,
         'total_kills': kills,
         'total_deaths': deaths,
         'total_assists': assists,
         'total_damage': damage,
         'total_healing': healing,
+        'total_blocked': total_blocked,
+        'avg_accuracy': avg_accuracy,
+        'kda_ratio': kda_ratio,
+        'avg_kda_ratio': avg_kda_ratio,
+        'avg_damage': avg_damage,
+        'avg_healing': avg_healing,
+        'avg_blocked': avg_blocked,
         'total_medals': total_medals,
-        'avg_accuracy': avg_accuracy
+        'top_damage_player': top_damage_player,
+        'top_healing_player': top_healing_player,
+        'top_blocked_player': top_blocked_player,
+        'fmvp_player': fmvp_player
     }
-
     # Caluculate the max round number for specific team
     # This is the max round number for the team in the tournament
     # This round number is used to display the correct round in the game view
@@ -387,7 +444,7 @@ def team_results_page():
     {"title": "Top Damage Player", "value": team_summary.get("top_damage_player", "N/A")},
     {"title": "Top Healing Player", "value": team_summary.get("top_healing_player", "N/A")},
     {"title": "Top Blocked Player", "value": team_summary.get("top_blocked_player", "N/A")},
-    {"title": "Most Valuable Player", "value": team_summary.get("mvp_player", "N/A")},
+    {"title": "FMVP", "value": team_summary.get("fmvp_player", "N/A")},
     ]
 
     return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round, stats_cards=stats_cards)
