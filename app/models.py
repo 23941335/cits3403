@@ -122,8 +122,6 @@ class Tournament(BaseModel):
     title: Mapped[str] = mapped_column(sa.Text)
     description: Mapped[str] = mapped_column(sa.Text)
     visibility_id: Mapped[int] = mapped_column(sa.ForeignKey(Visibility.id))
-
-
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
     start_time: Mapped[Optional[datetime]] = mapped_column(sa.DateTime, nullable=True)
 
@@ -141,6 +139,7 @@ class TournamentUsers(BaseModel):
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="users")
     user: Mapped["User"] = relationship("User", back_populates="tournaments")
+    tournament_role: Mapped["Role"] = relationship("Role")
 
 class GameMode(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
