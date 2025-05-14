@@ -86,7 +86,7 @@ def generate_csv(file_path, heroes, medals, maps, modes, num_teams):
                     kills = random_stat(0, 30)
                     deaths = random_stat(0, 30)
                     assists = random_stat(0, 30)
-                    final_hits = random_stat(0, 10)
+                    final_hits = random_stat(0, 30)
                     damage = random_stat(1000, 10000)
                     damage_blocked = random_stat(0, 10000)
                     healing = random_stat(0, 10000)
