@@ -177,7 +177,19 @@ def tournament_page():
         g.mvp = mvp_medal.player if mvp_medal else None
         g.svp = svp_medal.player if svp_medal else None
     
+    # All users on the website
     users = db.session.query(models.User).all()
+    # All users who have the owner role for this tournament (usually will be one, but could support more)
+    owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+    # All users this tournament has been shared with (i.e. all that have access to it, minus owners).
+    users_shared = [tu.user for tu in tournament.users if tu.user_id not in owners]
+
+    # All users who don't have access to the tournament
+    users_unshared = db.session.query(models.User).filter(
+        models.User.id.not_in([u.id for u in users_shared]),
+        models.User.id.not_in([u.id for u in owners])
+    ).all()
+    
     form = forms.UserSelectionForm()
     form.tid.data = tournament.id
 
