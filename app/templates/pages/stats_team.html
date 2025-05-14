@@ -6,7 +6,10 @@
 <div class="container my-4">
     <div class="text-center">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="mb-0">{{ team.team_name }} Performance</h2>
+            <h2 id="page-title" class="mb-0 text-center">
+                <!-- Placeholder will be overwritten by JS -->
+            </h2>
+
             <div class="d-flex gap-2">
                 <!-- View Mode dropdown -->
                 <div class="dropdown">
@@ -34,9 +37,10 @@
                 </div>
             </div>
         </div>
-
-        <p>During <a href="/tournament?id={{ tournament.id }}">{{ tournament.title }}</a></p>
     </div>
+    <a href="/tournament?id={{ tournament.id }}" class="btn btn-outline-primary mb-3">
+        👈 Back to Tournament "{{ tournament.title }}"
+    </a>
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-center bg-light">
@@ -154,7 +158,14 @@
    */
     function switchModeView(mode) {
         currentMode = mode;
-
+        if (mode === "player") {
+            // Auto-select first player button
+            const firstPlayerBtn = document.querySelector("#player-selector button");
+            if (firstPlayerBtn) {
+                document.querySelectorAll("#player-selector button").forEach(b => b.classList.remove("active"));
+                firstPlayerBtn.classList.add("active");
+            }
+        }
         // Update dropdown button label
         document.getElementById("modeDropdown").textContent =
             mode === "team" ? "Team View" : "Player View";
@@ -177,6 +188,15 @@
    */
     function switchGameView(view) {
         currentView = view;
+        if (view === "game") {
+            // Auto-select first round button
+            const firstRoundBtn = document.querySelector("#round-selector button");
+            if (firstRoundBtn) {
+                document.querySelectorAll("#round-selector button").forEach(b => b.classList.remove("active"));
+                firstRoundBtn.classList.add("active");
+            }
+        }
+
         document.getElementById("viewDropdown").textContent =
             view === "tournament" ? "This Tournament" : "Game View";
 
@@ -200,6 +220,25 @@
         const allSections = document.querySelectorAll(".mode-block");
         // Show or hide player selector based on mode and view
         const playerSelector = document.getElementById("player-selector");
+        const titleEl = document.getElementById("page-title");
+
+        const teamName = "{{ team.team_name }}";
+        const tournamentTitle = "{{ tournament.title }}";
+        const selectedRound = getSelectedRound();
+        const selectedPlayer = getSelectedPlayerName();
+
+        let titleText = "";
+        if (currentMode === "team") {
+            titleText = `Team ${teamName} Performance in Tournament "${tournamentTitle}"`;
+        } else {
+            titleText = `Player ${selectedPlayer} Performance in Tournament "${tournamentTitle}"`;
+        }
+
+        if (currentView === "game" && selectedRound) {
+            titleText += ` - Round ${selectedRound}`;
+        }
+
+        titleEl.textContent = titleText;
         playerSelector.classList.toggle("d-none", currentMode !== "player");
         allSections.forEach(div => div.classList.add("d-none"));
 
@@ -208,6 +247,22 @@
         const section = document.getElementById(targetId);
         if (section) section.classList.remove("d-none");
     }
+    // Get the currently selected round from the round selector buttons
+    function getSelectedRound() {
+        const btn = document.querySelector("#round-selector button.active");
+        return btn ? btn.textContent.replace("Round ", "") : null;
+    }
+
+    // Get the currently selected player name from player selector buttons
+    function getSelectedPlayerName() {
+        const btn = document.querySelector("#player-selector button.active");
+        return btn ? btn.textContent : "Unknown";
+    }
+
+    // Ensure title and visible section are initialized on page load
+    document.addEventListener("DOMContentLoaded", () => {
+        updateVisibleSection();
+    });
 
 </script>
 
