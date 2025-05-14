@@ -286,10 +286,12 @@ def create_tournament():
             db.session.add(tournament)
             db.session.flush()  # Ensure we can reference the new tournament
             
+            tournament_role = db.session.query(models.Role).where(models.Role.role_name == 'tournament_owner').one()
+
             tournament_user = models.TournamentUsers(
                 tournament_id=tournament.id,
                 user_id=current_user.id,
-                tournament_role_id=1            # TODO
+                tournament_role_id=tournament_role.id
             )
             db.session.add(tournament_user)
             
