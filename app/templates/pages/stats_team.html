@@ -82,9 +82,16 @@
     <div id="player-selector" class="mb-3 d-none">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
             {% for gp in game_players|groupby("player.gamertag") %}
-            <button class="btn btn-outline-dark btn-sm">{{ gp.grouper }}</button>
+            {% set player = gp.list[0].player %}
+            <button class="btn btn-outline-dark btn-sm" data-player-id="{{ player.id }}">{{ player.gamertag }}</button>
             {% endfor %}
         </div>
+    </div>
+    <!-- Player View: Jump to full player stats page -->
+    <div id="view-player-button" class="text-center mb-3 d-none">
+        <a id="player-stats-link" href="#" class="btn btn-sm btn-outline-secondary">
+            Go to Player Stats
+        </a>
     </div>
 
     <!-- Round selector block -->
@@ -218,35 +225,55 @@
    */
     function updateVisibleSection() {
         const allSections = document.querySelectorAll(".mode-block");
-        // Show or hide player selector based on mode and view
+
         const playerSelector = document.getElementById("player-selector");
         const titleEl = document.getElementById("page-title");
+        const viewPlayerBtn = document.getElementById("view-player-button");
+        const playerStatsLink = document.getElementById("player-stats-link");
 
         const teamName = "{{ team.team_name }}";
         const tournamentTitle = "{{ tournament.title }}";
+
         const selectedRound = getSelectedRound();
         const selectedPlayer = getSelectedPlayerName();
 
-        let titleText = "";
-        if (currentMode === "team") {
-            titleText = `Team ${teamName} Performance in Tournament "${tournamentTitle}"`;
-        } else {
-            titleText = `Player ${selectedPlayer} Performance in Tournament "${tournamentTitle}"`;
-        }
+        // Construct the main title based on current mode/view
+        let titleText = currentMode === "team"
+            ? `Team ${teamName} Performance in Tournament "${tournamentTitle}"`
+            : `Player ${selectedPlayer} Performance in Tournament "${tournamentTitle}"`;
 
+        // Append round number if in game view
         if (currentView === "game" && selectedRound) {
             titleText += ` - Round ${selectedRound}`;
         }
 
         titleEl.textContent = titleText;
-        playerSelector.classList.toggle("d-none", currentMode !== "player");
-        allSections.forEach(div => div.classList.add("d-none"));
 
-        // Compute the ID of the section to show
+        // Toggle player selector visibility
+        playerSelector.classList.toggle("d-none", currentMode !== "player");
+
+        // Show/hide 'View Stats' button based on selected player
+        if (currentMode === "player") {
+            const selectedBtn = document.querySelector("#player-selector button.active");
+            const playerId = selectedBtn?.getAttribute("data-player-id");
+
+            if (playerId) {
+                playerStatsLink.href = `/tournament/player?id=${playerId}&t={{ tournament.id }}`;
+                viewPlayerBtn.classList.remove("d-none");
+            } else {
+                viewPlayerBtn.classList.add("d-none");
+            }
+        } else {
+            viewPlayerBtn.classList.add("d-none");
+        }
+
+        // Show only the relevant content block
+        allSections.forEach(div => div.classList.add("d-none"));
         const targetId = `mode-${currentMode}-${currentView}`;
         const section = document.getElementById(targetId);
         if (section) section.classList.remove("d-none");
     }
+
     // Get the currently selected round from the round selector buttons
     function getSelectedRound() {
         const btn = document.querySelector("#round-selector button.active");
