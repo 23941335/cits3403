@@ -24,6 +24,7 @@
   Share
 </button>
 
+<!-- Modal -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -33,19 +34,16 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <!-- <div class="modal-body">
-        <p>Contents</p>
-      </div> -->
       <div class="container">
         <h2>Select Users</h2>
-        <form action="/tournament/share" method="POST">
+        <form id="shareForm" action="/tournament/share" method="POST">
           {{ form.hidden_tag() }}
 
           <div class="mb-3">
             <label for="selectUser" class="form-label">Share</label>
             <select id="selectUser" class="form-select">
               <option value="" disabled selected>Select a User</option>
-              {% for user in users %}
+              {% for user in unsharedUsers %}
                 <option value="{{ user.id }}">{{ user.username }}</option>
               {% endfor %}
             </select>
@@ -55,16 +53,21 @@
 
           <div class="mb-3">
             <h5>Selected Users</h5>
-            <ul id="selectedUsersList" class="list-group mb-2"></ul>
-            {{ form.selected_users }}
+            <ul id="selectedUsersList" class="list-group mb-2">
+              {% for user in sharedUsers %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="{{ user.id }}">
+                  {{ user.username }}
+                  <button class="btn btn-sm btn-danger" onclick="removeUser('{{ user.id }}', '{{ user.username }}')">Remove</button>
+                </li>
+              {% endfor %}
+            </ul>
+            {{ form.selected_users(id="selected_users", value=selectedUsers | map(attribute='id') | join(',')) }}
           </div>
-
-          <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-        {{ form.submit(class="btn btn-primary") }}
+        {{ form.submit(class="btn btn-primary", form="shareForm") }}
       </div>
     </div>
   </div>
@@ -76,51 +79,64 @@
   const selectedUsersInput = document.getElementById('selected_users');
   let selectedUserIds = new Set();
 
+  function removeUser(userId, userName) {
+    const listItem = selectedUsersList.querySelector(`li[data-user-id="${userId}"]`);
+    if (listItem) {
+      selectedUsersList.removeChild(listItem);
+      selectedUserIds.delete(userId);
+      updateHiddenInput();
+
+      // Re-add to dropdown
+      const option = document.createElement('option');
+      option.value = userId;
+      option.textContent = userName;
+      selectUser.appendChild(option);
+    }
+  }
+
   selectUser.addEventListener('change', function () {
-      const selectedId = this.value;
-      const selectedName = this.options[this.selectedIndex].text;
+    const selectedId = this.value;
+    const selectedName = this.options[this.selectedIndex].text;
 
-      if (!selectedUserIds.has(selectedId)) {
-          selectedUserIds.add(selectedId);
+    if (!selectedUserIds.has(selectedId)) {
+      selectedUserIds.add(selectedId);
 
-          const listItem = document.createElement('li');
-          listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-          listItem.textContent = selectedName;
+      const listItem = document.createElement('li');
+      listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+      listItem.textContent = selectedName;
 
-          const removeBtn = document.createElement('button');
-          removeBtn.className = 'btn btn-sm btn-danger';
-          removeBtn.textContent = 'Remove';
-          removeBtn.onclick = () => {
-              selectedUsersList.removeChild(listItem);
-              selectedUserIds.delete(selectedId);
-              updateHiddenInput();
-              // Add back to dropdown
-              const option = document.createElement('option');
-              option.value = selectedId;
-              option.textContent = selectedName;
-              selectUser.appendChild(option);
-          };
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'btn btn-sm btn-danger';
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => {
+        selectedUsersList.removeChild(listItem);
+        selectedUserIds.delete(selectedId);
+        updateHiddenInput();
+        // Add back to dropdown
+        const option = document.createElement('option');
+        option.value = selectedId;
+        option.textContent = selectedName;
+        selectUser.appendChild(option);
+      };
 
-          listItem.appendChild(removeBtn);
-          selectedUsersList.appendChild(listItem);
-          updateHiddenInput();
+      listItem.appendChild(removeBtn);
+      selectedUsersList.appendChild(listItem);
+      updateHiddenInput();
 
-          // Remove the selected user from the dropdown
-          const selectedOption = selectUser.querySelector(`option[value="${selectedId}"]`);
-          if (selectedOption) {
-              selectUser.removeChild(selectedOption);
-          }
-
-          selectUser.value = "";
+      // Remove the selected user from the dropdown
+      const selectedOption = selectUser.querySelector(`option[value="${selectedId}"]`);
+      if (selectedOption) {
+        selectUser.removeChild(selectedOption);
       }
+
+      selectUser.value = "";
+    }
   });
 
   function updateHiddenInput() {
-      selectedUsersInput.value = Array.from(selectedUserIds).join(',');
+    selectedUsersInput.value = Array.from(selectedUserIds).join(',');
   }
 </script>
-
-
 
 <h4 class="mt-4 mb-3">Teams Participating</h4>
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">

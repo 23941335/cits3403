@@ -194,7 +194,8 @@ def tournament_page():
     form.tid.data = tournament.id
 
 
-    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status, users=users, form=form)
+    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status,
+                           sharedUsers=users_shared, unsharedUsers=users_unshared, form=form)
 
 
 @app.route("/tournament/share", methods=["POST"])
