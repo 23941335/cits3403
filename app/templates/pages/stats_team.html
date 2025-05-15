@@ -3,82 +3,333 @@
 {% block header_text %} Team Performance During Tournament {% endblock %}
 
 {% block main %}
+    <!-- Debug output -->
+<p>{{ chart_data.kills }}</p>
 <div class="container my-4">
     <div class="text-center">
-        <h3>{{ team.team_name }} Performance</h3>
-        <p>During <a href="/tournament?id={{ tournament.id }}">{{ tournament.title }}</a></p>
-    </div>
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Games Played</h6>
-                    <p class="card-text fs-4">{{ team_summary.games }}</p>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 id="page-title" class="mb-0 text-center">
+                <!-- Placeholder will be overwritten by JS -->
+            </h2>
+
+            <div class="d-flex gap-2">
+                <!-- View Mode dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="modeDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Team View
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="modeDropdown">
+                        <li><a class="dropdown-item active" href="#" onclick="switchModeView('team')">Team View</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="switchModeView('player')">Player View</a></li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Total Kills</h6>
-                    <p class="card-text fs-4">{{ team_summary.total_kills }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">KDA Ratio</h6>
-                    <p class="card-text fs-4">{{ team_summary.kda_ratio }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center bg-light">
-                <div class="card-body">
-                    <h6 class="card-title">Accuracy</h6>
-                    <p class="card-text fs-4">{{ team_summary.avg_accuracy }}%</p>
+
+                <!-- Game View dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Tournament view
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                        <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">Tournament
+                                view</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game view</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-
-
+    <a href="/tournament?id={{ tournament.id }}" class="btn btn-outline-primary mb-3">
+        👈 Back to Tournament "{{ tournament.title }}"
+    </a>
     <!-- Placeholder for a graphic, to show time series improvement across various team stats -->
-    <div class="mb-4">
-        <div class="bg-light border rounded">
-            <img src="{{ url_for('static', filename='images/placeholder-graph.png') }}" class="img-fluid">
+     <canvas id="teamStatsChart" class="mb-4 bg-white rounded border" height="100"></canvas>
+
+    <!-- 👇 Player selector block -->
+    <div id="player-selector" class="mb-3 d-none">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            {% for gp in game_players|groupby("player.gamertag") %}
+            {% set player = gp.list[0].player %}
+            <button class="btn btn-outline-dark btn-sm" data-player-id="{{ player.id }}">{{ player.gamertag }}</button>
+            {% endfor %}
         </div>
     </div>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% set stats = [
-        {'name': 'Wins', 'value': 4},
-        {'name': 'Losses', 'value': 2},
-        {'name': 'Draws', 'value': 0},
-        {'name': 'Total Kills', 'value': 245},
-        {'name': 'Total Deaths', 'value': 198},
-        {'name': 'Average K/D Ratio', 'value': 1.24},
-        {'name': 'Total Assists', 'value': 112},
-        {'name': 'Total Medals', 'value': 34},
-        {'name': 'Total Final Hits', 'value': 67},
-        {'name': 'Total Damage Dealt', 'value': '58,935'},
-        {'name': 'Total Damage Blocked', 'value': '46,278'},
-        {'name': 'Total Healing', 'value': '27,763'},
-        {'name': 'Average Accuracy', 'value': '62.4%'},
-        {'name': 'Average Kills', 'value': '42'},
-        {'name': 'Average Damage', 'value': '9,822'},
-        {'name': 'Average Healing', 'value': '4,627'}
-        ] %}
-        {% for stat in stats %}
-        <div class="col">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h5 class="card-title">{{ stat.name }}</h5>
-                    <p class="card-text" style="font-size: 2rem;">{{ stat.value }}</p>
+    <!-- Player View: Jump to full player stats page -->
+    <div id="view-player-button" class="text-center mb-3 d-none">
+        <a id="player-stats-link" href="#" class="btn btn-sm btn-outline-secondary">
+            Go to Player Stats
+        </a>
+    </div>
+
+    <!-- Round selector block -->
+    <div id="round-selector" class="mb-3 d-none">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            {% for r in range(1, max_round + 1) %}
+            <button class="btn btn-outline-primary btn-sm">Round {{ r }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- 👇 4 mode-view combination container -->
+    <div id="mode-team-tournament" class="mode-block">
+        <div class="row mb-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {% for stat in stats_cards %}
+                <div class="col">
+                    <div class="card h-100 text-center bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ stat.title }}</h6>
+                            <p class="card-text fs-4">{{ stat.value }}</p>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
+    </div>
+    <div id="mode-team-game" class="mode-block d-none">
+        <p class="text-muted">[Team + Game view placeholder]</p>
+    </div>
+    <div id="mode-player-tournament" class="mode-block d-none">
+        <p class="text-muted">[Player + Tournament view placeholder]</p>
+    </div>
+    <div id="mode-player-game" class="mode-block d-none">
+        <p class="text-muted">[Player + Game view placeholder]</p>
     </div>
 </div>
+
+<script>
+    
+    // Track the current selected mode (either 'team' or 'player')
+    let currentMode = "team";
+
+    // Track the current selected view (either 'tournament' or 'game')
+    let currentView = "tournament";
+
+    /**
+   * Handle switching between 'Team View' and 'Player View'
+   * - Updates dropdown text
+   * - Highlights active menu item
+   * - Triggers section update
+   */
+    function switchModeView(mode) {
+        currentMode = mode;
+        if (mode === "player") {
+            // Auto-select first player button
+            const firstPlayerBtn = document.querySelector("#player-selector button");
+            if (firstPlayerBtn) {
+                document.querySelectorAll("#player-selector button").forEach(b => b.classList.remove("active"));
+                firstPlayerBtn.classList.add("active");
+            }
+        }
+        // Update dropdown button label
+        document.getElementById("modeDropdown").textContent =
+            mode === "team" ? "Team View" : "Player View";
+
+        // Highlight the selected menu item
+        document.querySelectorAll("#modeDropdown + .dropdown-menu .dropdown-item")
+            .forEach(item => item.classList.remove("active"));
+        document.querySelector(`#modeDropdown + .dropdown-menu .dropdown-item[onclick="switchModeView('${mode}')"]`)
+            .classList.add("active");
+
+        updateVisibleSection();
+    }
+
+    /**
+   * Handle switching between 'Tournament View' and 'Game View'
+   * - Updates dropdown text
+   * - Highlights active menu item
+   * - Toggles round selector visibility
+   * - Triggers section update
+   */
+    function switchGameView(view) {
+        currentView = view;
+        if (view === "game") {
+            // Auto-select first round button
+            const firstRoundBtn = document.querySelector("#round-selector button");
+            if (firstRoundBtn) {
+                document.querySelectorAll("#round-selector button").forEach(b => b.classList.remove("active"));
+                firstRoundBtn.classList.add("active");
+            }
+        }
+
+        document.getElementById("viewDropdown").textContent =
+            view === "tournament" ? "This Tournament" : "Game View";
+
+        document.querySelectorAll("#viewDropdown + .dropdown-menu .dropdown-item")
+            .forEach(item => item.classList.remove("active"));
+        document.querySelector(`#viewDropdown + .dropdown-menu .dropdown-item[onclick="switchGameView('${view}')"]`)
+            .classList.add("active");
+
+        // Round display control 
+        const roundSelector = document.getElementById("round-selector");
+        roundSelector.classList.toggle("d-none", view !== "game");
+
+        updateVisibleSection();
+    }
+
+    /**
+   * Show only the relevant content block based on current mode and view
+   * e.g. show #mode-player-game and hide the other 3 combinations
+   */
+    function updateVisibleSection() {
+        const allSections = document.querySelectorAll(".mode-block");
+
+        const playerSelector = document.getElementById("player-selector");
+        const titleEl = document.getElementById("page-title");
+        const viewPlayerBtn = document.getElementById("view-player-button");
+        const playerStatsLink = document.getElementById("player-stats-link");
+
+        const teamName = "{{ team.team_name }}";
+        const tournamentTitle = "{{ tournament.title }}";
+
+        const selectedRound = getSelectedRound();
+        const selectedPlayer = getSelectedPlayerName();
+
+        // Construct the main title based on current mode/view
+        let titleText = currentMode === "team"
+            ? `Team ${teamName} Performance in Tournament "${tournamentTitle}"`
+            : `Player ${selectedPlayer} Performance in Tournament "${tournamentTitle}"`;
+
+        // Append round number if in game view
+        if (currentView === "game" && selectedRound) {
+            titleText += ` - Round ${selectedRound}`;
+        }
+
+        titleEl.textContent = titleText;
+
+        // Toggle player selector visibility
+        playerSelector.classList.toggle("d-none", currentMode !== "player");
+
+        // Show/hide 'View Stats' button based on selected player
+        if (currentMode === "player") {
+            const selectedBtn = document.querySelector("#player-selector button.active");
+            const playerId = selectedBtn?.getAttribute("data-player-id");
+
+            if (playerId) {
+                playerStatsLink.href = `/tournament/player?id=${playerId}&t={{ tournament.id }}`;
+                viewPlayerBtn.classList.remove("d-none");
+            } else {
+                viewPlayerBtn.classList.add("d-none");
+            }
+        } else {
+            viewPlayerBtn.classList.add("d-none");
+        }
+
+        // Show only the relevant content block
+        allSections.forEach(div => div.classList.add("d-none"));
+        const targetId = `mode-${currentMode}-${currentView}`;
+        const section = document.getElementById(targetId);
+        if (section) section.classList.remove("d-none");
+    }
+
+    // Get the currently selected round from the round selector buttons
+    function getSelectedRound() {
+        const btn = document.querySelector("#round-selector button.active");
+        return btn ? btn.textContent.replace("Round ", "") : null;
+    }
+
+    // Get the currently selected player name from player selector buttons
+    function getSelectedPlayerName() {
+        const btn = document.querySelector("#player-selector button.active");
+        return btn ? btn.textContent : "Unknown";
+    }
+
+    // Ensure title and visible section are initialized on page load
+    document.addEventListener("DOMContentLoaded", () => {
+        updateVisibleSection();
+        // Enable click selection for player buttons
+        document.querySelectorAll("#player-selector button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#player-selector button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVisibleSection();
+            });
+        });
+
+        // Enable click selection for round buttons
+        document.querySelectorAll("#round-selector button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#round-selector button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVisibleSection();
+            });
+        });
+    });    
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById('teamStatsChart').getContext('2d');
+
+    const teamStatsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: JSON.parse(`{{ chart_data.rounds | tojson | safe }}`),
+        datasets: [
+          {
+            label: 'Kills',
+            data: JSON.parse(`{{ chart_data.kills | tojson | safe }}`),
+            yAxisID: 'yKills',
+            borderColor: 'blue',
+            backgroundColor: 'blue',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 4
+          },
+          {
+            label: 'Damage',
+            data: JSON.parse(`{{ chart_data.damage | tojson | safe }}`),
+            yAxisID: 'yBig',
+            borderColor: 'red',
+            backgroundColor: 'red',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Healing',
+            data: JSON.parse(`{{ chart_data.healing | tojson | safe }}`),
+            yAxisID: 'yBig',
+            borderColor: 'orange',
+            backgroundColor: 'orange',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Team Performance Over Rounds'
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          yBig: {
+            type: 'linear',
+            position: 'left',
+            beginAtZero: true,
+            title: { display: true, text: 'Damage / Healing' }
+          },
+          yKills: {
+            type: 'linear',
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'Kills' }
+          }
+        }
+      }
+    });
+  });
+</script>
+
+
 {% endblock %}
