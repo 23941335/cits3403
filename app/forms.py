@@ -70,7 +70,7 @@ class LoginForm(FlaskForm):
 
 class CreateTournamentForm(FlaskForm):
     name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
-    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[Optional()])
+    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[InputRequired(message="Tournament Start Time is required.")])
     description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
 
     visibility = SelectField(
