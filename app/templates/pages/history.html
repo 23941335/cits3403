@@ -6,6 +6,15 @@
 {% block main %}
 <div class="container mt-4">
   <h2 class="mb-3">All Tournaments</h2>
+
+  <!-- Search form -->
+  <form method="GET" action="{{ url_for('history_page') }}" class="mb-3">
+    <div class="input-group">
+      <input type="text" name="search" class="form-control" placeholder="Search by tournament name" value="{{ request.args.get('search', '') }}">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </form>
+
   {% if tournaments %}
   <table class="table table-hover">
     <thead class="table-dark">

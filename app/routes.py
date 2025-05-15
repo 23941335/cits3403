@@ -329,16 +329,21 @@ def create_tournament():
 
     # TODO: Add error handling
 
-@app.route("/history")
+@app.route("/history", methods=['GET'])
 def history_page():
-    stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))
+    search_query = request.args.get('search', '').lower()  # Get the search query (default to empty string if not provided)
+    stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))  # Use selectinload correctly
+
+    if search_query:
+        stmt = stmt.filter(models.Tournament.title.ilike(f'%{search_query}%'))
     tournaments = db.session.scalars(stmt).all()
+    
     for t in tournaments:
-        # print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
         if isinstance(t.created_at, str):
             t.created_at = datetime.fromisoformat(t.created_at)
         if isinstance(t.start_time, str):
             t.start_time = datetime.fromisoformat(t.start_time)
+    
     return render_template("pages/history.html", tournaments=tournaments)
 
 @app.route("/tournament/game")
