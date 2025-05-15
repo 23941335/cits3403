@@ -1,5 +1,5 @@
 from app import app, db, models, forms
-from flask import render_template, redirect, flash, request
+from flask import render_template, redirect, flash, request, jsonify
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
@@ -129,8 +129,7 @@ def user_account_page():
     return render_template("pages/account.html", form=form)
 
 
-
-@app.route("/tournament")
+@app.route("/tournament", methods=["GET"])
 def tournament_page():
     tid = request.args.get("id", type=int)
     if not tid:
@@ -178,9 +177,72 @@ def tournament_page():
 
         g.mvp = mvp_medal.player if mvp_medal else None
         g.svp = svp_medal.player if svp_medal else None
+    
+    # All users who have the owner role for this tournament (usually will be one, but could support more)
+    owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+    # All users this tournament has been shared with (i.e. all that have access to it, minus owners).
+    users_shared = [tu.user for tu in tournament.users if tu.user not in owners]
+
+    # All users who don't have access to the tournament
+    users_unshared = db.session.query(models.User).filter(
+        models.User.id.not_in([u.id for u in users_shared]),
+        models.User.id.not_in([u.id for u in owners])
+    ).all()
+    
+    form = forms.UserSelectionForm()
+    form.tid.data = tournament.id
 
 
-    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status)
+    return render_template("pages/tournament.html", tournament=tournament, games=games,teams=teams, team_status=team_status,
+                           sharedUsers=users_shared, unsharedUsers=users_unshared, owners=owners, form=form)
+
+
+@app.route("/tournament/share", methods=["POST"])
+def share():
+
+    # TODO
+    DEFAULT_ROLE_ID = 1
+
+    form = forms.UserSelectionForm()
+    if form.validate_on_submit():
+        try:
+            tournament = db.session.query(models.Tournament).filter_by(id=form.tid.data).one()
+            owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+            tourn_users_shared = [tu for tu in tournament.users if tu.user not in owners]
+            
+            
+            # Process form to insert values into the database
+            user_ids_to_share = []
+            if form.selected_users.data:
+                user_ids_to_share = [int(uid) for uid in form.selected_users.data.split(',')]
+
+            for user_id in user_ids_to_share:
+                existing_tu = db.session.query(models.TournamentUsers).filter_by(
+                    tournament_id=form.tid.data,
+                    user_id=user_id
+                ).first()
+                
+                if not existing_tu:
+                    user = db.session.query(models.User).where(models.User.id == user_id).one()
+                    tournament_user = models.TournamentUsers(
+                        tournament_id=form.tid.data,
+                        user_id=user.id,
+                        tournament_role_id=DEFAULT_ROLE_ID
+                    )
+                    db.session.add(tournament_user)
+
+            # Revoke access to users who have already if deselected
+            for tourn_user in tourn_users_shared:
+                if tourn_user.user_id not in user_ids_to_share:
+                    db.session.delete(tourn_user)
+
+            db.session.commit()
+
+        except Exception as e:
+            db.session.rollback()
+            raise e
+    
+    return redirect(f"/tournament?id={form.tid.data}")
 
 
 @app.route("/tournament/delete/<int:tid>", methods=["POST"])
@@ -244,10 +306,12 @@ def create_tournament():
             db.session.add(tournament)
             db.session.flush()  # Ensure we can reference the new tournament
             
+            tournament_role = db.session.query(models.Role).where(models.Role.role_name == 'tournament_owner').one()
+
             tournament_user = models.TournamentUsers(
                 tournament_id=tournament.id,
                 user_id=current_user.id,
-                tournament_role_id=1            # TODO
+                tournament_role_id=tournament_role.id
             )
             db.session.add(tournament_user)
             
@@ -266,17 +330,98 @@ def create_tournament():
 
     # TODO: Add error handling
 
-@app.route("/history")
+
+
+@app.route("/history", methods=['GET'])
 def history_page():
-    stmt = sa.select(models.Tournament).options(selectinload(models.Tournament.users))
+    """Render the tournament history page (initial load before AJAX takes over)."""
+    # Render the template without passing data, as AJAX will load the tournaments
+    return render_template("pages/history.html")
+
+
+
+@app.route("/api/tournaments", methods=['GET'])
+def api_get_tournaments():
+    """API endpoint to retrieve tournaments with optional search filter and category filter."""
+    search_query = request.args.get('search', '').lower()
+    filter_type = request.args.get('filter', 'all')  # Filter parameters: 'owned', 'shared', 'discover', or 'all'
+    
+    # Start with a base query
+    stmt = sa.select(models.Tournament).options(
+        selectinload(models.Tournament.users).selectinload(models.TournamentUsers.tournament_role),
+        selectinload(models.Tournament.visibility)
+    )
+    
+    # Apply search filter if provided
+    if search_query:
+        stmt = stmt.filter(models.Tournament.title.ilike(f'%{search_query}%'))
+    
+    # Get all tournaments matching the search criteria
     tournaments = db.session.scalars(stmt).all()
+    
+    # Filter based on the filter_type
+    filtered_tournaments = []
+    
     for t in tournaments:
-        print(f"Tournament {t.id}: {[u.user_id for u in t.users]}")
-        if isinstance(t.created_at, str):
-            t.created_at = datetime.fromisoformat(t.created_at)
-        if isinstance(t.start_time, str):
-            t.start_time = datetime.fromisoformat(t.start_time)
-    return render_template("pages/history.html", tournaments=tournaments)
+        # Get owners and shared users
+        owners = [tu.user for tu in t.users if tu.tournament_role.role_name == 'tournament_owner']
+        owner_ids = [user.id for user in owners if user]
+        
+        is_owner = current_user.is_authenticated and current_user.id in owner_ids
+        is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+        is_shared = False
+        
+        if current_user.is_authenticated:
+            is_shared = any(tu.user_id == current_user.id and tu.tournament_role.role_name != 'tournament_owner' 
+                            for tu in t.users)
+        
+        # Apply filters
+        if filter_type == 'owned' and is_owner:
+            filtered_tournaments.append(t)
+        elif filter_type == 'shared' and is_shared and not is_public:
+            filtered_tournaments.append(t)
+        elif filter_type == 'discover' and is_public and not is_owner and not is_shared:
+            filtered_tournaments.append(t)
+        elif filter_type == 'all':
+            if is_owner or is_shared or is_public:
+                filtered_tournaments.append(t)
+    
+    # Convert tournaments to a list of dictionaries
+    tournaments_data = []
+    for t in filtered_tournaments:
+        # Handle date formatting
+        created_at = t.created_at
+        start_time = t.start_time
+        
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
+        if isinstance(start_time, str):
+            start_time = datetime.fromisoformat(start_time)
+            
+        # Build the tournament data dictionary
+        tournament_data = {
+            'id': t.id,
+            'title': t.title,
+            'description': t.description,
+            'created_at': created_at.isoformat() if created_at else None,
+            'start_time': start_time.isoformat() if start_time else None,
+            'visibility': {
+                'visibility': t.visibility.visibility if hasattr(t, 'visibility') and t.visibility else 'Unknown'
+            },
+            'users': [{'user_id': link.user_id} for link in t.users] if t.users else [],
+            'is_owner': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
+                                                                       if tu.tournament_role.role_name == 'tournament_owner'],
+            'is_shared': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
+                                                                       if tu.tournament_role.role_name != 'tournament_owner'],
+            'is_public': t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+        }
+        
+        tournaments_data.append(tournament_data)
+    
+    return jsonify({'tournaments': tournaments_data})
+
+
 
 @app.route("/tournament/game")
 def tournament_game_view():

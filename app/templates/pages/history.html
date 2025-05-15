@@ -4,45 +4,227 @@
 {% block header_text %}Tournament History{% endblock %}
 
 {% block main %}
-<div class="container mt-4">
-  <h2 class="mb-3">All Tournaments</h2>
-  {% if tournaments %}
-  <table class="table table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th>Upload Time</th>
-        <th>Start Time</th>
-        <th>tID</th>
-        <th>Tournament</th>
-        <th>Description</th>
-        <th>Visibility</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for t in tournaments %}
-      <tr>
-        <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
-        <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
-        <td>{{ t.id }}</td>
-        <td><a href="/tournament?id={{ t.id }}">{{ t.title }}</a></td>
-        <td>{{ t.description }}</td>
-        <td>{{ t.visibility.visibility }}</td>
-        <td>
-          {% for link in t.users %}
-            {% if link.user_id == current_user.id %}
-              <form method="POST" action="/tournament/delete/{{ t.id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this tournament?');">
+<div class="container mt-4" data-user-id="{{ current_user.id if current_user.is_authenticated else '' }}">
+  <h2 class="mb-3">Tournaments</h2>
+
+  <!-- Search form (no action or method since we're using AJAX) -->
+  <div class="mb-3">
+    <div class="input-group">
+      <input type="text" id="search-input" class="form-control" placeholder="Search by tournament name" value="{{ request.args.get('search', '') }}">
+      <button id="search-button" class="btn btn-primary">Search</button>
+    </div>
+  </div>
+
+  <!-- Filter options -->
+  <div class="btn-group mb-3 me-2">
+    <button id="filter-all" class="btn btn-primary active">All</button>
+    <button id="filter-discover" class="btn btn-outline-primary">Discover</button>
+    <button id="filter-shared" class="btn btn-outline-primary">Shared With Me</button>
+    <button id="filter-owned" class="btn btn-outline-primary">My Tournaments</button>
+  </div>
+
+  <!-- Loading indicator -->
+  <div id="loading-indicator" class="text-center d-none">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Tournament results table -->
+  <div id="tournaments-container">
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Tournament</th>
+          <th>Description</th>
+          <th>Visibility</th>
+          <th>Start Time</th>
+          <th>Upload Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tournaments-tbody">
+        <!-- Tournament rows loaded via AJAX -->
+      </tbody>
+    </table>
+    <p id="no-tournaments" class="d-none">No tournaments found.</p>
+  </div>
+</div>
+
+<!-- JavaScript for AJAX functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements
+  const searchInput = document.getElementById('search-input');
+  const searchButton = document.getElementById('search-button');
+  const tournamentsContainer = document.getElementById('tournaments-container');
+  const tournamentsBody = document.getElementById('tournaments-tbody');
+  const noTournamentsMsg = document.getElementById('no-tournaments');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  
+  // Filter buttons
+  const filterAll = document.getElementById('filter-all');
+  const filterOwned = document.getElementById('filter-owned');
+  const filterShared = document.getElementById('filter-shared');
+  const filterDiscover = document.getElementById('filter-discover');
+  
+  // Get current user ID from data attribute
+  const container = document.querySelector('.container');
+  const currentUserId = container.dataset.userId ? parseInt(container.dataset.userId) : null;
+  
+  // Current active filter
+  let currentFilter = 'all';
+  
+  // Initial load of tournaments
+  loadTournaments();
+  
+  // Filter button click events
+  filterAll.addEventListener('click', function() {
+    setActiveFilter('all', this);
+    loadTournaments();
+  });
+  
+  filterOwned.addEventListener('click', function() {
+    setActiveFilter('owned', this);
+    loadTournaments();
+  });
+  
+  filterShared.addEventListener('click', function() {
+    setActiveFilter('shared', this);
+    loadTournaments();
+  });
+
+  filterDiscover.addEventListener('click', function() {
+    setActiveFilter('discover', this);
+    loadTournaments();
+  });
+  
+  // Set active filter button
+  function setActiveFilter(filter, button) {
+    currentFilter = filter;
+    
+    // Reset all buttons
+    [filterAll, filterOwned, filterShared, filterDiscover].forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.remove('active');
+      btn.classList.add('btn-outline-primary');
+    });
+    
+    // Activate selected button
+    button.classList.remove('btn-outline-primary');
+    button.classList.add('btn-primary');
+    button.classList.add('active');
+  }
+  
+  // Search button click event
+  searchButton.addEventListener('click', function() {
+    loadTournaments();
+  });
+  
+  // Enter key in search input
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      loadTournaments();
+      e.preventDefault();
+    }
+  });
+  
+  // Load tournaments via AJAX
+  function loadTournaments() {
+    const searchQuery = searchInput.value.trim();
+    
+    // Show loading indicator
+    loadingIndicator.classList.remove('d-none');
+    
+    // Fetch tournaments from API with filter
+    fetch(`/api/tournaments?search=${encodeURIComponent(searchQuery)}&filter=${currentFilter}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Hide loading indicator
+        loadingIndicator.classList.add('d-none');
+        
+        // Update the tournaments table
+        updateTournamentsTable(data.tournaments);
+      })
+      .catch(error => {
+        console.error('Error fetching tournaments:', error);
+        loadingIndicator.classList.add('d-none');
+        alert('Error loading tournaments. Please try again.');
+      });
+  }
+  
+  // Update the tournaments table with data
+  function updateTournamentsTable(tournaments) {
+    // Clear existing rows
+    tournamentsBody.innerHTML = '';
+    
+    if (tournaments.length === 0) {
+      // Show "No tournaments found" message
+      noTournamentsMsg.classList.remove('d-none');
+    } else {
+      // Hide "No tournaments found" message
+      noTournamentsMsg.classList.add('d-none');
+      
+      // Add tournament rows
+      tournaments.forEach(tournament => {
+        const row = document.createElement('tr');
+        
+        // Format timestamps
+        const createdAt = tournament.created_at ? new Date(tournament.created_at).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', '') : 'N/A';
+        
+        const startTime = tournament.start_time ? new Date(tournament.start_time).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', '') : 'N/A';
+        
+        // Check if current user is an owner of this tournament
+        const isOwner = tournament.is_owner;
+        
+        // Build the row HTML
+        row.innerHTML = `
+          <td><a href="/tournament?id=${tournament.id}">${escapeHtml(tournament.title)}</a></td>
+          <td>${escapeHtml(tournament.description || '')}</td>
+          <td>${escapeHtml(tournament.visibility.visibility || '')}</td>
+          <td>${createdAt}</td>
+          <td>${startTime}</td>
+          <td>
+            ${isOwner ? `
+              <form method="POST" action="/tournament/delete/${tournament.id}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this tournament?');">
                 <button class="btn btn-sm btn-danger">Delete</button>
               </form>
-            {% endif %}
-          {% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <p>No tournaments found.</p>
-  {% endif %}
-</div>
+            ` : ''}
+          </td>
+        `;
+        
+        tournamentsBody.appendChild(row);
+      });
+    }
+  }
+  
+  // Escape HTML and prevent XSS
+  function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return '';
+    return String(unsafe)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+});
+</script>
 {% endblock %}
