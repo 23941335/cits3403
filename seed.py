@@ -89,7 +89,7 @@ def reset_tables(model_list):
 
 if __name__ == '__main__':
     with app.app_context():
-        reset_tables([Role, Permission, RolePermissions, Hero, HeroRole, GameMode, Visibility, Map])
+        # reset_tables([Role, Permission, RolePermissions, Hero, HeroRole, GameMode, Visibility, Map])
         Role.populate_with_list('role_name', [role.value for role in ROLE])
         Permission.populate_with_list('permission', [permission.value for permission in PERMISSION])
         HeroRole.populate_with_list('role_name', ['vanguard', 'duelist', 'strategist'])
