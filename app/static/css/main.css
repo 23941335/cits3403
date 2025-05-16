@@ -112,3 +112,59 @@ nav:hover {
   transform: scale(1.05);
   background-color: #ff0000;
 }
+
+/* Table styling for column width control and text wrapping */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Strengthen column width enforcement */
+.table-custom th,
+.table-custom td {
+  word-wrap: break-word;
+  overflow: hidden;
+  width: auto; /* Allow natural width calculation */
+}
+
+/* Column width variations */
+.table-custom .col-10 {
+  max-width: 10%;
+  min-width: 80px;
+}
+
+.table-custom .col-15 {
+  max-width: 15%;
+  min-width: 100px;
+}
+
+.table-custom .col-20 {
+  max-width: 20%;
+  min-width: 120px;
+}
+
+.table-custom .col-25 {
+  max-width: 25%;
+  min-width: 140px;
+}
+
+.table-custom .col-30 {
+  max-width: 30%;
+  min-width: 180px;
+}
+
+.table-custom .col-40 {
+  max-width: 40%;
+  min-width: 220px;
+}
+
+.table-custom .col-50 {
+  max-width: 50%;
+  min-width: 220px;
+}
+
+/* Ensure text wraps but table remains responsive */
+.table-custom {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 600px; /* Ensures minimum width for proper column distribution */
+}

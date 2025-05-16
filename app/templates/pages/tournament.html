@@ -44,21 +44,28 @@
 {% endblock %}
 
 {% block main %}
-<h1>Tournament——{{ tournament.title }}</h1>
-<p>{{ tournament.description }}</p>
-<p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
-<p>Visibility: {{ tournament.visibility.visibility }}</p>
+<!-- Main Info -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-break">{{ tournament.title }}</h1>
+      <p class="text-break">{{ tournament.description }}</p>
+      <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+      <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-{% if (current_user.id in owners | map(attribute='id') | list) %}
-  {% if tournament.visibility.visibility == 'private' %}
-  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
-    Share
-  </button>
-  {% endif %}
-  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-    Upload Data
-  </button>
-{% endif %}
+      {% if (current_user.id in owners | map(attribute='id') | list) %}
+        {% if tournament.visibility.visibility == 'private' %}
+        <button type="submit" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#shareModal">
+          Share
+        </button>
+        {% endif %}
+        <button type="submit" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+          Upload Data
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
 <!-- Share Modal -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
