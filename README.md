@@ -97,6 +97,11 @@ This command will discover and run all test files within the `app/testing/unit` 
 
 ### Running Selenium Tests
 
+First install selenium if you do not have it:
+```bash
+pip install selenium
+```
+
 Navigate to the project's root directory
 
 ```bash
