@@ -100,6 +100,43 @@ flask db upgrade
 ```
 This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
 
+## Test Data
+
+### Users
+Username: test_user_1
+Email: test_user_1@foo.foo
+Password: 12345678
+Has pfp
+
+test_user_2
+test_user_2@foo.foo
+
+test_user_3
+test_user_3@foo.foo
+
+test_user_4
+test_user_4@foo.foo
+
+test_user_5
+test_user_5@foo.foo
+
+### Tournaments
+Name: test_user_1_private_unshared
+Visibility: Private
+Shared: None
+
+test_user_1_public_1
+Visibility: Public
+Shared: N/A
+
+test_user_2_private_shared
+Visibility: Private
+Shared: test_user_1
+
+test_user_1_public_2
+Visibility: Public
+Shared: N/A
+
 ## Testing
 
 Note: Selenium testing requires that you have Google Chrome installed.
