@@ -19,21 +19,28 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ### Quick Start Instructions
 
-Set up virtual environment and install requirements:
-`python -m venv .venv`
-`source .venv/bin/activate` (Linux/MacOS); `.venv\Scripts\activate` (Windows); `source .venv/Scripts/activate` (WSL)
-`pip install -r requirements.txt`
-
-Set the environment variables:
+#### Virtual environment:
 ```
+python -m venv .venv
+```
+Depending on OS:
+
+`source .venv/bin/activate` (Linux/MacOS)
+
+`.venv\Scripts\activate` (Windows)
+
+`source .venv/Scripts/activate` (WSL)
+
+```
+pip install -r requirements.txt
 export SECRET_KEY='somevaluehere'
 ```
-Build the database:
+#### Build the database:
 ```
 flask db upgrade
 python seed.py
 ```
-Start the server:
+#### Start the server:
 ```
 flask run
 ```
@@ -50,15 +57,30 @@ flask run
 
 Any other requirements listed in the requirements.txt are dependencies of these packages.
 
-#### Create Virtual Environment and Install Dependencies
+#### Virtual environment:
+Create:
+```
+python -m venv .venv
+```
+Activate:
 
-Set up virtual environment and install requirements:
-`python -m venv .venv`
-`source .venv/bin/activate` (Linux/MacOS); `.venv\Scripts\activate` (Windows); `source .venv/Scripts/activate` (WSL)
-`pip install -r requirements.txt`
+`source .venv/bin/activate` (Linux/MacOS)
+
+`.venv\Scripts\activate` (Windows)
+
+`source .venv/Scripts/activate` (WSL)
+
+Install requirements:
+
+```
+pip install -r requirements.txt
+```
+
 
 If you want to delete the .venv:
+
 `rd /s /q .venv` (Windows)
+
 `rm -rf .venv` (Linux/MacOS)
 
 #### Database
