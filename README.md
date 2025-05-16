@@ -103,40 +103,52 @@ This will automatically generate migration scripts that can be used to upgrade (
 ## Test Data
 
 ### Users
+```
 Username: test_user_1
 Email: test_user_1@foo.foo
-Password: 12345678
 Has pfp
-
-test_user_2
-test_user_2@foo.foo
-
-test_user_3
-test_user_3@foo.foo
-
-test_user_4
-test_user_4@foo.foo
-
-test_user_5
-test_user_5@foo.foo
-
+```
+```
+Username: test_user_2
+Email: test_user_2@foo.foo
+```
+```
+Username: test_user_3
+Email: test_user_3@foo.foo
+```
+```
+Username: test_user_4
+Email: test_user_4@foo.foo
+```
+```
+Username: test_user_5
+Email: test_user_5@foo.foo
+```
+#### All users
+```
+Password: 12345678
+```
 ### Tournaments
+```
 Name: test_user_1_private_unshared
 Visibility: Private
 Shared: None
-
-test_user_1_public_1
+```
+```
+Name: test_user_1_public_1
 Visibility: Public
 Shared: N/A
-
-test_user_2_private_shared
+```
+```
+Name: test_user_2_private_shared
 Visibility: Private
 Shared: test_user_1
-
-test_user_1_public_2
+```
+```
+Name: test_user_1_public_2
 Visibility: Public
 Shared: N/A
-
+```
 ## Testing
 
 Note: Selenium testing requires that you have Google Chrome installed.
