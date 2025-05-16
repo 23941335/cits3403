@@ -4,8 +4,6 @@
 
 The aim of this project is to create a website which is used to manage tournaments for the game _Marvel Rivals_. Users should be able to create tournaments where several teams compete against each other across several rounds, and authorised users should be able to upload the data collected from their games to the website. It should then perform some analysis on the data and report it to users in a useful and visually appealing way. Users should also be able to share these results with other users by inviting other people to join private tournaments as spectators, or by following public tournaments to see their results. 
 
-TODO: ensure above fulfills: "a description of the purpose of the application, explaining its design and use."
-
 ## Contributors
 | Student Number | Name            | GitHub Username |
 |----------------|-----------------|-----------------|
@@ -19,24 +17,30 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ## Setup
 
-### Instructions
+### Quick Start Instructions
 
-Set up virtual environment and install requirements:
+#### Virtual Environment:
 ```
 python -m venv .venv
-source .venv/*/activate
+```
+Depending on OS:
+
+`source .venv/bin/activate` (Linux/MacOS)
+
+`.venv\Scripts\activate` (Windows)
+
+`source .venv/Scripts/activate` (WSL)
+
+```
 pip install -r requirements.txt
-```
-Set the environment variables:
-```
 export SECRET_KEY='somevaluehere'
 ```
-Build the database:
+#### Build the Database:
 ```
 flask db upgrade
 python seed.py
 ```
-Start the server:
+#### Start the Server:
 ```
 flask run
 ```
@@ -51,30 +55,37 @@ flask run
 - [Flask-SQLAlchemy](https://github.com/pallets-eco/flask-sqlalchemy/)
 - [Flask-WTF](https://github.com/pallets-eco/flask-wtf/) <!-- cf. lecture 9, slide 31 -->
 
-
 Any other requirements listed in the requirements.txt are dependencies of these packages.
 
-#### Create Virtual Environment and Install Dependencies
+#### Virtual Environment:
+Create:
+```
+python -m venv .venv
+```
+Activate:
 
-1. `python -m venv .venv`
-2. `source .venv/bin/activate` (Linux/MacOS); or `.venv\Scripts\activate` (Windows); or `source .venv/Scripts/activate` (WSL)
-3. `pip install -r requirements.txt`
+`source .venv/bin/activate` (Linux/MacOS)
+
+`.venv\Scripts\activate` (Windows)
+
+`source .venv/Scripts/activate` (WSL)
+
+Install requirements:
+
+```
+pip install -r requirements.txt
+```
+
 
 If you want to delete the .venv:
-`rd /s /q .venv` on Windows or
-`rm -rf .venv` on Linux/MacOS
+
+`rd /s /q .venv` (Windows)
+
+`rm -rf .venv` (Linux/MacOS)
 
 #### Database
-<!-- 
-Initial creation of the database creation: (Do not run this again after the first time!)
-```
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
-``` 
--->
 
-If you do not yet have th app.db file (the database), run:
+If you do not yet have the app.db file (the database), run:
 ```
 flask db upgrade
 ``` 
@@ -97,15 +108,8 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 
 ### Running Unit Tests
 
-Navigate to the project's root directory, make sure your test environment is clean and ready.  
-<!--
-```bash
-rm app.db
-flask db upgrade
-export SECRET_KEY='somevaluehere'
-python seed.py
-```
--->
+Navigate to the project's root directory, make sure your test environment is clean and ready. 
+
 ```bash
 python -m unittest discover -s app/testing/unit
 ```
