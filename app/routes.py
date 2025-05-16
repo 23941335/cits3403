@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 from collections import defaultdict
 from functools import wraps
 from app.consts import *
+import csv_generator as csvg
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
@@ -885,6 +886,42 @@ def tournament_player_view():
 
     return render_template("pages/stats_player.html", player=player, player_games=player_games,current_game=current_game, tournament=tournament, player_summary=player_summary, player_cards=player_cards,radar_data=radar_data, team_id=team_id, team_radar_data=team_radar_data)
 
+
+@app.route("/help/csv-guide/", defaults={'variant': 'example'})
+@app.route("/help/csv-guide/<variant>")
+def csv_guide(variant):
+    # Get num_teams from query param, default to 8 if not provided or invalid
+    try:
+        num_teams = int(request.args.get("num_teams", 8))
+        # Enforce power of 2
+        if num_teams < 2 or (num_teams & (num_teams - 1)) != 0:
+            num_teams = 8
+        if num_teams < 2:
+            num_teams = 8
+        if num_teams > 128:
+            raise ValueError("Too many teams")
+    except (ValueError, TypeError):
+        num_teams = 8
+
+    if variant == "template":
+        csv_file_name = "guide_template.csv"
+    elif variant == "random":
+        csv_file_name = "guide_random.csv"
+        csv_file_path = os.path.join(os.path.dirname(__file__), "static/csv_samples", csv_file_name)
+        csvg.generate_csv(
+            csv_file_path, 
+            heroes=csvg.fetch_heroes(),
+            medals=csvg.fetch_medals(),
+            maps=csvg.fetch_maps(),
+            modes=csvg.fetch_modes(),
+            num_teams=num_teams
+        )
+    else:
+        csv_file_name = "guide_example.csv"
+    csv_file_path = os.path.join(os.path.dirname(__file__), "static/csv_samples", csv_file_name)
+    with open(csv_file_path, "r", encoding="utf-8") as f:
+        csv_data = f.read()
+    return render_template("pages/csv_guide.html", csv_data=csv_data, variant=variant, num_teams=num_teams)
 
 # 404 not found page
 @app.errorhandler(404)
