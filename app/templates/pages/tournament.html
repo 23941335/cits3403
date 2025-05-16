@@ -45,7 +45,7 @@
 <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
 <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-{% if current_user.id in owners | map(attribute='id') | list %}
+{% if (current_user.id in owners | map(attribute='id') | list) and tournament.visibility.visibility == 'private' %}
   <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
     Share
   </button>
