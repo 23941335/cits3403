@@ -132,6 +132,20 @@ class Tournament(BaseModel):
     def __repr__(self):
         return f"<Tournament '{self.title}'>"
 
+    def user_can_access(self, user):
+        '''Check if a user can access the page.'''
+        # Allow access to all for public tournaments
+        if self.visibility.visibility == 'public':
+            return True
+        
+        # Restrict access to private tournaments
+        if self.visibility.visibility == 'private':
+            if user.is_authenticated and user in [tu.user for tu in self.users]:
+                return True
+
+        return False
+
+
 class TournamentUsers(BaseModel):
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id), primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id), primary_key=True)
