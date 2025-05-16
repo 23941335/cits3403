@@ -75,7 +75,7 @@
                 <tr class="{{ side }}-row">
                     <td>{{ p.hero.hero_role.role_name.title() }}</td>
                     <td>{{ p.hero.hero_name }}</td>
-                    <td><a href="/tournament/player?id={{ p.player.id }}" class="text-dark">{{ p.player.gamertag }}</a>
+                    <td><a href="/tournament/player?t={{ game.tournament.id }}&id={{ p.player.id }}" class="text-dark">{{ p.player.gamertag }}</a>
                     </td>
                     <td>{{ p.kills }}</td>
                     <td>{{ p.deaths }}</td>

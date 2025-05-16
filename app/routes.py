@@ -62,7 +62,7 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
-        login_user(user, remember=form.remember_me.data)  # TODO: Later add form.remember_me.data
+        login_user(user, remember=form.remember_me.data)
         return redirect("/home")
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
@@ -125,8 +125,34 @@ def user_account_page():
                 db.session.commit()
                 flash("Profile picture updated successfully.", "success")
                 return redirect("/account")
+    tournaments = db.session.scalars(
+        sa.select(models.Tournament)
+        .join(models.TournamentUsers)
+        .where(models.TournamentUsers.user_id == current_user.id)
+    ).all()
 
-    return render_template("pages/account.html", form=form)
+    return render_template("pages/account.html", form=form, tournaments=tournaments)
+
+@app.route("/account/delete-tournament/<int:tournament_id>", methods=["POST"])
+@login_required
+def delete_user_tournament(tournament_id):
+    tournament = db.session.get(models.Tournament, tournament_id)
+
+    # Check if the tournament exists and if the current user is a participant
+    if not tournament or not any(tu.user_id == current_user.id for tu in tournament.users):
+        flash("You do not have permission to delete this tournament.", "danger")
+        return redirect("/account")
+
+    try:
+        db.session.delete(tournament)
+        db.session.commit()
+        flash(f"Tournament {tournament.title} deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Failed to delete tournament.", "danger")
+
+    return redirect("/account")
+
 
 
 @app.route("/tournament", methods=["GET"])
@@ -139,7 +165,10 @@ def tournament_page():
     tournament = db.session.get(models.Tournament, tid)
     if not tournament:
         return render_template("pages/404.html", error=f"Tournament with ID {tid} not found."), 404
-    
+
+    if not tournament.user_can_access(current_user):
+        return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
+
     games = tournament.games
     teams = sorted(
         list({g.team_a for g in games} | {g.team_b for g in games}),
@@ -425,14 +454,21 @@ def api_get_tournaments():
 
 @app.route("/tournament/game")
 def tournament_game_view():
+    tid = request.args.get("t", type=int)
     gid = request.args.get("id", type=int)
-    if not gid:
-        flash("Game ID missing in request", "warning")
+    if not tid or not gid:
+        flash("Tournament or game ID missing in request", "warning")
         return redirect("/history")
 
+    tournament = db.session.get(models.Tournament, tid)
     game = db.session.get(models.Game, gid)
-    if not game:
-        return render_template("pages/404.html", error=f"Game with ID {gid} not found."), 404
+    
+    if not tournament or not game:
+        return render_template("pages/404.html", error="Invalid tournament or game ID"), 404
+    
+    if not tournament.user_can_access(current_user):
+        return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
+
 
     medal_by_player = {}
     for gm in game.game_medals:
@@ -461,6 +497,9 @@ def team_results_page():
 
     if not tournament or not team:
         return render_template("pages/404.html", error="Invalid tournament or team ID"), 404
+    
+    if not tournament.user_can_access(current_user):
+        return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
 
     # Display tournament details for the team
     game_players = db.session.scalars(
@@ -629,6 +668,15 @@ def tournament_player_view():
     if not pid:
         flash("Player ID missing in request", "warning")
         return redirect("/history")
+    
+    tournament = db.session.get(models.Tournament, tid)
+
+    if not tournament:
+        return render_template("pages/404.html", error="Invalid tournament ID"), 404
+    
+    if not tournament.user_can_access(current_user):
+        return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
+
     player = db.session.get(models.Player, pid)
     if not player:
         return render_template("pages/404.html", error=f"Player with ID {pid} not found."), 404
