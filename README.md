@@ -19,7 +19,7 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ### Quick Start Instructions
 
-#### Virtual environment:
+#### Virtual Environment:
 ```
 python -m venv .venv
 ```
@@ -35,12 +35,12 @@ Depending on OS:
 pip install -r requirements.txt
 export SECRET_KEY='somevaluehere'
 ```
-#### Build the database:
+#### Build the Database:
 ```
 flask db upgrade
 python seed.py
 ```
-#### Start the server:
+#### Start the Server:
 ```
 flask run
 ```
@@ -57,7 +57,7 @@ flask run
 
 Any other requirements listed in the requirements.txt are dependencies of these packages.
 
-#### Virtual environment:
+#### Virtual Environment:
 Create:
 ```
 python -m venv .venv
