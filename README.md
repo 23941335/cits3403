@@ -17,14 +17,14 @@ python -m venv .venv
 source .venv/*/activate
 pip install -r requirements.txt
 ```
+Set the environment variables:
+```
+export SECRET_KEY='somevaluehere'
+```
 Build the database:
 ```
 flask db upgrade
 python seed.py
-```
-Set the environment variables:
-```
-export SECRET_KEY='somevaluehere'
 ```
 Start the server:
 ```
