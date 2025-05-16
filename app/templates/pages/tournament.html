@@ -11,25 +11,29 @@
     transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
   }
-  
-  /* Custom search input styling */ 
+
+  .clickable-card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+  }
+  .clickable-card {
+    cursor: pointer;
+  }
+
   .search-container {
     position: relative;
     margin-bottom: 15px;
   }
-  
   .search-container input {
     padding-right: 30px;
   }
-  
   .search-container .search-icon {
     position: absolute;
     right: 10px;
     top: 10px;
     color: #6c757d;
   }
-  
-  /* No results message */
   .no-results {
     padding: 8px;
     color: #6c757d;
@@ -350,7 +354,8 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_a.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_a.id %}
-                <div class="card mb-2 p-2">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
+                <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
                     {% if g.mvp and gp.player.id == g.mvp.id %}
@@ -364,6 +369,7 @@
                   <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%
                   </p>
                 </div>
+                </a>
                 {% endfor %}
               </div>
 
@@ -371,7 +377,8 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_b.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_b.id %}
-                <div class="card mb-2 p-2">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
+                <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
                     {% if g.mvp and gp.player.id == g.mvp.id %}
@@ -385,10 +392,10 @@
                   <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%
                   </p>
                 </div>
+                </a>
                 {% endfor %}
               </div>
             </div>
-
           </div>
         </td>
       </tr>
