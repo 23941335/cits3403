@@ -9,16 +9,10 @@
     <div class="col-md-4">
       <div class="card">
         <div class="mx-auto pt-4 pb-3 text-center ">
-          {% if current_user.profile_picture %}
-            <img src="{{ url_for('static', filename=current_user.profile_picture) }}"
-                class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
-          {% else %}
-            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2" 
-                 style="width: 150px; height: 150px;">
-              <i class="bi bi-person" style="font-size: 5rem; color: #6c757d;"></i>
-            </div>
-          {% endif %}
-          <br>
+          <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2" 
+                style="width: 150px; height: 150px;">
+            <i class="bi bi-person" style="font-size: 5rem; color: #6c757d;"></i>
+          </div>
         </div>
         <div class="card-body">
           <h5 class="card-title">Player Name</h5>
