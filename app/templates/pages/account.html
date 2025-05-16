@@ -10,18 +10,21 @@
       <div class="card">
         <div class="mx-auto pt-4 pb-3 text-center">
           <img src="{{ url_for('static', filename=current_user.profile_picture or 'icons/placeholder.ico') }}"
-               class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+            class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
           <br>
-          <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editPictureModal">Edit</button>
+          <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal"
+            data-bs-target="#editPictureModal">Edit</button>
         </div>
         <div class="card-body">
           <h5 class="card-title d-flex justify-content-between align-items-center">
             {{ current_user.username }}
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUsernameModal">Edit</button>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+              data-bs-target="#editUsernameModal">Edit</button>
           </h5>
           <p class="card-text d-flex justify-content-between align-items-center">
             {{ current_user.email }}
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">Edit</button>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+              data-bs-target="#editEmailModal">Edit</button>
           </p>
           <p class="card-text">User ID: {{ current_user.id }}</p>
           <p class="card-text">Account Created: {{ current_user.created_at }}</p>
@@ -31,95 +34,118 @@
     </div>
 
     <!-- Right: Games table -->
+    <!-- Right: User's tournaments -->
     <div class="col-md-8">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">Games Played In <a href="/tournament">This Tournament</a></h5>
+          <h5 class="card-title">Tournaments You Uploaded</h5>
+          {% if tournaments %}
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>Game</th><th>Team Rank</th><th>Kills</th><th>Deaths</th><th>Assists</th><th>Medals</th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Start Time</th>
+                <th>Created At</th>
+                <th>Visibility</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><a href="/tournament/game?id=1">Game 1</a></td><td>4th</td><td>20</td><td>5</td><td>10</td><td>0</td></tr>
-              <tr><td><a href="/tournament/game?id=2">Game 2</a></td><td>2nd</td><td>25</td><td>8</td><td>12</td><td>1</td></tr>
-              <tr><td><a href="/tournament/game?id=3">Game 3</a></td><td>1st (MVP)</td><td>30</td><td>6</td><td>15</td><td>3</td></tr>
-              <tr><td><strong>Total</strong></td><td>-</td><td><strong>75</strong></td><td><strong>19</strong></td><td><strong>37</strong></td><td><strong>4</strong></td></tr>
+              {% for t in tournaments %}
+              <tr>
+                <td>{{ t.id }}</td>
+                <td>{{ t.title }}</td>
+                <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
+                <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
+                <td>{{ t.visibility.visibility if t.visibility else 'N/A' }}</td>
+                <td><a href="/tournament?id={{ t.id }}" class="btn btn-sm btn-outline-primary">View</a>
+                  <form method="POST" action="/account/delete-tournament/{{ t.id }}" style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this tournament?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
+          {% else %}
+          <p>No tournaments uploaded yet.</p>
+          {% endif %}
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal: Edit Username -->
-  <div class="modal fade" id="editUsernameModal" tabindex="-1" aria-labelledby="editUsernameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <form method="POST">
-        {{ form.hidden_tag() }}
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Username</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+    <!-- Modal: Edit Username -->
+    <div class="modal fade" id="editUsernameModal" tabindex="-1" aria-labelledby="editUsernameModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Username</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{ form.username.label }}
+              {{ form.username(class="form-control", value=current_user.username) }}
+              <input type="hidden" name="form_type" value="edit_username">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
           </div>
-          <div class="modal-body">
-            {{ form.username.label }}
-            {{ form.username(class="form-control", value=current_user.username) }}
-            <input type="hidden" name="form_type" value="edit_username">
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Edit Email -->
+    <div class="modal fade" id="editEmailModal" tabindex="-1" aria-labelledby="editEmailModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Email</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{ form.email.label }}
+              {{ form.email(class="form-control", value=current_user.email) }}
+              <input type="hidden" name="form_type" value="edit_email">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
           </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Update Picture -->
+    <div class="modal fade" id="editPictureModal" tabindex="-1" aria-labelledby="editPictureModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Update Profile Picture</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{ form.picture.label }}
+              {{ form.picture(class="form-control") }}
+              <input type="hidden" name="form_type" value="edit_picture">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-
-  <!-- Modal: Edit Email -->
-  <div class="modal fade" id="editEmailModal" tabindex="-1" aria-labelledby="editEmailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <form method="POST">
-        {{ form.hidden_tag() }}
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Email</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            {{ form.email.label }}
-            {{ form.email(class="form-control", value=current_user.email) }}
-            <input type="hidden" name="form_type" value="edit_email">
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: Update Picture -->
-  <div class="modal fade" id="editPictureModal" tabindex="-1" aria-labelledby="editPictureModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Update Profile Picture</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            {{ form.picture.label }}
-            {{ form.picture(class="form-control") }}
-            <input type="hidden" name="form_type" value="edit_picture">
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Upload</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-{% endblock %}
+  {% endblock %}

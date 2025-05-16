@@ -62,7 +62,7 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
-        login_user(user, remember=form.remember_me.data)  # TODO: Later add form.remember_me.data
+        login_user(user, remember=form.remember_me.data)
         return redirect("/home")
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
@@ -125,8 +125,34 @@ def user_account_page():
                 db.session.commit()
                 flash("Profile picture updated successfully.", "success")
                 return redirect("/account")
+    tournaments = db.session.scalars(
+        sa.select(models.Tournament)
+        .join(models.TournamentUsers)
+        .where(models.TournamentUsers.user_id == current_user.id)
+    ).all()
 
-    return render_template("pages/account.html", form=form)
+    return render_template("pages/account.html", form=form, tournaments=tournaments)
+
+@app.route("/account/delete-tournament/<int:tournament_id>", methods=["POST"])
+@login_required
+def delete_user_tournament(tournament_id):
+    tournament = db.session.get(models.Tournament, tournament_id)
+
+    # Check if the tournament exists and if the current user is a participant
+    if not tournament or not any(tu.user_id == current_user.id for tu in tournament.users):
+        flash("You do not have permission to delete this tournament.", "danger")
+        return redirect("/account")
+
+    try:
+        db.session.delete(tournament)
+        db.session.commit()
+        flash(f"Tournament {tournament.title} deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Failed to delete tournament.", "danger")
+
+    return redirect("/account")
+
 
 
 @app.route("/tournament", methods=["GET"])
