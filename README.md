@@ -4,8 +4,6 @@
 
 The aim of this project is to create a website which is used to manage tournaments for the game _Marvel Rivals_. Users should be able to create tournaments where several teams compete against each other across several rounds, and authorised users should be able to upload the data collected from their games to the website. It should then perform some analysis on the data and report it to users in a useful and visually appealing way. Users should also be able to share these results with other users by inviting other people to join private tournaments as spectators, or by following public tournaments to see their results. 
 
-TODO: ensure above fulfills: "a description of the purpose of the application, explaining its design and use."
-
 ## Contributors
 | Student Number | Name            | GitHub Username |
 |----------------|-----------------|-----------------|
