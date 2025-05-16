@@ -48,7 +48,7 @@
                 <th>Start Time</th>
                 <th>Created At</th>
                 <th>Visibility</th>
-                <th>View</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -59,7 +59,12 @@
                 <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
                 <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
                 <td>{{ t.visibility.visibility if t.visibility else 'N/A' }}</td>
-                <td><a href="/tournament?id={{ t.id }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                <td><a href="/tournament?id={{ t.id }}" class="btn btn-sm btn-outline-primary">View</a>
+                  <form method="POST" action="/account/delete-tournament/{{ t.id }}" style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this tournament?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Delete</button>
+                  </form>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
