@@ -17,14 +17,14 @@ python -m venv .venv
 source .venv/*/activate
 pip install -r requirements.txt
 ```
+Set the environment variables:
+```
+export SECRET_KEY='somevaluehere'
+```
 Build the database:
 ```
 flask db upgrade
 python seed.py
-```
-Set the environment variables:
-```
-export SECRET_KEY='somevaluehere'
 ```
 Start the server:
 ```
@@ -90,14 +90,14 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 ### Running Unit Tests
 
 Navigate to the project's root directory
-
+<!--
 ```bash
 rm app.db
 flask db upgrade
 export SECRET_KEY='somevaluehere'
 python seed.py
 ```
-
+-->
 ```bash
 python -m unittest discover -s app/testing/unit
 ```
