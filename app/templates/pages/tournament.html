@@ -45,13 +45,18 @@
 <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
 <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-{% if (current_user.id in owners | map(attribute='id') | list) and tournament.visibility.visibility == 'private' %}
+{% if (current_user.id in owners | map(attribute='id') | list) %}
+  {% if tournament.visibility.visibility == 'private' %}
   <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
     Share
   </button>
+  {% endif %}
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+    Upload Data
+  </button>
 {% endif %}
 
-<!-- Modal -->
+<!-- Share Modal -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -103,6 +108,34 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
         {{ form.submit(class="btn btn-primary", form="shareForm") }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadModalLabel">Upload Tournament Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="container">
+        <form id="uploadForm" action="/tournament/upload" method="POST" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          {{ form.tid() }}
+          
+          <div class="mb-3 mt-3">
+            <label for="csv_file" class="form-label">Select CSV File</label>
+            <input type="file" class="form-control" id="csv_file" name="file" accept=".csv" required>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
