@@ -58,7 +58,7 @@ def signup_page():
 def login_page():
     if current_user.is_authenticated:
         return redirect("/home")
-    return render_template("pages/login.html", title="Login", form=forms.LoginForm(), next=request.args.get("next"))
+    return render_template("pages/login.html", title="Login", form=forms.LoginForm())
 
 
 @app.route("/account/login", methods=["POST"])
