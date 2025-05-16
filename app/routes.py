@@ -339,6 +339,8 @@ def new_tournament_page():
 def create_tournament():
     form = forms.CreateTournamentForm()
 
+    #TODO: check user actually has permission to do this
+
     visibilities = db.session.scalars(sa.select(models.Visibility)).all()
     form.visibility.choices = [(-1, '- Select -')] + [(v.id, v.visibility.capitalize()) for v in visibilities]
 
@@ -382,6 +384,34 @@ def create_tournament():
 
     # TODO: Add error handling
 
+@app.route("/tournament/upload", methods=["POST"])
+def tournament_upload():
+    '''For uploading data after tournament creation, not initial upload on creation.'''
+    try:
+        tid = request.form.get('tid')
+        if not tid:
+            return "Tournament ID required", 400
+
+        tournament = db.session.get(models.Tournament, tid)
+        if not tournament:
+            return "Tournament not found", 404
+
+        #TODO: check permissions before doing this
+
+        csv_file = request.files.get('file')
+        if not csv_file:
+            return "No file provided", 400
+
+        #TODO: prevent uploading duplicate data. Consider comparing file hashes, etc.
+        import_csv(csv_file.stream, tournament=tournament, commit_changes=True)
+        flash("Tournament data uploaded successfully!", "success")
+        return redirect(f"/tournament?id={tid}")
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        flash("Failed to upload tournament data", "danger")
+        return redirect(f"/tournament?id={tid}")
 
 
 @app.route("/history", methods=['GET'])
