@@ -10,7 +10,7 @@ TODO: ensure above fulfills: "a description of the purpose of the application, e
 | Student Number | Name            | GitHub Username |
 |----------------|-----------------|-----------------|
 | 23941335       | George Brice    | 23941335        |
-| 22666335       | Koda Lan        | Kod4-lan        |
+| 22666335       | Koda(Zhengxun) Lan        | Kod4-lan        |
 | 23769985       | Max Moltoni     | SuperMax732     |
 | 24240636       | Dongkai Liu Liu | itchat          |
 
