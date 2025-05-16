@@ -19,14 +19,13 @@ https://github.com/23941335/cits3403/blob/main/planning.md
 
 ## Setup
 
-### Instructions
+### Quick Start Instructions
 
 Set up virtual environment and install requirements:
-```
-python -m venv .venv
-source .venv/*/activate
-pip install -r requirements.txt
-```
+`python -m venv .venv`
+`source .venv/bin/activate` (Linux/MacOS); `.venv\Scripts\activate` (Windows); `source .venv/Scripts/activate` (WSL)
+`pip install -r requirements.txt`
+
 Set the environment variables:
 ```
 export SECRET_KEY='somevaluehere'
@@ -51,30 +50,22 @@ flask run
 - [Flask-SQLAlchemy](https://github.com/pallets-eco/flask-sqlalchemy/)
 - [Flask-WTF](https://github.com/pallets-eco/flask-wtf/) <!-- cf. lecture 9, slide 31 -->
 
-
 Any other requirements listed in the requirements.txt are dependencies of these packages.
 
 #### Create Virtual Environment and Install Dependencies
 
-1. `python -m venv .venv`
-2. `source .venv/bin/activate` (Linux/MacOS); or `.venv\Scripts\activate` (Windows); or `source .venv/Scripts/activate` (WSL)
-3. `pip install -r requirements.txt`
+Set up virtual environment and install requirements:
+`python -m venv .venv`
+`source .venv/bin/activate` (Linux/MacOS); `.venv\Scripts\activate` (Windows); `source .venv/Scripts/activate` (WSL)
+`pip install -r requirements.txt`
 
 If you want to delete the .venv:
-`rd /s /q .venv` on Windows or
-`rm -rf .venv` on Linux/MacOS
+`rd /s /q .venv` (Windows)
+`rm -rf .venv` (Linux/MacOS)
 
 #### Database
-<!-- 
-Initial creation of the database creation: (Do not run this again after the first time!)
-```
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
-``` 
--->
 
-If you do not yet have th app.db file (the database), run:
+If you do not yet have the app.db file (the database), run:
 ```
 flask db upgrade
 ``` 
@@ -97,15 +88,8 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 
 ### Running Unit Tests
 
-Navigate to the project's root directory, make sure your test environment is clean and ready.  
-<!--
-```bash
-rm app.db
-flask db upgrade
-export SECRET_KEY='somevaluehere'
-python seed.py
-```
--->
+Navigate to the project's root directory, make sure your test environment is clean and ready. 
+
 ```bash
 python -m unittest discover -s app/testing/unit
 ```
