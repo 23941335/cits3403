@@ -145,12 +145,18 @@ def user_account_page():
                 db.session.commit()
                 flash("Profile picture updated successfully.", "success")
                 return redirect("/account")
+
     tournaments = db.session.scalars(
         sa.select(models.Tournament)
         .join(models.TournamentUsers)
-        .where(models.TournamentUsers.user_id == current_user.id)
+        .where(
+            sa.and_(
+                models.TournamentUsers.user_id == current_user.id,
+                models.TournamentUsers.tournament_role.has(role_name='tournament_owner')
+            )
+        )
     ).all()
-
+            
     return render_template("pages/account.html", form=form, tournaments=tournaments)
 
 @app.route("/account/delete-tournament/<int:tournament_id>", methods=["POST"])
