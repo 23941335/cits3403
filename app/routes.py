@@ -455,12 +455,10 @@ def api_get_tournaments():
     for t in tournaments:
         # Get owners and shared users
         role_name = t.get_user_role(current_user).role_name if t.get_user_role(current_user) else None
+
         is_owner = role_name == ROLE.OWNER
         is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
-        is_shared = False
-        
-        if t.user_can_view(current_user):
-            is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
+        is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
         
         # Apply filters
         if filter_type == 'owned' and is_owner:
@@ -485,7 +483,12 @@ def api_get_tournaments():
         
         if isinstance(start_time, str):
             start_time = datetime.fromisoformat(start_time)
-            
+        
+        role_name = t.get_user_role(current_user).role_name if t.get_user_role(current_user) else None
+        is_owner = role_name == ROLE.OWNER
+        is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+        is_shared = t.user_can_view(current_user) and not is_public and not is_owner
+
         # Build the tournament data dictionary
         tournament_data = {
             'id': t.id,
@@ -497,11 +500,9 @@ def api_get_tournaments():
                 'visibility': t.visibility.visibility if hasattr(t, 'visibility') and t.visibility else 'Unknown'
             },
             'users': [{'user_id': link.user_id} for link in t.users] if t.users else [],
-            'is_owner': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
-                                                                       if tu.tournament_role.role_name == ROLE.OWNER],
-            'is_shared': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
-                                                                       if tu.tournament_role.role_name != ROLE.OWNER],
-            'is_public': t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+            'is_owner': is_owner,
+            'is_shared': is_shared,
+            'is_public': is_public
         }
         
         tournaments_data.append(tournament_data)
