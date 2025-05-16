@@ -487,8 +487,7 @@ def api_get_tournaments():
         role_name = t.get_user_role(current_user).role_name if t.get_user_role(current_user) else None
         is_owner = role_name == ROLE.OWNER
         is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
-        is_shared = t.user_can_view(current_user) and not is_public and not is_owner
-
+        is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
         # Build the tournament data dictionary
         tournament_data = {
             'id': t.id,
