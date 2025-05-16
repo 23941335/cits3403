@@ -73,7 +73,11 @@ class CreateTournamentForm(FlaskForm):
         InputRequired(message="Tournament Name is required."),
         Length(min=1, max=256, message="Tournament title must be between 1-256 characters")
     ])
-    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[Optional()])
+
+    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[
+        InputRequired(message="Tournament Start Time is required.")
+    ])
+    
     description = StringField('Tournament Description', validators=[
         InputRequired(message="Tournament Description is required."),
         Length(min=1, max=512, message="Description must be between 1-512 characters")
@@ -81,14 +85,19 @@ class CreateTournamentForm(FlaskForm):
 
     visibility = SelectField(
         'Tournament Visibility',  coerce=int,
-        validators=[DataRequired(message="You must select an option.")]
+        validators=[
+            DataRequired(message="You must select an option.")
+        ]
     )
 
     # TODO: team validation
 
     csv_file = FileField(
         'CSV Upload (Optional)',
-        validators=[Optional(), FileAllowed(['csv'], 'CSV files only.')]
+        validators=[
+            Optional(),
+            FileAllowed(['csv'], 'CSV files only.')
+        ]
     )
 
     submit = SubmitField("Create Tournament")
