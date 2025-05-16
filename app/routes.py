@@ -740,7 +740,150 @@ def tournament_player_view():
         return render_template("pages/404.html", error=f"Player with ID {pid} not found."), 404
     player_games = [gp.game for gp in player.game_players]
     current_game = db.session.get(models.Game, gid) if gid else None
-    return render_template("pages/stats_player.html", player=player, player_games=player_games,current_game=current_game)
+    tournament_games = [gp for gp in player.game_players if gp.game.tournament_id == tid]
+
+    total_kills = sum(gp.kills for gp in tournament_games)
+    total_deaths = sum(gp.deaths for gp in tournament_games)
+    total_assists = sum(gp.assists for gp in tournament_games)
+    total_damage = sum(gp.damage for gp in tournament_games)
+    total_healing = sum(gp.healing for gp in tournament_games)
+    total_blocked = sum(gp.damage_blocked for gp in tournament_games)
+    total_final_hits = sum(gp.final_hits for gp in tournament_games)
+    avg_accuracy = round(sum(gp.accuracy_pct for gp in tournament_games) / len(tournament_games), 2) if tournament_games else 0
+    max_damage = max((gp.damage for gp in tournament_games), default=0)
+    max_healing = max((gp.healing for gp in tournament_games), default=0)
+    max_blocked = max((gp.damage_blocked for gp in tournament_games), default=0)
+
+    kda_ratio = round((total_kills + total_assists) / (total_deaths if total_deaths > 0 else 1), 2)
+    game_count = len(tournament_games)
+
+    player_summary = {
+        "total_kills": total_kills,
+        "total_deaths": total_deaths,
+        "total_assists": total_assists,
+        "total_damage": total_damage,
+        "total_healing": total_healing,
+        "total_blocked": total_blocked,
+        "total_final_hits": total_final_hits,
+        "kda_ratio": kda_ratio,
+
+        "avg_kills": round(total_kills / game_count, 2) if game_count else 0,
+        "avg_deaths": round(total_deaths / game_count, 2) if game_count else 0,
+        "avg_assists": round(total_assists / game_count, 2) if game_count else 0,
+        "avg_damage": round(total_damage / game_count, 2) if game_count else 0,
+        "avg_healing": round(total_healing / game_count, 2) if game_count else 0,
+        "avg_blocked": round(total_blocked / game_count, 2) if game_count else 0,
+        "avg_accuracy": avg_accuracy,
+
+        "max_damage": max_damage,
+        "max_healing": max_healing,
+        "max_blocked": max_blocked,
+    }
+
+    radar_data = {
+    "avg_damage": player_summary.get("avg_damage", 0),
+    "avg_kills": player_summary.get("avg_kills", 0),
+    "avg_deaths": player_summary.get("avg_deaths", 0),
+    "avg_assists": player_summary.get("avg_assists", 0),
+    "avg_healing": player_summary.get("avg_healing", 0),
+    "avg_blocked": player_summary.get("avg_blocked", 0),
+    }
+    # team_id check
+    # Get the team ID from the player's game players
+
+    team_ids = list({gp.team_id for gp in tournament_games if gp.team_id})
+    team_id = team_ids[0] if team_ids else None
+
+    if team_id:
+        # game_players for the team in the tournament
+        team_gps = db.session.scalars(
+            sa.select(models.GamePlayers)
+            .where(
+                models.GamePlayers.team_id == team_id,
+                models.GamePlayers.game.has(models.Game.tournament_id == tid)
+            )
+        ).all()
+
+        # calculate team stats
+        from collections import defaultdict
+
+        player_stats = defaultdict(lambda: {
+            "games": 0,
+            "damage": 0,
+            "kills": 0,
+            "deaths": 0,
+            "assists": 0,
+            "healing": 0,
+            "blocked": 0
+        })
+
+        for gp in team_gps:
+            pid = gp.player_id
+            player_stats[pid]["games"] += 1
+            player_stats[pid]["damage"] += gp.damage or 0
+            player_stats[pid]["kills"] += gp.kills or 0
+            player_stats[pid]["deaths"] += gp.deaths or 0
+            player_stats[pid]["assists"] += gp.assists or 0
+            player_stats[pid]["healing"] += gp.healing or 0
+            player_stats[pid]["blocked"] += gp.damage_blocked or 0
+
+        # average stats for the team
+        def safe_div(n, d): return round(n / d, 2) if d else 0
+
+        num_players = len(player_stats)
+        avg_stats = {
+            "avg_damage": 0,
+            "avg_kills": 0,
+            "avg_deaths": 0,
+            "avg_assists": 0,
+            "avg_healing": 0,
+            "avg_blocked": 0
+        }
+
+        for stat in avg_stats:
+            for s in player_stats.values():
+                avg = safe_div(s[stat.replace("avg_", "")], s["games"])
+                avg_stats[stat] += avg
+            avg_stats[stat] = round(avg_stats[stat] / num_players, 2) if num_players else 0
+
+        team_radar_data = avg_stats
+    else:
+        team_radar_data = {
+            "avg_damage": 0,
+            "avg_kills": 0,
+            "avg_deaths": 0,
+            "avg_assists": 0,
+            "avg_healing": 0,
+            "avg_blocked": 0
+        }
+
+
+
+    player_cards = [
+    {"label": "Total KDA Ratio", "value": player_summary["kda_ratio"]},
+    {"label": "Total Kills", "value": player_summary["total_kills"]},
+    {"label": "Total Deaths", "value": player_summary["total_deaths"]},
+    {"label": "Total Assists", "value": player_summary["total_assists"]},
+    {"label": "Total Damage", "value": player_summary["total_damage"]},
+    {"label": "Total Healing", "value": player_summary["total_healing"]},
+    {"label": "Total Blocked", "value": player_summary["total_blocked"]},
+    {"label": "Total Final Hits", "value": player_summary["total_final_hits"]},
+
+    {"label": "Avg Kills/Game", "value": player_summary["avg_kills"]},
+    {"label": "Avg Deaths/Game", "value": player_summary["avg_deaths"]},
+    {"label": "Avg Assists/Game", "value": player_summary["avg_assists"]},
+    {"label": "Avg Damage/Game", "value": player_summary["avg_damage"]},
+    {"label": "Avg Healing/Game", "value": player_summary["avg_healing"]},
+    {"label": "Avg Blocked/Game", "value": player_summary["avg_blocked"]},
+    {"label": "Avg Accuracy", "value": f"{player_summary['avg_accuracy']}%"},
+
+    {"label": "Max Damage", "value": player_summary["max_damage"]},
+    {"label": "Max Healing", "value": player_summary["max_healing"]},
+    {"label": "Max Blocked", "value": player_summary["max_blocked"]},
+    ]
+
+
+    return render_template("pages/stats_player.html", player=player, player_games=player_games,current_game=current_game, tournament=tournament, player_summary=player_summary, player_cards=player_cards,radar_data=radar_data, team_id=team_id, team_radar_data=team_radar_data)
 
 
 # 404 not found page
