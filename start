@@ -1,0 +1,3 @@
+source .venv/Scripts/activate
+export SECRET_KEY='xxx'
+python app.py
