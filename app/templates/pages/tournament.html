@@ -11,25 +11,29 @@
     transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
   }
-  
-  /* Custom search input styling */ 
+
+  .clickable-card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+  }
+  .clickable-card {
+    cursor: pointer;
+  }
+
   .search-container {
     position: relative;
     margin-bottom: 15px;
   }
-  
   .search-container input {
     padding-right: 30px;
   }
-  
   .search-container .search-icon {
     position: absolute;
     right: 10px;
     top: 10px;
     color: #6c757d;
   }
-  
-  /* No results message */
   .no-results {
     padding: 8px;
     color: #6c757d;
@@ -40,18 +44,30 @@
 {% endblock %}
 
 {% block main %}
-<h1>Tournament——{{ tournament.title }}</h1>
-<p>{{ tournament.description }}</p>
-<p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
-<p>Visibility: {{ tournament.visibility.visibility }}</p>
+<!-- Main Info -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-break">{{ tournament.title }}</h1>
+      <p class="text-break">{{ tournament.description }}</p>
+      <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+      <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-{% if (current_user.id in owners | map(attribute='id') | list) and tournament.visibility.visibility == 'private' %}
-  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
-    Share
-  </button>
-{% endif %}
+      {% if (current_user.id in owners | map(attribute='id') | list) %}
+        {% if tournament.visibility.visibility == 'private' %}
+        <button type="submit" class="btn btn-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#shareModal">
+          Share
+        </button>
+        {% endif %}
+        <button type="submit" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#uploadModal">
+          Upload Data
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
-<!-- Modal -->
+<!-- Share Modal -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -103,6 +119,34 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
         {{ form.submit(class="btn btn-primary", form="shareForm") }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadModalLabel">Upload Tournament Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="container">
+        <form id="uploadForm" action="/tournament/upload" method="POST" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          {{ form.tid() }}
+          
+          <div class="mb-3 mt-3">
+            <label for="csv_file" class="form-label">Select CSV File</label>
+            <input type="file" class="form-control" id="csv_file" name="file" accept=".csv" required>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -317,7 +361,8 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_a.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_a.id %}
-                <div class="card mb-2 p-2">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
+                <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
                     {% if g.mvp and gp.player.id == g.mvp.id %}
@@ -331,6 +376,7 @@
                   <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%
                   </p>
                 </div>
+                </a>
                 {% endfor %}
               </div>
 
@@ -338,7 +384,8 @@
               <div class="col-md-6">
                 <h6 class="text-center">{{ g.team_b.team_name }}</h6>
                 {% for gp in g.game_players if gp.team_id == g.team_b.id %}
-                <div class="card mb-2 p-2">
+                <a href="/tournament/player?id={{ gp.player.id }}&t={{ tournament.id }}&g={{ g.id }}" class="text-decoration-none text-dark">
+                <div class="card mb-2 p-2 clickable-card">
                   <h6 class="card-title">
                     {{ gp.player.gamertag }}
                     {% if g.mvp and gp.player.id == g.mvp.id %}
@@ -352,10 +399,10 @@
                   <p class="mb-1">Damage: {{ gp.damage }} | Healing: {{ gp.healing }} | Accuracy: {{ gp.accuracy_pct }}%
                   </p>
                 </div>
+                </a>
                 {% endfor %}
               </div>
             </div>
-
           </div>
         </td>
       </tr>

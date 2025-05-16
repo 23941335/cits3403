@@ -8,9 +8,24 @@ import os
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 from collections import defaultdict
+from functools import wraps
+from app.consts import *
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
+
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Store the requested URL in the session
+            return redirect(f"/account/login?next={request.url}")
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 
 @app.route("/")
 @app.route("/home")
@@ -62,9 +77,14 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
+        
         login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get("next") or request.form.get("next")
-        return redirect(next_page) if next_page else redirect("/home")
+
+        next_page = request.args.get('next')
+        if next_page:
+            return redirect(next_page)
+        return redirect("/home")
+
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
 
@@ -126,21 +146,27 @@ def user_account_page():
                 db.session.commit()
                 flash("Profile picture updated successfully.", "success")
                 return redirect("/account")
-    tournaments = db.session.scalars(
+
+
+    my_tournaments = db.session.scalars(
         sa.select(models.Tournament)
         .join(models.TournamentUsers)
-        .where(models.TournamentUsers.user_id == current_user.id)
+        .where(sa.and_(
+            models.TournamentUsers.user_id == current_user.id,
+            models.TournamentUsers.tournament_role.has(role_name=ROLE.OWNER)
+        ))
     ).all()
+            
+    return render_template("pages/account.html", form=form, tournaments=my_tournaments)
 
-    return render_template("pages/account.html", form=form, tournaments=tournaments)
-
+# TODO rename this route
 @app.route("/account/delete-tournament/<int:tournament_id>", methods=["POST"])
 @login_required
 def delete_user_tournament(tournament_id):
     tournament = db.session.get(models.Tournament, tournament_id)
 
     # Check if the tournament exists and if the current user is a participant
-    if not tournament or not any(tu.user_id == current_user.id for tu in tournament.users):
+    if not tournament or not tournament.user_has_permission(current_user, PERMISSION.DELETE):
         flash("You do not have permission to delete this tournament.", "danger")
         return redirect("/account")
 
@@ -167,7 +193,7 @@ def tournament_page():
     if not tournament:
         return render_template("pages/404.html", error=f"Tournament with ID {tid} not found."), 404
 
-    if not tournament.user_can_access(current_user):
+    if not tournament.user_can_view(current_user):
         return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
 
     games = tournament.games
@@ -209,7 +235,7 @@ def tournament_page():
         g.svp = svp_medal.player if svp_medal else None
     
     # All users who have the owner role for this tournament (usually will be one, but could support more)
-    owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+    owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == ROLE.OWNER]
     # All users this tournament has been shared with (i.e. all that have access to it, minus owners).
     users_shared = [tu.user for tu in tournament.users if tu.user not in owners]
 
@@ -230,14 +256,11 @@ def tournament_page():
 @app.route("/tournament/share", methods=["POST"])
 def share():
 
-    # TODO
-    DEFAULT_ROLE_ID = 1
-
     form = forms.UserSelectionForm()
     if form.validate_on_submit():
         try:
             tournament = db.session.query(models.Tournament).filter_by(id=form.tid.data).one()
-            owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == 'tournament_owner']
+            owners = [tu.user for tu in tournament.users if tu.tournament_role.role_name == ROLE.OWNER]
             tourn_users_shared = [tu for tu in tournament.users if tu.user not in owners]
             
             
@@ -254,10 +277,11 @@ def share():
                 
                 if not existing_tu:
                     user = db.session.query(models.User).where(models.User.id == user_id).one()
+                    role = db.session.query(models.Role).filter_by(role_name=ROLE.DEFAULT).one()
                     tournament_user = models.TournamentUsers(
                         tournament_id=form.tid.data,
                         user_id=user.id,
-                        tournament_role_id=DEFAULT_ROLE_ID
+                        tournament_role_id=role.id
                     )
                     db.session.add(tournament_user)
 
@@ -314,6 +338,7 @@ def new_tournament_page():
     return render_template("pages/create-tournament.html", form=form)
 
 @app.route("/create-tournament", methods=["POST"])
+@login_required
 def create_tournament():
     form = forms.CreateTournamentForm()
 
@@ -336,7 +361,7 @@ def create_tournament():
             db.session.add(tournament)
             db.session.flush()  # Ensure we can reference the new tournament
             
-            tournament_role = db.session.query(models.Role).where(models.Role.role_name == 'tournament_owner').one()
+            tournament_role = db.session.query(models.Role).where(models.Role.role_name == ROLE.OWNER).one()
 
             tournament_user = models.TournamentUsers(
                 tournament_id=tournament.id,
@@ -360,6 +385,41 @@ def create_tournament():
 
     # TODO: Add error handling
 
+@app.route("/tournament/upload", methods=["GET"])
+def redir_upload():
+    return redirect("/tournament/")
+
+@app.route("/tournament/upload", methods=["POST"])
+@login_required
+def tournament_upload():
+    '''For uploading data after tournament creation, not initial upload on creation.'''
+    try:
+        tid = request.form.get('tid')
+        if not tid:
+            return "Tournament ID required", 400
+
+        tournament = db.session.get(models.Tournament, tid)
+        if not tournament:
+            return "Tournament not found", 404
+
+        print(current_user, tournament.user_has_permission(current_user, PERMISSION.UPLOAD))
+        if not tournament.user_has_permission(current_user, PERMISSION.UPLOAD):
+            return "You do not have permission to upload data", 403
+
+        csv_file = request.files.get('file')
+        if not csv_file:
+            return "No file provided", 400
+
+        #TODO: prevent uploading duplicate data. Consider comparing file hashes, etc.
+        import_csv(csv_file.stream, tournament=tournament, commit_changes=True)
+        flash("Tournament data uploaded successfully!", "success")
+        return redirect(f"/tournament?id={tid}")
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        flash("Failed to upload tournament data", "danger")
+        return redirect(f"/tournament?id={tid}")
 
 
 @app.route("/history", methods=['GET'])
@@ -394,16 +454,11 @@ def api_get_tournaments():
     
     for t in tournaments:
         # Get owners and shared users
-        owners = [tu.user for tu in t.users if tu.tournament_role.role_name == 'tournament_owner']
-        owner_ids = [user.id for user in owners if user]
-        
-        is_owner = current_user.is_authenticated and current_user.id in owner_ids
+        role_name = t.get_user_role(current_user).role_name if t.get_user_role(current_user) else None
+
+        is_owner = role_name == ROLE.OWNER
         is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
-        is_shared = False
-        
-        if current_user.is_authenticated:
-            is_shared = any(tu.user_id == current_user.id and tu.tournament_role.role_name != 'tournament_owner' 
-                            for tu in t.users)
+        is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
         
         # Apply filters
         if filter_type == 'owned' and is_owner:
@@ -428,7 +483,11 @@ def api_get_tournaments():
         
         if isinstance(start_time, str):
             start_time = datetime.fromisoformat(start_time)
-            
+        
+        role_name = t.get_user_role(current_user).role_name if t.get_user_role(current_user) else None
+        is_owner = role_name == ROLE.OWNER
+        is_public = t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+        is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
         # Build the tournament data dictionary
         tournament_data = {
             'id': t.id,
@@ -440,11 +499,9 @@ def api_get_tournaments():
                 'visibility': t.visibility.visibility if hasattr(t, 'visibility') and t.visibility else 'Unknown'
             },
             'users': [{'user_id': link.user_id} for link in t.users] if t.users else [],
-            'is_owner': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
-                                                                       if tu.tournament_role.role_name == 'tournament_owner'],
-            'is_shared': current_user.is_authenticated and current_user.id in [tu.user_id for tu in t.users 
-                                                                       if tu.tournament_role.role_name != 'tournament_owner'],
-            'is_public': t.visibility.visibility == 'public' if hasattr(t, 'visibility') and t.visibility else False
+            'is_owner': is_owner,
+            'is_shared': is_shared,
+            'is_public': is_public
         }
         
         tournaments_data.append(tournament_data)
@@ -467,7 +524,7 @@ def tournament_game_view():
     if not tournament or not game:
         return render_template("pages/404.html", error="Invalid tournament or game ID"), 404
     
-    if not tournament.user_can_access(current_user):
+    if not tournament.user_can_view(current_user):
         return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
 
 
@@ -499,7 +556,7 @@ def team_results_page():
     if not tournament or not team:
         return render_template("pages/404.html", error="Invalid tournament or team ID"), 404
     
-    if not tournament.user_can_access(current_user):
+    if not tournament.user_can_view(current_user):
         return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
 
     # Display tournament details for the team
@@ -675,7 +732,7 @@ def tournament_player_view():
     if not tournament:
         return render_template("pages/404.html", error="Invalid tournament ID"), 404
     
-    if not tournament.user_can_access(current_user):
+    if not tournament.user_can_view(current_user):
         return render_template("pages/404.html", error=f"You do not have access to this tournament."), 403
 
     player = db.session.get(models.Player, pid)

@@ -4,13 +4,20 @@
 
 {% block main %}
 <div class="container my-4">
-  <div class="row">
-    <!-- Left: User profile card -->
-    <div class="col-md-4">
+  <div class="row justify-content-center">
+    <!-- User profile card -->
+    <div class="col-md-6 col-lg-4">
       <div class="card">
-        <div class="mx-auto pt-4 pb-3 text-center">
-          <img src="{{ url_for('static', filename=current_user.profile_picture or 'icons/placeholder.ico') }}"
-            class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+        <div class="mx-auto pt-4 pb-3 text-center ">
+          {% if current_user.profile_picture %}
+            <img src="{{ url_for('static', filename=current_user.profile_picture) }}"
+                class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+          {% else %}
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2" 
+                 style="width: 150px; height: 150px;">
+              <i class="bi bi-person" style="font-size: 5rem; color: #6c757d;"></i>
+            </div>
+          {% endif %}
           <br>
           <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal"
             data-bs-target="#editPictureModal">Edit</button>
@@ -26,35 +33,31 @@
             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
               data-bs-target="#editEmailModal">Edit</button>
           </p>
-          <p class="card-text">User ID: {{ current_user.id }}</p>
-          <p class="card-text">Account Created: {{ current_user.created_at }}</p>
+          <p class="card-text">User ID: {{ current_user.id }}</p><p class="card-text">Account Created: {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
           <p class="card-text">Account Status: {{ 'Active' if current_user.is_active else 'Suspended' }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Right: Games table -->
     <!-- Right: User's tournaments -->
     <div class="col-md-8">
       <div class="card h-100">
-        <div class="card-body">
+        <div class="card-body table-responsive">
           <h5 class="card-title">Tournaments You Uploaded</h5>
           {% if tournaments %}
-          <table class="table table-striped">
+          <table class="table table-striped table-custom">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Start Time</th>
-                <th>Created At</th>
-                <th>Visibility</th>
-                <th>Action</th>
+                <th class="col-30">Tournament</th>
+                <th class="col-20">Start Time</th>
+                <th class="col-20">Created At</th>
+                <th class="col-10">Visibility</th>
+                <th class="col-20">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for t in tournaments %}
               <tr>
-                <td>{{ t.id }}</td>
                 <td>{{ t.title }}</td>
                 <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
                 <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
