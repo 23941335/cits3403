@@ -301,7 +301,7 @@
           {% endif %}
         </td>
         <td>
-          <a class="btn btn-sm btn-outline-primary me-2" href="/tournament/game?id={{ g.id }}">Full View</a>
+          <a class="btn btn-sm btn-outline-primary me-2" href="/tournament/game?t={{ g.tournament.id }}&id={{ g.id }}">Full View</a>
           <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
             data-bs-target="#details-{{ g.id }}" aria-expanded="false" aria-controls="details-{{ g.id }}">
             Players
