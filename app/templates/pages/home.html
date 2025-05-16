@@ -13,15 +13,15 @@
   <h1>Capture your matches and epic moments.</h1>
   <p>Upload your results, analyze team performance, and uncover the MVPs.</p>
   {% if current_user.is_authenticated %}
-  <a href="/create-tournament"><button class="btn btn-primary" id="upload-button">UPLOAD</button></a>
+    <a href="/create-tournament"><button class="btn btn-primary" id="upload-button">UPLOAD</button></a>
   {% else %}
-  <button class="btn btn-secondary" id="upload-button" onclick="alertAndRedirect()">UPLOAD</button>
-  <script>
-    function alertAndRedirect() {
-      alert("Log in first");
-      window.location.href = "/account/login";
-    }
-  </script>
+    <button class="btn btn-secondary" id="upload-button" onclick="alertAndRedirect()">UPLOAD</button>
+    <script>
+      function alertAndRedirect() {
+        alert("Log in first");
+        window.location.href = "/account/login";
+      }
+    </script>
   {% endif %}
 </section>
 
