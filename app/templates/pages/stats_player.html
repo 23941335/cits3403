@@ -5,12 +5,19 @@
 {% block main %}
 <div class="container my-4">
   <div class="row">
+    <div class="mb-3">
+      <a href="/tournament?id={{ tournament.id }}" class="btn btn-outline-primary">
+        ← Back to Tournament page: {{ tournament.title }}
+      </a>
+    </div>
+
     <!-- player profile -->
     <div class="col-md-4">
       <div class="card">
         <div class="mx-auto pt-4 pb-3 text-center ">
-          <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2" 
-                style="width: 150px; height: 150px;">
+          <div
+            class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2"
+            style="width: 150px; height: 150px;">
             <i class="bi bi-person" style="font-size: 5rem; color: #6c757d;"></i>
           </div>
         </div>
@@ -26,17 +33,15 @@
       <div class="card h-100">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Games Stats</h5>
+            <h5 class="card-title mb-0">Tournament stats</h5>
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="viewDropdown"
                 data-bs-toggle="dropdown" aria-expanded="false">
                 This Tournament
               </button>
               <ul class="dropdown-menu" aria-labelledby="viewDropdown">
-                <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">This Tournament</a>
-                </li>
+                <li><a class="dropdown-item active" href="#" onclick="switchGameView('tournament')">This Tournament</a></li>
                 <li><a class="dropdown-item" href="#" onclick="switchGameView('game')">Game View</a></li>
-                <li><a class="dropdown-item" href="#" onclick="switchGameView('overall')">Career</a></li>
               </ul>
             </div>
           </div>
@@ -45,50 +50,34 @@
             <table class="table table-striped">
               <thead>
                 <tr>
+                  <th scope="col">Hero</th>
                   <th scope="col">Round</th>
-                  <th scope="col">Team Rank</th>
-                  <th scope="col">Kills</th>
-                  <th scope="col">Deaths</th>
+                  <th scope="col">Kill</th>
+                  <th scope="col">Death</th>
                   <th scope="col">Assists</th>
                   <th scope="col">Medals</th>
+                  <th scope="col">Accuracy</th>
                 </tr>
               </thead>
               <tbody>
+                {% for gp in player.game_players if gp.game.tournament_id == tournament.id %}
                 <tr>
-                  <td><a href="/tournament/game?id=1">Game 1</a></td>
-                  <td>4th</td>
-                  <td>20</td>
-                  <td>5</td>
-                  <td>10</td>
-                  <td>0</td>
+                  <td>{{ gp.hero.hero_name if gp.hero else "Unknown" }}</td>
+                  <td><a href="/tournament/game?id={{ gp.game.id }}&t={{ tournament.id }}">Round {{ gp.game.round }}</a></td>
+                  <td>{{ gp.kills }}</td>
+                  <td>{{ gp.deaths }}</td>
+                  <td>{{ gp.assists }}</td>
+                  <td>
+                    {% set medals = gp.player.game_medals | selectattr("game_id", "equalto", gp.game.id) | list %}
+                    {% if medals %}{{ medals | map(attribute='medal.medal_name') | join(', ') }}{% else %}N/A{% endif %}
+                  </td>
+                  <td>{{ gp.accuracy_pct }}%</td>
                 </tr>
-                <tr>
-                  <td><a href="/tournament/game?id=2">Game 2</a></td>
-                  <td>2nd</td>
-                  <td>25</td>
-                  <td>8</td>
-                  <td>12</td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td><a href="/tournament/game?id=3">Game 3</a></td>
-                  <td>1st (MVP)</td>
-                  <td>30</td>
-                  <td>6</td>
-                  <td>15</td>
-                  <td>3</td>
-                </tr>
-                <tr>
-                  <td><strong>Total</strong></td>
-                  <td>-</td>
-                  <td><strong>75</strong></td>
-                  <td><strong>19</strong></td>
-                  <td><strong>37</strong></td>
-                  <td><strong>4</strong></td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
+
           <div id="game-view-game" class="game-table-view" style="display:none;">
             {% if current_game %}
             {% set gp = player.game_players | selectattr("game_id", "equalto", current_game.id) | list | first %}
@@ -117,159 +106,132 @@
                 </tr>
               </tbody>
             </table>
-            {% else %}
-            <p>This player did not participate in this game.</p>
-            {% endif %}
-            {% else %}
-            <p>No game selected. Please provide a game ID using `?g=GAME_ID` in the URL.</p>
-            {% endif %}
+            {% else %}<p>This player did not participate in this game.</p>{% endif %}
+            {% else %}<p>No game selected. Please provide a game ID using `?g=GAME_ID` in the URL.</p>{% endif %}
           </div>
-
-
-          <div id="game-view-overall" class="game-table-view" style="display:none;">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Game ID</th>
-                  <th>Tournament</th>
-                  <th>Team</th>
-                  <th>Kills</th>
-                  <th>Deaths</th>
-                  <th>Assists</th>
-                  <th>Damage</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for gp in player.game_players %}
-                <tr>
-                  <td>
-                    <a href="/tournament/game?id={{ gp.game.id }}">
-                      Round {{ gp.game.round }}
-                    </a>
-                  </td>
-                  <td>
-                    <a href="/tournament?id={{ gp.game.tournament.id }}">
-                      {{ gp.game.tournament.title }}
-                    </a>
-                  </td>
-                  <td>
-                    {% if gp.team_id == gp.game.team_a.id %}
-                    {{ gp.game.team_a.team_name }}
-                    {% elif gp.team_id == gp.game.team_b.id %}
-                    {{ gp.game.team_b.team_name }}
-                    {% else %}
-                    Unknown
-                    {% endif %}
-                  </td>
-                  <td>{{ gp.kills }}</td>
-                  <td>{{ gp.deaths }}</td>
-                  <td>{{ gp.assists }}</td>
-                  <td>{{ gp.damage }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-
-            </table>
-          </div>
-
         </div>
       </div>
     </div>
   </div>
 
-  <!-- stats from this tournament -->
-  <div class="row mt-4">
-    <div class="col-md-8">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Average Damage Per Game</h5>
-              <p class="card-text">1500</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Average Healing</h5>
-              <p class="card-text">500</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Average Damage Blocked</h5>
-              <p class="card-text">300</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Top Hero</h5>
-              <p class="card-text">Iron Man</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Win Rate</h5>
-              <p class="card-text">65%</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Participation</h5>
-              <p class="card-text">3/4 games</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Average Accuracy</h5>
-              <p class="card-text">48%</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Most Kills in a Game</h5>
-              <p class="card-text">30</p>
-            </div>
-          </div>
+  <!-- radar charts above cards -->
+  <div class="row mt-4 mb-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="text-center">Combat Stats</h6>
+          <canvas id="radarChartCombat"></canvas>
         </div>
       </div>
     </div>
-
-    <div class="col-md-4 d-flex align-items-center">
-      <div class="card w-100 h-100">
-        <div class="card-body d-flex align-items-center justify-content-center">
-          <img src="{{url_for('static', filename='images/spider-placeholder.png')}}" alt="Spider Chart Placeholder"
-            class="img-fluid" style="max-width: 100%; height: auto; aspect-ratio: 1 / 1;">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="text-center">Kill Stats</h6>
+          <canvas id="radarChartKills"></canvas>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- summary cards -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row g-3">
+        {% for card in player_cards %}
+        <div class="col-md-3">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <h6 class="card-title">{{ card.label }}</h6>
+              <p class="card-text fs-4">{{ card.value }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  function switchGameView(view) {
-    document.getElementById("viewDropdown").textContent =
-      view === "tournament" ? "This Tournament" :
-        view === "game" ? "This Game" :
-          "Overall";
-    document.querySelectorAll(".dropdown-item").forEach(item => item.classList.remove("active"));
-    document.querySelector(`.dropdown-item[onclick="switchGameView('${view}')"]`).classList.add("active");
-    // display hidden sections
-    document.querySelectorAll(".game-table-view").forEach(div => div.style.display = "none");
-    const section = document.getElementById(`game-view-${view}`);
-    if (section) section.style.display = "block";
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const playerStats = JSON.parse(document.getElementById('radar-data').textContent);
+    const teamStats = JSON.parse(document.getElementById('team-radar-data').textContent);
+
+    new Chart(document.getElementById('radarChartCombat'), {
+      type: 'radar',
+      data: {
+        labels: ['Damage', 'Healing', 'Blocked'],
+        datasets: [
+          {
+            label: 'Player',
+            data: [playerStats.avg_damage, playerStats.avg_healing, playerStats.avg_blocked],
+            fill: true,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+          },
+          {
+            label: 'Team',
+            data: [teamStats.avg_damage, teamStats.avg_healing, teamStats.avg_blocked],
+            fill: true,
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            pointBackgroundColor: 'rgba(255, 159, 64, 1)'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: 'Combat Stats' }
+        },
+        scales: {
+          r: { suggestedMin: 0 }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('radarChartKills'), {
+      type: 'radar',
+      data: {
+        labels: ['Kills', 'Deaths', 'Assists'],
+        datasets: [
+          {
+            label: 'Player',
+            data: [playerStats.avg_kills, playerStats.avg_deaths, playerStats.avg_assists],
+            fill: true,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+          },
+          {
+            label: 'Team',
+            data: [teamStats.avg_kills, teamStats.avg_deaths, teamStats.avg_assists],
+            fill: true,
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            pointBackgroundColor: 'rgba(255, 159, 64, 1)'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: 'Kill Stats' }
+        },
+        scales: {
+          r: { suggestedMin: 0 }
+        }
+      }
+    });
+  });
+</script>
+<script id="radar-data" type="application/json">
+  {{ radar_data | tojson }}
+</script>
+<script id="team-radar-data" type="application/json">
+  {{ team_radar_data | tojson }}
 </script>
 {% endblock %}
