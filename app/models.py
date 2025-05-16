@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from app.consts import *
 
 # NOTE:
 # 1) DATATYPES: I have used Text here as the datatype for strings. This is the only option
@@ -132,20 +133,38 @@ class Tournament(BaseModel):
     def __repr__(self):
         return f"<Tournament '{self.title}'>"
 
-    def user_can_access(self, user):
+    def user_can_view(self, user):
         '''Check if a user can access the page.'''
         # Allow access to all for public tournaments
         if self.visibility.visibility == 'public':
             return True
         
         # Restrict access to private tournaments
-        if self.visibility.visibility == 'private':
-            if user.is_authenticated and user in [tu.user for tu in self.users]:
-                return True
+        if self.user_has_permission(user, PERMISSION.READ):
+            return True
 
         return False
 
+    def get_user_role(self, user):
+        '''Return the user's role for this tournamnet, if any. Returns None otherwise.'''
+        if not user.is_authenticated or user not in [tu.user for tu in self.users]:
+            return None
+        
+        tournament_user = db.session.query(TournamentUsers).filter_by(user_id=user.id).first()
+        if not tournament_user:
+            return None
+        
+        return tournament_user.tournament_role
 
+    def user_has_permission(self, user, permission):
+        '''Check if a user has a permission on this tournament. '''
+        tournament_role = self.get_user_role(user)
+        if not tournament_role:
+            return False
+        if permission in [p.permission for p in tournament_role.permissions]:
+            return True
+        return False
+        
 class TournamentUsers(BaseModel):
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id), primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id), primary_key=True)
