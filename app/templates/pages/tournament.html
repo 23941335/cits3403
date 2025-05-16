@@ -287,7 +287,7 @@
         <td>{{ g.round }}</td>
         <td>{{ g.team_a.team_name }}</td>
         <td>{{ g.team_b.team_name }}</td>
-        <td>{{ g.game_mode.game_mode_name }}</td>
+        <td>{{ g.game_mode.game_mode_name.capitalize() }}</td>
         <td>{{ g.map.map_name }}</td>
         <td>
           {% if g.is_draw %}
