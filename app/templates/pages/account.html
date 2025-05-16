@@ -8,9 +8,16 @@
     <!-- User profile card -->
     <div class="col-md-6 col-lg-4">
       <div class="card">
-        <div class="mx-auto pt-4 pb-3 text-center">
-          <img src="{{ url_for('static', filename=current_user.profile_picture or 'icons/placeholder.ico') }}"
-               class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+        <div class="mx-auto pt-4 pb-3 text-center ">
+          {% if current_user.profile_picture %}
+            <img src="{{ url_for('static', filename=current_user.profile_picture) }}"
+                class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+          {% else %}
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2 border border-2" 
+                 style="width: 150px; height: 150px;">
+              <i class="bi bi-person" style="font-size: 5rem; color: #6c757d;"></i>
+            </div>
+          {% endif %}
           <br>
           <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#editPictureModal">Edit</button>
         </div>
