@@ -460,8 +460,10 @@ def api_get_tournaments():
         is_shared = False
         
         if t.user_can_view(current_user):
-            is_shared = t.user_can_view(current_user) and role_name != ROLE.OWNER
+            is_shared = t.user_has_permission(current_user, PERMISSION.READ) and not is_owner
         
+        print(filter_type, is_public, not is_owner, not is_shared)
+
         # Apply filters
         if filter_type == 'owned' and is_owner:
             filtered_tournaments.append(t)
