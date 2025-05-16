@@ -4,7 +4,14 @@
 https://github.com/23941335/cits3403.git
 
 ## Description
-The aim of this project is to create a website which is used to manage tournaments for the game _Marvel Rivals_. Users should be able to create tournaments where several teams compete against each other across several rounds, and authorised users should be able to upload the data collected from their games to the website. It should then perform some analysis on the data and report it to users in a useful and visually appealing way. Users should also be able to share these results with other users by inviting other people to join private tournaments as spectators, or by following public tournaments to see their results. 
+This project is a web application for creating and managing tournaments for the game _Marvel Rivals_. Users can create their own tournaments and upload data as a CSV file collected from games played by tournament participants. They can add all the data from a tournament at once, if entering it after it is completed, or update the tournament data across multiple uploads as the tournament progresses in real time.
+
+The tournament owner can set the tournament as either public or private. Public tournaments are accessible to all site visitors, while private tournaments are only accessible to people invited by the owner. Users can search for public tournaments and see a list of all tournaments they created or that have been shared with them.
+
+Based on the uploaded data, we then provide uses with a variety of ways to view their team or individual performances in the tournament, with numerous metrics and visualisations to bring the make the data easy to understand and to be able to find useful insights quickly. To make it easier for users to upload data, we have a guide page which explains the format of the CSVs and allows them to download templates and examples.
+
+## Implementation
+The project is implemented using a Python Flask backend, connected to a SQLite3 database (via SQLAlchemy), and makes use of server side rendering to give users a customised experience depending on if they are logged in or not. We also have used AJAX to implement the search functionality to query the database for tournaments with matching names.
 
 ## Contributors
 | Student Number | Name            | GitHub Username |
@@ -47,108 +54,16 @@ python seed.py
 flask run
 ```
 
-### Backend
-
 #### Python Package Dependencies
 - [email_validator](https://github.com/JoshData/python-email-validator)
 - [Flask](https://github.com/pallets/flask)
 - [Flask-Login](https://github.com/maxcountryman/flask-login)
 - [Flask-Migrate](https://github.com/miguelgrinberg/flask-migrate)
 - [Flask-SQLAlchemy](https://github.com/pallets-eco/flask-sqlalchemy/)
-- [Flask-WTF](https://github.com/pallets-eco/flask-wtf/) <!-- cf. lecture 9, slide 31 -->
+- [Flask-WTF](https://github.com/pallets-eco/flask-wtf/)
 
 Any other requirements listed in the requirements.txt are dependencies of these packages.
 
-#### Virtual Environment:
-Create:
-```
-python -m venv .venv
-```
-Activate:
-
-`source .venv/bin/activate` (Linux/MacOS)
-
-`.venv\Scripts\activate` (Windows)
-
-`source .venv/Scripts/activate` (WSL)
-
-Install requirements:
-
-```
-pip install -r requirements.txt
-```
-
-
-If you want to delete the .venv:
-
-`rd /s /q .venv` (Windows)
-
-`rm -rf .venv` (Linux/MacOS)
-
-#### Database
-
-If you do not yet have the app.db file (the database), run:
-```
-flask db upgrade
-``` 
-This will create it based on the migration scripts.
-
-On subsequent (and hopefully rare) changes:
-```
-flask db migrate -m "message/comment"
-flask db upgrade
-```
-This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
-
-## Test Data
-
-### Users
-```
-Username: test_user_1
-Email: test_user_1@foo.foo
-Has pfp
-```
-```
-Username: test_user_2
-Email: test_user_2@foo.foo
-```
-```
-Username: test_user_3
-Email: test_user_3@foo.foo
-```
-```
-Username: test_user_4
-Email: test_user_4@foo.foo
-```
-```
-Username: test_user_5
-Email: test_user_5@foo.foo
-```
-#### All users
-```
-Password: 12345678
-```
-### Tournaments
-```
-Name: test_user_1_private_unshared
-Visibility: Private
-Shared: None
-```
-```
-Name: test_user_1_public_1
-Visibility: Public
-Shared: N/A
-```
-```
-Name: test_user_2_private_shared
-Visibility: Private
-Shared: test_user_1
-```
-```
-Name: test_user_1_public_2
-Visibility: Public
-Shared: N/A
-```
 ## Testing
 
 Note: Selenium testing requires that you have Google Chrome installed.
@@ -199,3 +114,42 @@ This will discover and run all test files in the `app/testing/selenium` director
 - TestForms.test_password_hashing: Verifies user password is hashed and verified correctly.
 - TestDataImport.test_valid_csv_import: Tests CSV import function with a valid file, checking database records.
 - TestDataImport.test_invalid_csv_import: Tests CSV import function raises exception on invalid file and form validation.
+
+## Sample Data
+
+## Test Data
+
+### Users
+Username: test_user_1
+Email: test_user_1@foo.foo
+Password: 12345678
+Has pfp
+
+test_user_2
+test_user_2@foo.foo
+
+test_user_3
+test_user_3@foo.foo
+
+test_user_4
+test_user_4@foo.foo
+
+test_user_5
+test_user_5@foo.foo
+
+### Tournaments
+Name: test_user_1_private_unshared
+Visibility: Private
+Shared: None
+
+test_user_1_public_1
+Visibility: Public
+Shared: N/A
+
+test_user_2_private_shared
+Visibility: Private
+Shared: test_user_1
+
+test_user_1_public_2
+Visibility: Public
+Shared: N/A
