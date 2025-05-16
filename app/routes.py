@@ -187,7 +187,7 @@ def tournament_page():
     tid = request.args.get("id", type=int)
     if not tid:
         flash("Tournament ID missing in request", "warning")
-        return redirect("/history")
+        return redirect("/tournaments")
 
     tournament = db.session.get(models.Tournament, tid)
     if not tournament:
@@ -305,7 +305,7 @@ def delete_tournament(tid):
     tournament = db.session.get(models.Tournament, tid)
     if not tournament:
         flash("Tournament not found.", "danger")
-        return redirect("/history")
+        return redirect("/tournaments")
 
     is_owner = db.session.scalar(sa.select(models.TournamentUsers).where(
         models.TournamentUsers.tournament_id == tid,
@@ -324,7 +324,7 @@ def delete_tournament(tid):
         db.session.rollback()
         flash("Failed to delete tournament.", "danger")
 
-    return redirect("/history")
+    return redirect("/tournaments")
 
 
 @app.route("/create-tournament", methods=["GET"])
@@ -422,11 +422,11 @@ def tournament_upload():
         return redirect(f"/tournament?id={tid}")
 
 
-@app.route("/history", methods=['GET'])
-def history_page():
-    """Render the tournament history page (initial load before AJAX takes over)."""
+@app.route("/tournaments", methods=['GET'])
+def browse_tournaments():
+    """Render the tournaments list/search page (initial load before AJAX takes over)."""
     # Render the template without passing data, as AJAX will load the tournaments
-    return render_template("pages/history.html")
+    return render_template("pages/tournaments.html")
 
 
 
@@ -516,7 +516,7 @@ def tournament_game_view():
     gid = request.args.get("id", type=int)
     if not tid or not gid:
         flash("Tournament or game ID missing in request", "warning")
-        return redirect("/history")
+        return redirect("/tournaments")
 
     tournament = db.session.get(models.Tournament, tid)
     game = db.session.get(models.Game, gid)
@@ -548,7 +548,7 @@ def team_results_page():
 
     if not tid or not team_id:
         flash("Missing tournament or team ID", "warning")
-        return redirect("/history")
+        return redirect("/tournaments")
 
     tournament = db.session.get(models.Tournament, tid)
     team = db.session.get(models.Team, team_id)
@@ -725,7 +725,7 @@ def tournament_player_view():
     gid = request.args.get("g", type=int)
     if not pid:
         flash("Player ID missing in request", "warning")
-        return redirect("/history")
+        return redirect("/tournaments")
     
     tournament = db.session.get(models.Tournament, tid)
 
