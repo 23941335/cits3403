@@ -150,7 +150,7 @@ class Tournament(BaseModel):
         if not user.is_authenticated or user not in [tu.user for tu in self.users]:
             return None
         
-        tournament_user = db.session.query(TournamentUsers).filter_by(user_id=user.id).first()
+        tournament_user = db.session.query(TournamentUsers).filter_by(user_id=user.id, tournament_id=self.id).first()
         if not tournament_user:
             return None
         
