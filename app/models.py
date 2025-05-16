@@ -119,8 +119,8 @@ class Visibility(BaseModel):
 
 class Tournament(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(sa.Text)
-    description: Mapped[str] = mapped_column(sa.Text)
+    title: Mapped[str] = mapped_column(sa.String(256))
+    description: Mapped[str] = mapped_column(sa.String(512))
     visibility_id: Mapped[int] = mapped_column(sa.ForeignKey(Visibility.id))
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
     start_time: Mapped[Optional[datetime]] = mapped_column(sa.DateTime, nullable=True)
