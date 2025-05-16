@@ -43,7 +43,7 @@ def signup_page():
 def login_page():
     if current_user.is_authenticated:
         return redirect("/home")
-    return render_template("pages/login.html", title="Login", form=forms.LoginForm())
+    return render_template("pages/login.html", title="Login", form=forms.LoginForm(), next=request.args.get("next"))
 
 
 @app.route("/account/login", methods=["POST"])
@@ -63,7 +63,8 @@ def api_login():
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
         login_user(user, remember=form.remember_me.data)
-        return redirect("/home")
+        next_page = request.args.get("next") or request.form.get("next")
+        return redirect(next_page) if next_page else redirect("/home")
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
 
