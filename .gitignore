@@ -11,6 +11,4 @@
 **/.DS_Store
 
 app/static/profile_pics/*
-app/testing/*
-!app/testing/.gitkeep
 

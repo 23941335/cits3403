@@ -1,0 +1,161 @@
+,Team1,Team2,Team1,convoy,Central Park,1,,,
+,MVP,Team1_Player4,,,,,,,
+,SVP,Team2_Player3,,,,,,,
+,4 Medal,Team2_Player2,,,,,,,
+,3 Medal,Team2_Player2,,,,,,,
+,Shield Medal,Team1_Player3,,,,,,,
+,5 Medal,Team1_Player1,,,,,,,
+,Fist Medal,Team1_Player1,,,,,,,
+,Plus Medal,Team1_Player3,,,,,,,
+,Sword Medal,Team2_Player2,,,,,,,
+,Fire Medal,Team2_Player4,,,,,,,
+Team1_Player1,10,27,21,23,7478,1880,9327,95,Human Torch
+Team1_Player2,28,3,28,15,7684,5726,7387,16,Doctor Strange
+Team1_Player3,4,19,14,10,6109,4701,4356,3,Iron Fist
+Team1_Player4,1,5,0,11,5061,7313,7695,35,Emma Frost
+Team1_Player5,5,9,24,9,7644,2442,2850,10,Spider-Man
+Team1_Player6,14,25,15,18,2912,8103,4720,79,Loki
+Team2_Player1,18,6,24,6,1719,8762,4967,9,Winter Soldier
+Team2_Player2,27,30,22,27,8718,5462,4068,39,Namor
+Team2_Player3,28,10,10,28,2073,4646,8916,12,Hela
+Team2_Player4,28,1,30,6,6820,3814,3121,60,Storm
+Team2_Player5,18,7,15,1,5623,8800,9198,61,Iron Man
+Team2_Player6,16,17,13,9,6162,6384,4637,7,Star-Lord
+,Team3,Team4,Team3,convergence,Midtown,1,,,
+,MVP,Team3_Player6,,,,,,,
+,SVP,Team4_Player3,,,,,,,
+,5 Medal,Team4_Player5,,,,,,,
+,Fist Medal,Team3_Player3,,,,,,,
+,Sword Medal,Team4_Player4,,,,,,,
+,Fire Medal,Team3_Player5,,,,,,,
+,3 Medal,Team4_Player4,,,,,,,
+,Shield Medal,Team3_Player5,,,,,,,
+,4 Medal,Team4_Player5,,,,,,,
+,Plus Medal,Team4_Player2,,,,,,,
+Team3_Player1,2,20,4,4,6327,5982,8455,52,Iron Fist
+Team3_Player2,2,20,14,0,1531,7793,739,69,Hela
+Team3_Player3,18,4,23,22,4756,952,5728,71,Invisible Woman
+Team3_Player4,4,26,29,26,3851,6214,3577,56,Cloak & Dagger
+Team3_Player5,9,19,12,13,3369,3066,2122,4,The Thing
+Team3_Player6,1,4,22,28,8403,3596,1423,72,Squirrel Girl
+Team4_Player1,2,4,16,18,7108,9390,5000,59,Scarlet Witch
+Team4_Player2,15,12,23,21,7096,7795,2424,28,Hulk
+Team4_Player3,18,8,14,29,7542,6172,8160,17,Hawkeye
+Team4_Player4,26,16,29,9,3101,8853,2710,5,Spider-Man
+Team4_Player5,16,15,15,1,4241,4649,6333,72,Luna Snow
+Team4_Player6,16,24,24,20,8287,2050,4000,35,Peni Parker
+,Team5,Team6,Team6,convoy,Midtown,1,,,
+,MVP,Team5_Player2,,,,,,,
+,SVP,Team6_Player4,,,,,,,
+,Sword Medal,Team6_Player5,,,,,,,
+,Fist Medal,Team5_Player5,,,,,,,
+,Fire Medal,Team6_Player5,,,,,,,
+,5 Medal,Team5_Player4,,,,,,,
+,4 Medal,Team6_Player5,,,,,,,
+,3 Medal,Team5_Player1,,,,,,,
+,Shield Medal,Team5_Player6,,,,,,,
+,Plus Medal,Team5_Player5,,,,,,,
+Team5_Player1,3,2,21,13,5847,4496,9569,52,Iron Fist
+Team5_Player2,13,26,16,29,4495,7362,2627,92,Black Widow
+Team5_Player3,18,18,1,9,4368,8206,30,41,Thor
+Team5_Player4,30,20,26,19,7645,8953,2296,65,Loki
+Team5_Player5,3,6,29,29,7759,5035,3595,75,Human Torch
+Team5_Player6,26,23,0,7,3718,7961,9650,69,Mantis
+Team6_Player1,14,5,10,25,5933,9684,2895,30,The Thing
+Team6_Player2,4,2,6,9,2606,9295,5019,75,Namor
+Team6_Player3,15,25,3,20,6988,7083,6309,19,Winter Soldier
+Team6_Player4,20,14,5,11,7610,2539,4313,35,Groot
+Team6_Player5,25,0,11,29,5439,1988,4367,26,Emma Frost
+Team6_Player6,5,2,18,8,5409,4268,4787,46,Black Panther
+,Team7,Team8,Team8,convoy,Central Park,1,,,
+,MVP,Team7_Player3,,,,,,,
+,SVP,Team8_Player1,,,,,,,
+,4 Medal,Team7_Player1,,,,,,,
+,Fire Medal,Team8_Player6,,,,,,,
+,Plus Medal,Team7_Player2,,,,,,,
+,3 Medal,Team8_Player4,,,,,,,
+,Sword Medal,Team7_Player3,,,,,,,
+,Fist Medal,Team8_Player6,,,,,,,
+,5 Medal,Team7_Player1,,,,,,,
+,Shield Medal,Team7_Player2,,,,,,,
+Team7_Player1,3,25,6,20,4910,2831,4894,73,Captain America
+Team7_Player2,6,6,22,17,2169,7114,209,76,Storm
+Team7_Player3,16,16,26,21,3404,2701,3135,19,Invisible Woman
+Team7_Player4,22,30,23,15,7805,7100,2050,71,Doctor Strange
+Team7_Player5,18,2,21,15,6623,1257,1994,13,Star-Lord
+Team7_Player6,12,29,18,13,6487,2436,1972,45,Moon Knight
+Team8_Player1,14,10,12,24,8460,4091,8698,2,Winter Soldier
+Team8_Player2,9,20,8,29,9689,154,3840,59,Magneto
+Team8_Player3,29,1,8,6,5587,3821,511,99,Human Torch
+Team8_Player4,7,25,15,5,2722,2257,5484,98,Black Panther
+Team8_Player5,24,1,10,9,4114,1635,2207,64,Squirrel Girl
+Team8_Player6,11,20,19,0,5308,4135,4703,31,Scarlet Witch
+,Team1,Team3,Team3,domination,Royal Palace,2,,,
+,MVP,Team1_Player2,,,,,,,
+,SVP,Team3_Player5,,,,,,,
+,Shield Medal,Team1_Player5,,,,,,,
+,Sword Medal,Team3_Player3,,,,,,,
+,4 Medal,Team3_Player1,,,,,,,
+,Plus Medal,Team3_Player5,,,,,,,
+,3 Medal,Team1_Player2,,,,,,,
+,Fire Medal,Team1_Player5,,,,,,,
+,Fist Medal,Team1_Player5,,,,,,,
+,5 Medal,Team3_Player2,,,,,,,
+Team1_Player1,12,3,16,16,1613,6380,1566,76,Star-Lord
+Team1_Player2,27,30,30,27,7583,4688,1082,74,Hulk
+Team1_Player3,28,24,18,10,5449,2913,2954,11,Mantis
+Team1_Player4,1,4,19,23,6555,8271,1816,19,Storm
+Team1_Player5,10,16,23,20,2688,8552,7861,27,Invisible Woman
+Team1_Player6,25,26,9,11,1257,9168,5865,77,Hawkeye
+Team3_Player1,17,25,21,13,8627,2154,6718,17,Squirrel Girl
+Team3_Player2,20,17,30,25,2511,5848,2827,68,Black Panther
+Team3_Player3,0,8,17,0,9145,4737,5958,99,Adam Warlock
+Team3_Player4,6,23,28,11,5327,2968,2527,94,The Punisher
+Team3_Player5,19,25,1,16,9887,157,810,11,Hela
+Team3_Player6,21,8,12,30,7575,1678,7593,49,Doctor Strange
+,Team6,Team8,Team8,convergence,Birnin T'Challa,2,,,
+,MVP,Team6_Player1,,,,,,,
+,SVP,Team8_Player3,,,,,,,
+,Sword Medal,Team8_Player6,,,,,,,
+,4 Medal,Team6_Player4,,,,,,,
+,Plus Medal,Team8_Player1,,,,,,,
+,3 Medal,Team6_Player4,,,,,,,
+,Fist Medal,Team6_Player2,,,,,,,
+,Fire Medal,Team8_Player3,,,,,,,
+,Shield Medal,Team8_Player1,,,,,,,
+,5 Medal,Team8_Player6,,,,,,,
+Team6_Player1,13,9,13,29,3415,538,410,28,Groot
+Team6_Player2,4,25,7,9,5610,5805,1050,16,Emma Frost
+Team6_Player3,20,1,23,14,9358,5864,6457,96,Invisible Woman
+Team6_Player4,11,15,6,14,5090,1792,3656,15,Hawkeye
+Team6_Player5,30,9,29,30,7462,3516,8590,30,Spider-Man
+Team6_Player6,6,30,11,24,8056,5715,2067,56,Hulk
+Team8_Player1,26,27,27,19,7959,9730,9840,6,Squirrel Girl
+Team8_Player2,27,21,23,20,3029,1350,3091,65,Mantis
+Team8_Player3,7,16,14,19,4692,4189,6610,48,Namor
+Team8_Player4,14,19,17,6,3236,7422,1244,48,Moon Knight
+Team8_Player5,15,24,13,24,8681,6617,9282,48,Magneto
+Team8_Player6,10,17,20,11,3916,1165,1194,30,Jeff the Land Shark
+,Team3,Team8,Team3,convoy,Yggdrasill Path,3,,,
+,MVP,Team3_Player4,,,,,,,
+,SVP,Team8_Player3,,,,,,,
+,Sword Medal,Team8_Player5,,,,,,,
+,Fire Medal,Team8_Player3,,,,,,,
+,Plus Medal,Team3_Player5,,,,,,,
+,Shield Medal,Team3_Player6,,,,,,,
+,5 Medal,Team8_Player1,,,,,,,
+,3 Medal,Team3_Player4,,,,,,,
+,4 Medal,Team8_Player4,,,,,,,
+,Fist Medal,Team3_Player3,,,,,,,
+Team3_Player1,12,18,26,7,4508,1220,5402,25,Iron Fist
+Team3_Player2,17,23,12,13,5713,433,590,15,Hulk
+Team3_Player3,9,7,25,8,6949,1185,8494,64,The Thing
+Team3_Player4,0,5,4,20,2716,9515,8317,76,Hawkeye
+Team3_Player5,20,21,16,26,1326,6429,25,59,Star-Lord
+Team3_Player6,29,25,0,27,5912,4419,7014,79,Magneto
+Team8_Player1,1,4,2,10,7204,2441,942,23,Mantis
+Team8_Player2,14,6,14,29,6467,9277,3054,94,Captain America
+Team8_Player3,25,14,11,16,2063,576,9393,89,Psylocke
+Team8_Player4,25,4,24,29,1547,2225,7639,77,Spider-Man
+Team8_Player5,13,12,9,23,4928,6150,9027,86,Black Panther
+Team8_Player6,10,16,17,18,3114,8939,6448,97,Storm
