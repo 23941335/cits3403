@@ -81,7 +81,7 @@ class CSV_Game:
         winning_team_name = header_row[MATCH_WINNER]
         round_num = int(header_row[MATCH_ROUND])
 
-        game_mode_name = header_row[MATCH_GAME_MODE]
+        game_mode_name = header_row[MATCH_GAME_MODE].lower()
         map_name = header_row[MATCH_MAP]
 
         # Find or create teams
