@@ -1,12 +1,12 @@
 from enum import Enum
 
-class PERMISSION(Enum):
+class PERMISSION(str, Enum):
     READ   = 'view'
     DELETE = 'delete'
     UPLOAD = 'upload'
 
 
-class ROLE(Enum):
+class ROLE(str, Enum):
     DEFAULT = 'default'
     OWNER = 'tournament_owner'
 
