@@ -92,6 +92,13 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 Navigate to the project's root directory
 
 ```bash
+rm app.db
+flask db upgrade
+export SECRET_KEY='somevaluehere'
+python seed.py
+```
+
+```bash
 python -m unittest discover -s app/testing/unit
 ```
 
