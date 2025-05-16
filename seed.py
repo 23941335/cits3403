@@ -113,7 +113,7 @@ def populate_heros():
 
 if __name__ == '__main__':
     with app.app_context():
-        Role.populate_with_list('role_name', ['default', 'administrator', 'moderator'])
+        Role.populate_with_list('role_name', ['default', 'administrator', 'moderator', 'tournament_owner'])
         HeroRole.populate_with_list('role_name', ['vanguard', 'duelist', 'strategist'])
         GameMode.populate_with_list('game_mode_name', ['domination', 'convoy', 'convergence'])
         Visibility.populate_with_list('visibility', ['public', 'private'])

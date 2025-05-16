@@ -119,11 +119,9 @@ class Visibility(BaseModel):
 
 class Tournament(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(sa.Text)
-    description: Mapped[str] = mapped_column(sa.Text)
+    title: Mapped[str] = mapped_column(sa.String(256))
+    description: Mapped[str] = mapped_column(sa.String(512))
     visibility_id: Mapped[int] = mapped_column(sa.ForeignKey(Visibility.id))
-
-
     created_at: Mapped[datetime] = mapped_column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
     start_time: Mapped[Optional[datetime]] = mapped_column(sa.DateTime, nullable=True)
 
@@ -134,6 +132,20 @@ class Tournament(BaseModel):
     def __repr__(self):
         return f"<Tournament '{self.title}'>"
 
+    def user_can_access(self, user):
+        '''Check if a user can access the page.'''
+        # Allow access to all for public tournaments
+        if self.visibility.visibility == 'public':
+            return True
+        
+        # Restrict access to private tournaments
+        if self.visibility.visibility == 'private':
+            if user.is_authenticated and user in [tu.user for tu in self.users]:
+                return True
+
+        return False
+
+
 class TournamentUsers(BaseModel):
     tournament_id: Mapped[int] = mapped_column(sa.ForeignKey(Tournament.id), primary_key=True)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey(User.id), primary_key=True)
@@ -141,6 +153,7 @@ class TournamentUsers(BaseModel):
 
     tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="users")
     user: Mapped["User"] = relationship("User", back_populates="tournaments")
+    tournament_role: Mapped["Role"] = relationship("Role")
 
 class GameMode(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)

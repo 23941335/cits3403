@@ -11,20 +11,7 @@
       <a class="nav-link" href="/create-tournament" id="nav-create-tournament">New Tournament</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="/history" id="nav-history">History</a>
-    </li>
-
-    <!-- Dropdown Result -->
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" 
-         aria-expanded="false" id="nav-results-dropdown">
-        Result
-      </a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="/tournament/game" id="nav-results-game">Game Results</a></li>
-        <li><a class="dropdown-item" href="/tournament/team" id="nav-results-team">Team Results</a></li>
-        <li><a class="dropdown-item" href="/tournament/player" id="nav-results-player">Player Results</a></li>
-      </ul>
+      <a class="nav-link" href="/history">Tournaments</a>
     </li>
 
     {% if current_user.is_authenticated %}

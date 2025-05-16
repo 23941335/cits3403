@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed,FileField
 from wtforms.fields import DateTimeLocalField
-from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, BooleanField, HiddenField
 from wtforms.validators import ValidationError, InputRequired, DataRequired, Email, EqualTo, Length, Regexp, Optional
 import sqlalchemy as sa
 from app import db
@@ -69,9 +69,15 @@ class LoginForm(FlaskForm):
     #         raise ValidationError('username is Invalid.')
 
 class CreateTournamentForm(FlaskForm):
-    name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
+    name = StringField('Tournament Name', validators=[
+        InputRequired(message="Tournament Name is required."),
+        Length(min=1, max=256, message="Tournament title must be between 1-256 characters")
+    ])
     start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[Optional()])
-    description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
+    description = StringField('Tournament Description', validators=[
+        InputRequired(message="Tournament Description is required."),
+        Length(min=1, max=512, message="Description must be between 1-512 characters")
+    ])
 
     visibility = SelectField(
         'Tournament Visibility',  coerce=int,
@@ -99,3 +105,7 @@ class UpdateAccountForm(FlaskForm):
     ])
     submit = SubmitField('Update')
 
+class UserSelectionForm(FlaskForm):
+    tid = HiddenField("tid", validators=[DataRequired()])
+    selected_users = HiddenField("Selected Users")
+    submit = SubmitField("Submit")
