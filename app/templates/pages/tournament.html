@@ -11,6 +11,31 @@
     transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
   }
+  
+  /* Custom search input styling */ 
+  .search-container {
+    position: relative;
+    margin-bottom: 15px;
+  }
+  
+  .search-container input {
+    padding-right: 30px;
+  }
+  
+  .search-container .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #6c757d;
+  }
+  
+  /* No results message */
+  .no-results {
+    padding: 8px;
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+  }
 </style>
 {% endblock %}
 
@@ -20,7 +45,7 @@
 <p>Start Time: {{ tournament.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
 <p>Visibility: {{ tournament.visibility.visibility }}</p>
 
-{% if current_user.id in owners | map(attribute='id') | list %}
+{% if (current_user.id in owners | map(attribute='id') | list) and tournament.visibility.visibility == 'private' %}
   <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
     Share
   </button>
@@ -31,7 +56,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="shareModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="shareModalLabel">Share Tournament</h5>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -42,13 +67,21 @@
           {{ form.hidden_tag() }}
 
           <div class="mb-3">
-            <label for="selectUser" class="form-label">Share</label>
-            <select id="selectUser" class="form-select">
-              <option value="" disabled selected>Select a User</option>
-              {% for user in unsharedUsers %}
-                <option value="{{ user.id }}">{{ user.username }}</option>
-              {% endfor %}
-            </select>
+            <label for="userSearch" class="form-label">Search Users</label>
+            <div class="search-container">
+              <input type="text" id="userSearch" class="form-control" placeholder="Type to search users...">
+              <span class="search-icon">🔍</span>
+            </div>
+            
+            <div class="mt-2">
+              <select id="selectUser" class="form-select" size="5">
+                <option value="" disabled selected>Select a User</option>
+                {% for user in unsharedUsers %}
+                  <option value="{{ user.id }}" data-username="{{ user.username }}">{{ user.username }}</option>
+                {% endfor %}
+              </select>
+              <div id="noResults" class="no-results d-none">No users found</div>
+            </div>
           </div>
 
           {{ form.tid() }}
@@ -59,7 +92,7 @@
               {% for user in sharedUsers %}
                 <li class="list-group-item d-flex justify-content-between align-items-center" data-user-id="{{ user.id }}">
                   {{ user.username }}
-                  <button class="btn btn-sm btn-danger" onclick="removeUser('{{ user.id }}', '{{ user.username }}')">Remove</button>
+                  <button type="button" class="btn btn-sm btn-danger" onclick="removeUser('{{ user.id }}', '{{ user.username }}')">Remove</button>
                 </li>
               {% endfor %}
             </ul>
@@ -79,7 +112,35 @@
   const selectUser = document.getElementById('selectUser');
   const selectedUsersList = document.getElementById('selectedUsersList');
   const selectedUsersInput = document.getElementById('selected_users');
+  const userSearch = document.getElementById('userSearch');
+  const noResults = document.getElementById('noResults');
   let selectedUserIds = new Set();
+    
+  // Create a map to store all users (both shared and unshared)
+  const allUsers = new Map();
+
+  // Initialize with both unshared users from the dropdown
+  Array.from(selectUser.options).filter(option => option.value !== "").forEach(option => {
+    allUsers.set(option.value, {
+      id: option.value,
+      username: option.textContent
+    });
+  });
+
+  // Add already shared users from the list
+  document.querySelectorAll('#selectedUsersList li[data-user-id]').forEach(li => {
+    const userId = li.getAttribute('data-user-id');
+    const username = li.childNodes[0].textContent.trim();
+    selectedUserIds.add(userId);
+    
+    // Also add to allUsers map if they're not already there
+    if (!allUsers.has(userId)) {
+      allUsers.set(userId, {
+        id: userId,
+        username: username
+      });
+    }
+  });
 
   function removeUser(userId, userName) {
     const listItem = selectedUsersList.querySelector(`li[data-user-id="${userId}"]`);
@@ -92,46 +153,83 @@
       const option = document.createElement('option');
       option.value = userId;
       option.textContent = userName;
+      option.dataset.username = userName;
       selectUser.appendChild(option);
+      
+      // Re-apply search filter
+      filterUsers(userSearch.value);
     }
   }
 
+  function filterUsers(searchTerm) {
+    const term = searchTerm.toLowerCase();
+    
+    // Reset dropdown first
+    while (selectUser.options.length > 0) {
+      selectUser.remove(0);
+    }
+    
+    // Filter and add matching options
+    let matchCount = 0;
+    allUsers.forEach(user => {
+      const username = user.username.toLowerCase();
+      
+      // Only add options that match the search and aren't already selected
+      if (username.includes(term) && !selectedUserIds.has(user.id)) {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = user.username;
+        option.dataset.username = user.username;
+        selectUser.appendChild(option);
+        matchCount++;
+      }
+    });
+    
+    // Show/hide no results message
+    if (matchCount === 0) {
+      noResults.classList.remove('d-none');
+    } else {
+      noResults.classList.add('d-none');
+    }
+  }
+
+  // Search input event
+  userSearch.addEventListener('input', function() {
+    filterUsers(this.value);
+  });
+
   selectUser.addEventListener('change', function () {
     const selectedId = this.value;
-    const selectedName = this.options[this.selectedIndex].text;
+    const selectedOption = this.options[this.selectedIndex];
+    const selectedName = selectedOption.textContent;
 
     if (!selectedUserIds.has(selectedId)) {
       selectedUserIds.add(selectedId);
 
       const listItem = document.createElement('li');
       listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+      listItem.setAttribute('data-user-id', selectedId);
       listItem.textContent = selectedName;
 
       const removeBtn = document.createElement('button');
       removeBtn.className = 'btn btn-sm btn-danger';
       removeBtn.textContent = 'Remove';
+      removeBtn.type = 'button';
       removeBtn.onclick = () => {
-        selectedUsersList.removeChild(listItem);
-        selectedUserIds.delete(selectedId);
-        updateHiddenInput();
-        // Add back to dropdown
-        const option = document.createElement('option');
-        option.value = selectedId;
-        option.textContent = selectedName;
-        selectUser.appendChild(option);
+        removeUser(selectedId, selectedName);
       };
 
       listItem.appendChild(removeBtn);
       selectedUsersList.appendChild(listItem);
       updateHiddenInput();
 
-      // Remove the selected user from the dropdown
-      const selectedOption = selectUser.querySelector(`option[value="${selectedId}"]`);
+      // Remove the selected option from dropdown
       if (selectedOption) {
         selectUser.removeChild(selectedOption);
       }
-
-      selectUser.value = "";
+      
+      // Re-apply search filter
+      filterUsers(userSearch.value);
     }
   });
 
@@ -140,10 +238,11 @@
     console.log("Updated selected_users:", selectedUsersInput.value);
   }
 
-  document.querySelectorAll('#selectedUsersList li[data-user-id]').forEach(li => {
-    selectedUserIds.add(li.getAttribute('data-user-id'));
-  });
+  // Initialize selected users
   updateHiddenInput();
+
+  // Initialize the dropdown with all unselected users
+  filterUsers('');
 </script>
 
 <h4 class="mt-4 mb-3">Teams Participating</h4>

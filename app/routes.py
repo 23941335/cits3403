@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 from sqlalchemy.orm import selectinload
+from collections import defaultdict
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
@@ -484,25 +485,156 @@ def team_results_page():
 
     kda_ratio = round((kills + assists) / (deaths if deaths > 0 else 1), 2)
     avg_accuracy = round(sum(accuracy_list) / len(accuracy_list), 1) if accuracy_list else 0
+    # Gather all medals belonging to players in this team and this tournament
+    total_medals = (
+        db.session.query(models.GameMedals)
+        .join(models.GameMedals.game)  # JOIN to game
+        .filter(
+            models.GameMedals.player_id.in_([gp.player_id for gp in game_players]),
+            models.Game.tournament_id == tid
+        )
+        .count()
+    )
+    total_blocked = 0
+
+    # player stastics list
+    player_stats = defaultdict(lambda: {"damage": 0, "healing": 0, "blocked": 0, "games": 0})
+
+    for gp in game_players:
+        total_blocked += gp.damage_blocked or 0
+        pid = gp.player_id
+        player_stats[pid]["damage"] += gp.damage or 0
+        player_stats[pid]["healing"] += gp.healing or 0
+        player_stats[pid]["blocked"] += gp.damage_blocked or 0
+        player_stats[pid]["games"] += 1
+
+    # Average stats
+    games_played_count = len(games_played) if games_played else 1
+
+    avg_kda_ratio = round(kda_ratio / games_played_count, 2)
+    avg_damage = round(damage / games_played_count, 2)
+    avg_healing = round(healing / games_played_count, 2)
+    avg_blocked = round(total_blocked / games_played_count, 2)
+
+    player_ids = list(player_stats.keys())
+    players_by_id = {
+        p.id: p.gamertag for p in db.session.query(models.Player).filter(models.Player.id.in_(player_ids)).all()
+    }
+
+    # top players
+    def get_top_player(metric):
+        best = max(player_stats.items(), key=lambda x: x[1][metric] / max(x[1]["games"], 1), default=None)
+        return players_by_id.get(best[0], "N/A") if best else "N/A"
+
+    top_damage_player = get_top_player("damage")
+    top_healing_player = get_top_player("healing")
+    top_blocked_player = get_top_player("blocked")
+
+    # FMVP
+    final_game = db.session.query(models.Game).filter(
+        models.Game.tournament_id == tid
+    ).order_by(models.Game.round.desc()).first()
+
+    fmvp_player = "N/A"
+    if final_game:
+        fmvp_medal = next(
+            (gm for gm in final_game.game_medals if gm.medal.medal_name.lower() == "mvp"),
+            None
+        )
+        if fmvp_medal and fmvp_medal.player_id in player_ids:
+            fmvp_player = players_by_id.get(fmvp_medal.player_id, "N/A")
 
     team_summary = {
-        'games': len(games_played),
-        'kda_ratio': kda_ratio,
+        'games': games_played_count,
         'total_kills': kills,
+        'total_deaths': deaths,
         'total_assists': assists,
         'total_damage': damage,
         'total_healing': healing,
-        'avg_accuracy': avg_accuracy
+        'total_blocked': total_blocked,
+        'avg_accuracy': avg_accuracy,
+        'kda_ratio': kda_ratio,
+        'avg_kda_ratio': avg_kda_ratio,
+        'avg_damage': avg_damage,
+        'avg_healing': avg_healing,
+        'avg_blocked': avg_blocked,
+        'total_medals': total_medals,
+        'top_damage_player': top_damage_player,
+        'top_healing_player': top_healing_player,
+        'top_blocked_player': top_blocked_player,
+        'fmvp_player': fmvp_player
+    }
+    # Caluculate the max round number for specific team
+    # This is the max round number for the team in the tournament
+    # This round number is used to display the correct round in the game view
+    round_numbers = [
+        gp.game.round for gp in game_players if gp.game and gp.game.round is not None
+    ]
+    max_round = max(round_numbers) if round_numbers else 1
+
+    stats_cards = [
+    {"title": "Total Kills", "value": team_summary["total_kills"]},
+    {"title": "Total Deaths", "value": team_summary["total_deaths"]},
+    {"title": "Total Assists", "value": team_summary["total_assists"]},
+    {"title": "Total Medals", "value": team_summary["total_medals"]},
+    {"title": "Total Damage", "value": team_summary["total_damage"]},
+    {"title": "Total Healing", "value": team_summary["total_healing"]},
+    {"title": "Total Blocked", "value": team_summary.get("total_blocked", "N/A")},
+    {"title": "Average Accuracy", "value": f"{team_summary['avg_accuracy']}%"},
+    {"title": "Total K/D Ratio", "value": team_summary["kda_ratio"]},
+    {"title": "Avg K/D Ratio per Game", "value": team_summary.get("avg_kda_ratio", "N/A")},
+    {"title": "Avg Damage per Game", "value": team_summary.get("avg_damage", "N/A")},
+    {"title": "Avg Healing per Game", "value": team_summary.get("avg_healing", "N/A")},
+    {"title": "Avg Blocked per Game", "value": team_summary.get("avg_blocked", "N/A")},
+    {"title": "Top Damage Player", "value": team_summary.get("top_damage_player", "N/A")},
+    {"title": "Top Healing Player", "value": team_summary.get("top_healing_player", "N/A")},
+    {"title": "Top Blocked Player", "value": team_summary.get("top_blocked_player", "N/A")},
+    {"title": "FMVP", "value": team_summary.get("fmvp_player", "N/A")},
+    ]
+
+    games = db.session.scalars(
+    sa.select(models.Game).where(models.Game.tournament_id == tid)
+    ).all()
+
+    chart_data = {
+        "rounds": [],
+        "kills": [],
+        "damage": [],
+        "healing": []
     }
 
+    for g in sorted(games, key=lambda x: x.round):
+        if g.team_a_id != team.id and g.team_b_id != team.id:
+            continue # Skip games not involving the team
 
-    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary)
+        round_label = f"R{g.round}"
+        team_gps = [gp for gp in g.game_players if gp.team_id == team.id]
+
+        chart_data["rounds"].append(round_label)
+        chart_data["kills"].append(sum(gp.kills for gp in team_gps))
+        chart_data["damage"].append(sum(gp.damage for gp in team_gps))
+        chart_data["healing"].append(sum(gp.healing for gp in team_gps))
+
+
+
+    return render_template("pages/stats_team.html", team=team, tournament=tournament, game_players=game_players, team_summary=team_summary, max_round=max_round, stats_cards=stats_cards, chart_data=chart_data)
 
 
 
 @app.route("/tournament/player")
 def tournament_player_view():
-    return render_template("pages/stats_player.html")
+    pid = request.args.get("id", type=int)
+    tid = request.args.get("t", type=int)
+    gid = request.args.get("g", type=int)
+    if not pid:
+        flash("Player ID missing in request", "warning")
+        return redirect("/history")
+    player = db.session.get(models.Player, pid)
+    if not player:
+        return render_template("pages/404.html", error=f"Player with ID {pid} not found."), 404
+    player_games = [gp.game for gp in player.game_players]
+    current_game = db.session.get(models.Game, gid) if gid else None
+    return render_template("pages/stats_player.html", player=player, player_games=player_games,current_game=current_game)
 
 
 # 404 not found page
