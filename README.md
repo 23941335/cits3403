@@ -89,7 +89,7 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 
 ### Running Unit Tests
 
-Navigate to the project's root directory
+Navigate to the project's root directory, make sure your test environment is clean and ready.  
 <!--
 ```bash
 rm app.db
@@ -113,3 +113,26 @@ python -m unittest discover -s app/testing/ui
 ```
 
 This will discover and run all test files in the `app/testing/selenium` directory.
+
+### UI Tests (Selenium)
+- TestAuthFlows.test_successful_user_signup: Tests user signup flow, flash message, and login redirect.
+- TestAuthFlows.test_successful_user_login_and_logout: Tests login with valid credentials and logout redirect.
+- TestAuthFlows.test_user_login_with_invalid_credentials: Tests login failure with invalid credentials.
+- TestUIDataImport.login_user: Logs in an existing user via UI for data import tests.
+- TestUIDataImport.test01_create_tournament_with_valid_csv: Tests valid CSV upload via create tournament UI and database inserts.
+- TestUIDataImport.test02_create_tournament_with_invalid_csv: Tests invalid CSV upload handling on create tournament UI.
+- TestNavigation.test_public_page_accessibility_anonymous: Verifies anonymous access to public pages.
+- TestNavigation.test_authenticated_page_access_and_redirects: Verifies redirects to login for unauthenticated users accessing protected pages.
+- TestNavigation.test_404_error_page: Verifies the custom 404 error page displays correctly.
+
+### Unit Tests
+- TestForms.test_signup_form_valid: Make sure that signup form accepts valid input.
+- TestForms.test_signup_duplicate_username: Ensures signup form rejects duplicate username.
+- TestForms.test_signup_duplicate_email: Ensures signup form rejects duplicate email.
+- TestForms.test_signup_password_mismatch: Ensures signup form rejects mismatched passwords.
+- TestForms.test_login_form_valid: Validates login form accepts correct credentials.
+- TestForms.test_create_tournament_valid: Make sure create tournament form with proper data.
+- TestForms.test_create_tournament_missing_fields: Ensures create tournament form rejects missing required fields.
+- TestForms.test_password_hashing: Verifies user password is hashed and verified correctly.
+- TestDataImport.test_valid_csv_import: Tests CSV import function with a valid file, checking database records.
+- TestDataImport.test_invalid_csv_import: Tests CSV import function raises exception on invalid file and form validation.
