@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}CSV Upload Guide{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block main %}
+<div class="mb-4">
+    <h2>CSV Upload Guide</h2>
+    <p>
+        Use this page to learn about the required CSV format for uploading your data. 
+        You can view the expected format, see an example, or generate a random example using the buttons below. 
+        Adjust the number of teams for the random example as needed.
+    </p>
+    <p>
+        The data format is a CSV file as follows:
+        <ul>
+            <li>The first row contains the game header information, such as the teams, winner, game mode, map, and round number</li>
+            <li>Each subsequent line which begins with no first column maps a medal to the player who won it. Not all medals are given in every game. If a medal is not received, that row is omitted.</li>
+            <li>When the rows begin with a value in the first column this represents the players. The first six are the first team (A)'s player results and the next six rows are the second team (B)'s.</li>
+            <li>The format is stackable, so for each game, repeat the format directly after the previous one. Whether there is a value present in the first column is used to determine when the next game's data begins.</li>
+            <li>You should use a number of teams that is a power of 2 (e.g. 4, 8, 16, 32, ...)</li>
+        </ul>
+        You can download a template here, or generate a random example with a specified number of teams.
+    </p>
+</div>
+<table class="table table-striped table-bordered">
+    <tr>
+        <td colspan="100%">
+            <div class="d-flex justify-content-between mb-2">
+                <div>
+                    <a href="/help/csv-guide/template" class="btn {% if variant == 'template' %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill me-2">
+                        Template
+                    </a>
+                    <a href="/help/csv-guide/example" class="btn {% if variant == 'example' %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill me-2">
+                        Example
+                    </a>
+                    <a href="/help/csv-guide/random" class="btn {% if variant == 'random' %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill me-2" id="random-example-btn">
+                        Random Example
+                    </a>
+                    <input type="number" min="1" max="128" class="form-control d-inline-block w-auto me-3" id="num-teams-input" placeholder="Teams">
+                </div>
+                <div>
+                    <a href="{{ url_for('static', filename='csv_samples/guide_' + variant + '.csv') }}" class="btn btn-success rounded-pill">
+                        Download
+                    </a>
+                </div>
+            </div>
+            <script>
+                const btn = document.getElementById('random-example-btn');
+                const input = document.getElementById('num-teams-input');
+
+                input.addEventListener('blur', function() { 
+                    let baseUrl = '/help/csv-guide/random';
+                    let numTeams = input.value;
+
+                    // Check if the number is a power of 2
+                    if (numTeams > 0 && (numTeams & (numTeams - 1)) === 0) {
+                        window.location.href = baseUrl + '?num_teams=' + encodeURIComponent(numTeams);
+                    } else {
+                        alert('Please enter a power of 2 (e.g., 2, 4, 8, 16, etc.)');
+                        input.value = '';
+                    }
+                });
+            </script>
+        </td>
+    </tr>
+    {% for row in csv_data.splitlines() %}
+    <tr>
+        {% for cell in row.split(',') %}
+        <td>{{ cell }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

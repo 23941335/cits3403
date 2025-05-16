@@ -1,0 +1,23 @@
+,<Team A Name>,<Team B Name>,<Winning Team Name>,<Game Mode>,<Map Name>,<Round Number>,,,
+,MVP,<recipient player>,,,,,,,
+,SVP,<recipient player>,,,,,,,
+,3 Medal,<recipient player>,,,,,,,
+,4 Medal,<recipient player>,,,,,,,
+,5 Medal,<recipient player>,,,,,,,
+,Sword Medal,<recipient player>,,,,,,,
+,Fire Medal,<recipient player>,,,,,,,
+,Plus Medal,<recipient player>,,,,,,,
+,Fist Medal,<recipient player>,,,,,,,
+,Shield Medal,<recipient player>,,,,,,,
+<Team-A P1 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-A P2 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-A P3 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-A P4 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-A P5 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-A P6 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P1 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P2 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P3 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P4 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P5 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
+<Team-B P6 Name>,<kills>,<deaths>,<assists>,<final hits>,<damage>,<damage blocked>,<healing>,<accuracy %>,<hero name>
