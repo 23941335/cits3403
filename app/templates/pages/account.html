@@ -4,9 +4,9 @@
 
 {% block main %}
 <div class="container my-4">
-  <div class="row">
-    <!-- Left: User profile card -->
-    <div class="col-md-4">
+  <div class="row justify-content-center">
+    <!-- User profile card -->
+    <div class="col-md-6 col-lg-4">
       <div class="card">
         <div class="mx-auto pt-4 pb-3 text-center">
           <img src="{{ url_for('static', filename=current_user.profile_picture or 'icons/placeholder.ico') }}"
@@ -23,35 +23,11 @@
             {{ current_user.email }}
             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEmailModal">Edit</button>
           </p>
-          <p class="card-text">User ID: {{ current_user.id }}</p>
-          <p class="card-text">Account Created: {{ current_user.created_at }}</p>
+          <p class="card-text">User ID: {{ current_user.id }}</p><p class="card-text">Account Created: {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
           <p class="card-text">Account Status: {{ 'Active' if current_user.is_active else 'Suspended' }}</p>
         </div>
       </div>
     </div>
-
-    <!-- Right: Games table -->
-    <div class="col-md-8">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Games Played In <a href="/tournament">This Tournament</a></h5>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Game</th><th>Team Rank</th><th>Kills</th><th>Deaths</th><th>Assists</th><th>Medals</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><a href="/tournament/game?id=1">Game 1</a></td><td>4th</td><td>20</td><td>5</td><td>10</td><td>0</td></tr>
-              <tr><td><a href="/tournament/game?id=2">Game 2</a></td><td>2nd</td><td>25</td><td>8</td><td>12</td><td>1</td></tr>
-              <tr><td><a href="/tournament/game?id=3">Game 3</a></td><td>1st (MVP)</td><td>30</td><td>6</td><td>15</td><td>3</td></tr>
-              <tr><td><strong>Total</strong></td><td>-</td><td><strong>75</strong></td><td><strong>19</strong></td><td><strong>37</strong></td><td><strong>4</strong></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Modal: Edit Username -->
   <div class="modal fade" id="editUsernameModal" tabindex="-1" aria-labelledby="editUsernameModalLabel" aria-hidden="true">
