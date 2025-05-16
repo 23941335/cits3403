@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <!-- list of games/rounds played in this tournament -->
+    <!-- game tables -->
     <div class="col-md-8">
       <div class="card h-100">
         <div class="card-body">
@@ -114,7 +114,7 @@
     </div>
   </div>
 
-  <!-- radar charts above cards -->
+  <!-- radar charts -->
   <div class="row mt-4 mb-3">
     <div class="col-md-6">
       <div class="card">
@@ -153,7 +153,18 @@
   </div>
 </div>
 
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Injected Radar Data -->
+<script id="radar-data" type="application/json">
+  {{ radar_data | tojson }}
+</script>
+<script id="team-radar-data" type="application/json">
+  {{ team_radar_data | tojson }}
+</script>
+
+<!-- Radar Chart Init -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const playerStats = JSON.parse(document.getElementById('radar-data').textContent);
@@ -227,89 +238,5 @@
       }
     });
   });
-</script>
-<script id="radar-data" type="application/json">
-  {{ radar_data | tojson }}
-</script>
-<script id="team-radar-data" type="application/json">
-  {{ team_radar_data | tojson }}
-  document.addEventListener('DOMContentLoaded', function () {
-    const playerStats = JSON.parse(document.getElementById('radar-data').textContent);
-    const teamStats = JSON.parse(document.getElementById('team-radar-data').textContent);
-
-    new Chart(document.getElementById('radarChartCombat'), {
-      type: 'radar',
-      data: {
-        labels: ['Damage', 'Healing', 'Blocked'],
-        datasets: [
-          {
-            label: 'Player',
-            data: [playerStats.avg_damage, playerStats.avg_healing, playerStats.avg_blocked],
-            fill: true,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-          },
-          {
-            label: 'Team',
-            data: [teamStats.avg_damage, teamStats.avg_healing, teamStats.avg_blocked],
-            fill: true,
-            backgroundColor: 'rgba(255, 159, 64, 0.2)',
-            borderColor: 'rgba(255, 159, 64, 1)',
-            pointBackgroundColor: 'rgba(255, 159, 64, 1)'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: 'Combat Stats' }
-        },
-        scales: {
-          r: { suggestedMin: 0 }
-        }
-      }
-    });
-
-    new Chart(document.getElementById('radarChartKills'), {
-      type: 'radar',
-      data: {
-        labels: ['Kills', 'Deaths', 'Assists'],
-        datasets: [
-          {
-            label: 'Player',
-            data: [playerStats.avg_kills, playerStats.avg_deaths, playerStats.avg_assists],
-            fill: true,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-          },
-          {
-            label: 'Team',
-            data: [teamStats.avg_kills, teamStats.avg_deaths, teamStats.avg_assists],
-            fill: true,
-            backgroundColor: 'rgba(255, 159, 64, 0.2)',
-            borderColor: 'rgba(255, 159, 64, 1)',
-            pointBackgroundColor: 'rgba(255, 159, 64, 1)'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: 'Kill Stats' }
-        },
-        scales: {
-          r: { suggestedMin: 0 }
-        }
-      }
-    });
-  });
-</script>
-<script id="radar-data" type="application/json">
-  {{ radar_data | tojson }}
-</script>
-<script id="team-radar-data" type="application/json">
-  {{ team_radar_data | tojson }}
 </script>
 {% endblock %}
