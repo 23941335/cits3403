@@ -1,5 +1,5 @@
 from app import app, db, models, forms
-from flask import render_template, redirect, flash, request, jsonify
+from flask import render_template, redirect, flash, request, jsonify, session
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from data_import import import_csv
@@ -8,9 +8,24 @@ import os
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 from collections import defaultdict
+from functools import wraps
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
+
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            # Store the requested URL in the session
+            session['next'] = request.url
+            return redirect(f"/account/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 
 @app.route("/")
 @app.route("/home")
@@ -62,8 +77,16 @@ def api_login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password", "danger")
             return redirect("/account/login")
+        
         login_user(user, remember=form.remember_me.data)
+
+        if 'next' in session:
+            next_page = session.get('next')
+            session.pop('next')
+            if next_page:
+                return redirect(next_page)
         return redirect("/home")
+
     flash("Invalid username or password", "danger")
     return redirect("/account/login")
 
