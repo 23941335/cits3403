@@ -48,8 +48,7 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Title</th>
+                <th>Tournament</th>
                 <th>Start Time</th>
                 <th>Created At</th>
                 <th>Visibility</th>
@@ -59,7 +58,6 @@
             <tbody>
               {% for t in tournaments %}
               <tr>
-                <td>{{ t.id }}</td>
                 <td>{{ t.title }}</td>
                 <td>{{ t.start_time.strftime('%Y-%m-%d %H:%M') if t.start_time else 'N/A' }}</td>
                 <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else 'N/A' }}</td>
