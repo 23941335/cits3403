@@ -9,6 +9,7 @@ from datetime import datetime
 from sqlalchemy.orm import selectinload
 from collections import defaultdict
 from functools import wraps
+from app.consts import *
 
 if not app.config.get('SECRET_KEY'):
     raise ValueError("Please set the environment variable SECRET_KEY")
@@ -448,8 +449,9 @@ def api_get_tournaments():
     filtered_tournaments = []
     
     for t in tournaments:
+        # TODO: refactor / clean using new permissions functions
         # Get owners and shared users
-        owners = [tu.user for tu in t.users if tu.tournament_role.role_name == 'tournament_owner']
+        owners = [tu.user for tu in t.users if tu.tournament_role.role_name == ROLE.OWNER]
         owner_ids = [user.id for user in owners if user]
         
         is_owner = current_user.is_authenticated and current_user.id in owner_ids

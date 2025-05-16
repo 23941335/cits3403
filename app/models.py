@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from app.consts import *
 
 # NOTE:
 # 1) DATATYPES: I have used Text here as the datatype for strings. This is the only option
