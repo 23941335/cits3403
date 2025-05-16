@@ -45,8 +45,10 @@ def populate_heros():
 def db_add_role_permission(role_name, permission_name):
     role = db.session.query(Role).filter_by(role_name=role_name).first()
     permission = db.session.query(Permission).filter_by(permission=permission_name).first()
-    if not role or not permission:
-        raise sa_exc.NoResultFound("Role or permission does not exist!")
+    if not role:
+        raise sa_exc.NoResultFound(f"Role '{role_name}' does not exist!")
+    if not permission:
+        raise sa_exc.NoResultFound(f"Permission '{permission_name}' does not exist!")
     
     exists = db.session.query(RolePermissions).filter_by(role_id=role.id, permission_id=permission.id).first()
     if not exists:
@@ -67,8 +69,8 @@ def populate_role_permissions():
     inserted = 0
     skipped = 0
     for role in ROLE_PERMISSIONS:
-        for permissions in ROLE_PERMISSIONS[role]:
-            insert_succeeded = db_add_hero(hero['name'], hero_role)
+        for permission in ROLE_PERMISSIONS[role]:
+            insert_succeeded = db_add_role_permission(role, permission)
             inserted += (1 if insert_succeeded else 0)
             skipped += (1 if not insert_succeeded else 0)
     print(f"Inserted {inserted} records. Skipped {skipped} records.")
@@ -92,6 +94,7 @@ if __name__ == '__main__':
         # reset_tables([Role, Permission, RolePermissions, Hero, HeroRole, GameMode, Visibility, Map])
         Role.populate_with_list('role_name', [role.value for role in ROLE])
         Permission.populate_with_list('permission', [permission.value for permission in PERMISSION])
+        populate_role_permissions()
         HeroRole.populate_with_list('role_name', ['vanguard', 'duelist', 'strategist'])
         GameMode.populate_with_list('game_mode_name', ['domination', 'convoy', 'convergence'])
         Visibility.populate_with_list('visibility', ['public', 'private'])
