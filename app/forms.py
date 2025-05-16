@@ -90,8 +90,6 @@ class CreateTournamentForm(FlaskForm):
         ]
     )
 
-    # TODO: team validation
-
     csv_file = FileField(
         'CSV Upload (Optional)',
         validators=[
