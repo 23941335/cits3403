@@ -42,8 +42,11 @@ Depending on OS:
 
 ```
 pip install -r requirements.txt
-export SECRET_KEY='somevaluehere'
 ```
+`export SECRET_KEY='somevaluehere'` (Linux/MacOS/WSL)
+
+`set SECRET_KEY=somevaluehere` (Windows CMD)
+
 #### Build the Database:
 ```
 flask db upgrade
