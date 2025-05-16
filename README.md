@@ -74,7 +74,7 @@ By default, Chrome browser is used for UI testing, and the driver will be automa
 
 ### Running Unit Tests
 
-Navigate to the project's root directory, make sure your test environment is clean and ready. 
+Navigate to the project's root directory, make sure your test environment is clean and ready. You must be in the virtual environment as explained above.
 
 ```bash
 python -m unittest discover -s app/testing/unit
