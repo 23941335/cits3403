@@ -12,7 +12,7 @@ TODO: ensure above fulfills: "a description of the purpose of the application, e
 | 23941335       | George Brice    | 23941335        |
 | 22666335       | Koda(Zhengxun) Lan        | Kod4-lan        |
 | 23769985       | Max Moltoni     | SuperMax732     |
-| 24240636       | Dongkai Liu Liu | itchat          |
+| 24240636       | Dongkai Liu     | itchat          |
 
 ## Planning and Meeting Notes
 https://github.com/23941335/cits3403/blob/main/planning.md
@@ -88,6 +88,8 @@ flask db upgrade
 This will automatically generate migration scripts that can be used to upgrade (or downgrade) the database version as it changes over time without losing the data stored in it. 
 
 ## Testing
+
+Note: Selenium testing requires that you have Google Chrome installed.
 
 Separated into unit tests and Selenium tests in `app/testing/unit` and `app/testing/selenium`.
 
