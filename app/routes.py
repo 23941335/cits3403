@@ -277,7 +277,7 @@ def share():
                 
                 if not existing_tu:
                     user = db.session.query(models.User).where(models.User.id == user_id).one()
-                    role = db.session.query(models.Role).filter_by(role_name=ROLE.DEFAULT)
+                    role = db.session.query(models.Role).filter_by(role_name=ROLE.DEFAULT).one()
                     tournament_user = models.TournamentUsers(
                         tournament_id=form.tid.data,
                         user_id=user.id,
