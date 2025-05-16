@@ -42,17 +42,17 @@
     <!-- Right: User's tournaments -->
     <div class="col-md-8">
       <div class="card h-100">
-        <div class="card-body">
+        <div class="card-body table-responsive">
           <h5 class="card-title">Tournaments You Uploaded</h5>
           {% if tournaments %}
-          <table class="table table-striped">
+          <table class="table table-striped table-custom">
             <thead>
               <tr>
-                <th>Tournament</th>
-                <th>Start Time</th>
-                <th>Created At</th>
-                <th>Visibility</th>
-                <th>Action</th>
+                <th class="col-30">Tournament</th>
+                <th class="col-20">Start Time</th>
+                <th class="col-20">Created At</th>
+                <th class="col-10">Visibility</th>
+                <th class="col-20">Action</th>
               </tr>
             </thead>
             <tbody>
