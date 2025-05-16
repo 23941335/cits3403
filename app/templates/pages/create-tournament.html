@@ -62,11 +62,6 @@
           </div>
 
           <div class="mb-3">
-            <label for="description" class="form-label">Teams</label>
-            <textarea class="form-control" id="teams" name="teams" required maxlength="1000"></textarea>
-          </div>
-
-          <div class="mb-3">
             {{ form.csv_file.label(class="form-label", for="results_file") }}
             {{ form.csv_file(class="form-control" + (" is-invalid" if form.csv_file.errors else ""), id="results_file")
             }}
