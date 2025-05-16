@@ -69,9 +69,15 @@ class LoginForm(FlaskForm):
     #         raise ValidationError('username is Invalid.')
 
 class CreateTournamentForm(FlaskForm):
-    name = StringField('Tournament Name', validators=[InputRequired(message="Tournament Name is required.")])
-    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[InputRequired(message="Tournament Start Time is required.")])
-    description = StringField('Tournament Description', validators=[InputRequired(message="Tournament Description is required.")])
+    name = StringField('Tournament Name', validators=[
+        InputRequired(message="Tournament Name is required."),
+        Length(min=1, max=256, message="Tournament title must be between 1-256 characters")
+    ])
+    start_time = DateTimeLocalField("Tournament Start Time",format="%Y-%m-%dT%H:%M",validators=[Optional()])
+    description = StringField('Tournament Description', validators=[
+        InputRequired(message="Tournament Description is required."),
+        Length(min=1, max=512, message="Description must be between 1-512 characters")
+    ])
 
     visibility = SelectField(
         'Tournament Visibility',  coerce=int,
