@@ -32,8 +32,13 @@
         <div class="d-flex justify-content-around text-center">
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
                 <p class="mb-1" style="font-size: 0.9rem;">Winning Team</p>
-                <p id="winning-team" style="font-size: 1.5rem; font-weight: bold;">{{ game.team_a.team_name if game.winning_team == game.team_a.id else
-        game.team_b.team_name }}</p>
+                <p id="winning-team" style="font-size: 1.5rem; font-weight: bold;">
+                    {% if game.is_draw %}
+                        Draw
+                    {% else %}
+                        {{ game.team_a.team_name if game.winning_team == game.team_a.id else game.team_b.team_name }}
+                    {% endif %}
+                </p>
             </div>
             <div class="p-2 rounded" style="background-color: #555; flex: 1; margin: 0 5px;">
                 <p class="mb-1" style="font-size: 0.9rem;">MVP</p>
