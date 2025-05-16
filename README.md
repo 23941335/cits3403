@@ -66,7 +66,7 @@ Any other requirements listed in the requirements.txt are dependencies of these 
 
 ## Testing
 
-Note: Selenium testing requires that you have Google Chrome installed.
+Note: Selenium testing requires that you have Google Chrome installed, and that you have followed the setup instructions above.
 
 Separated into unit tests and Selenium tests in `app/testing/unit` and `app/testing/selenium`.
 
